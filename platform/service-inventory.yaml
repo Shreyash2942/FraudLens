@@ -1,0 +1,78 @@
+version: v1
+project: FraudLens
+runtime_source:
+  repository: https://github.com/Shreyash2942/Data-Lab.git
+  ownership_model: external_runtime_reference
+  packaging_note: current local runtime may package all services inside one actual container
+warehouse_strategy:
+  target_platform: snowflake
+  local_surrogate:
+    - spark
+    - hive
+  rationale: cost_controlled_local_development_and_testing
+services:
+  - service_name: airflow
+    role: orchestration
+    expected_endpoint: http://localhost:8080
+    auth_mode: username_password
+    source_status: advertised_in_datalab_readme
+    fraudlens_dependency:
+      - airflow_dags
+      - orchestration_control_plane
+      - future_lineage_emission
+  - service_name: postgresql
+    role: metadata_storage
+    expected_endpoint: postgresql://localhost:5432
+    auth_mode: database_credentials
+    source_status: advertised_in_datalab_readme
+    fraudlens_dependency:
+      - airflow_metadata
+      - service_metadata
+      - future_platform_state
+  - service_name: minio
+    role: object_storage
+    expected_endpoint: http://localhost:9000
+    auth_mode: access_key_secret_key
+    source_status: expected_fraudlens_platform_capability
+    fraudlens_dependency:
+      - raw_data_landing
+      - staged_file_exchange
+      - synthetic_dataset_storage
+  - service_name: prometheus
+    role: metrics_collection
+    expected_endpoint: http://localhost:9090
+    auth_mode: none_or_local_basic_auth
+    source_status: expected_fraudlens_platform_capability
+    fraudlens_dependency:
+      - runtime_observability
+      - pipeline_health
+      - service_metrics
+  - service_name: grafana
+    role: monitoring_visualization
+    expected_endpoint: http://localhost:3000
+    auth_mode: username_password
+    source_status: expected_fraudlens_platform_capability
+    fraudlens_dependency:
+      - dashboards
+      - operational_monitoring
+      - incident_triage
+  - service_name: marquez
+    role: lineage_backend
+    expected_endpoint: http://localhost:3003
+    auth_mode: none_or_local_basic_auth
+    source_status: expected_fraudlens_platform_capability
+    fraudlens_dependency:
+      - lineage_visualization
+      - dataset_dependency_analysis
+  - service_name: openlineage
+    role: lineage_protocol
+    expected_endpoint: http://localhost:5000
+    auth_mode: none
+    source_status: expected_fraudlens_platform_capability
+    fraudlens_dependency:
+      - airflow_lineage_emission
+      - dbt_lineage_emission
+      - metadata_exchange
+notes:
+  capability_model: FraudLens tracks logical platform capabilities even when the local runtime packages them inside one container
+  portfolio_position: local_runtime_is_a_sandbox_not_a_claim_of_production_topology

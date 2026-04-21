@@ -15,8 +15,10 @@ FraudLens is delivered in controlled phases. Each phase produces a testable and 
 
 ### Phase 1 - Platform Foundation
 
-- connect the repo to the already available Docker platform environment
-- establish implementation entry points for Airflow, dbt, monitoring, and warehouse assets
+- integrate FraudLens with the external `Shreyash2942/Data-Lab` runtime environment
+- define local configuration contracts and service inventory for Airflow, PostgreSQL, MinIO, Prometheus, Grafana, and Marquez/OpenLineage
+- document validation, dependencies, and runtime expectations without duplicating the Docker stack in this repo
+- treat the runtime as a local all-in-one sandbox when needed, while preserving Snowflake as the target warehouse direction
 
 ### Phase 2 - Dataset And Data Design
 

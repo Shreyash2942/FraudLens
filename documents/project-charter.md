@@ -25,6 +25,15 @@ Fraud analytics programs often suffer from fragmented payment data, inconsistent
 
 Phase 0 does not implement those components. It defines the governed contract structure that later phases will realize.
 
+## Cost-Aware Delivery Position
+
+- the project is Snowflake-centered in its target architecture
+- local development does not need to run fully inside Snowflake
+- Data-Lab, including Spark and Hive, can be used behind the scenes to replicate selected warehouse behaviors for development and testing
+- only the subset of work that benefits from real Snowflake validation needs to run in the Snowflake cloud account
+
+This keeps the project realistic and professional without pretending the local sandbox is identical to the final cloud platform.
+
 ## Modeling Direction
 
 - ISO 20022-inspired semantics for payment instructions, payment transactions, parties, accounts, amounts, and currency handling
