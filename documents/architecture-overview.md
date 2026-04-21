@@ -4,6 +4,14 @@
 
 FraudLens separates business-domain design from technical implementation so that later warehouse and analytics work inherits stable entity boundaries, naming, and controls.
 
+## Environment Strategy
+
+- target analytical platform: Snowflake
+- local development and cost-control platform: Data-Lab
+- local warehouse surrogate for experimentation and selected testing: Spark and Hive
+
+This project is intentionally designed as a professional portfolio artifact rather than a full production deployment. The local runtime may package multiple logical capabilities inside one container if that is the most practical way to iterate without unnecessary Snowflake spend.
+
 ## Domain Groups
 
 - `payments` payment instruction and transaction movement
@@ -45,4 +53,4 @@ The current repository reserves conventional technical roots for future implemen
 - `data/`
 - `platform/`
 
-Those locations are placeholders only in Phase 0.
+Those locations began as placeholders in Phase 0. In Phase 1, `platform/` documents how FraudLens connects to the external Data-Lab runtime while keeping Snowflake as the long-term analytical target.
