@@ -1,0 +1,40 @@
+version: v1
+project: FraudLens
+labels:
+  phase:
+    - phase:0
+    - phase:1
+    - phase:2
+    - phase:3
+    - phase:4
+    - phase:5
+    - phase:6
+    - phase:7
+    - phase:8
+    - phase:9
+    - phase:10
+  type:
+    - type:epic
+    - type:task
+    - type:bug
+    - type:docs
+  area:
+    - area:platform
+    - area:data
+    - area:warehouse
+    - area:dbt
+    - area:airflow
+    - area:observability
+    - area:cicd
+    - area:bi
+    - area:governance
+  priority:
+    - priority:p0
+    - priority:p1
+    - priority:p2
+    - priority:p3
+  status:
+    - status:ready
+    - status:in-progress
+    - status:blocked
+    - status:review

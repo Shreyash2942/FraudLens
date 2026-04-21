@@ -1,0 +1,54 @@
+version: v1
+domain: payments
+entity_name: payment_transaction
+classification: critical
+description: Execution or settlement event associated with a payment instruction.
+standards_alignment:
+  iso_20022_inspired: true
+  bian_inspired_domain: payments
+ownership:
+  business_owner: Fraud Analytics Product Owner
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: payment_transaction_id
+relationships:
+  - payment_instruction_id -> payments.payment_instruction.payment_instruction_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: payment_transaction_id
+    type: string
+    required: true
+    description: Stable business identifier for the executed payment movement.
+  - name: payment_instruction_id
+    type: string
+    required: true
+    description: Link to the originating instruction.
+  - name: transaction_status
+    type: string
+    required: true
+    allowed_values: [booked, pending_settlement, reversed, declined, returned]
+    description: Execution outcome state.
+  - name: booking_amount
+    type: decimal
+    required: true
+    description: Amount booked or attempted on the transaction.
+  - name: transaction_currency_code
+    type: string
+    required: true
+    description: ISO 4217 currency code.
+  - name: settlement_at
+    type: timestamp
+    required: false
+    description: Settlement timestamp when known.
+  - name: merchant_category_code
+    type: string
+    required: false
+    description: Merchant category reference for card-like transactions.
+  - name: reversal_reason_code
+    type: string
+    required: false
+    description: Reason for reversal or return when applicable.

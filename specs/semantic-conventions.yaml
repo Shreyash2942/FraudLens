@@ -1,0 +1,50 @@
+version: v1
+metadata:
+  artifact: semantic_conventions
+  project: FraudLens
+  purpose: Common business semantics shared across governed contracts
+common_identifier_rules:
+  primary_key_pattern: "<entity>_id"
+  foreign_key_rule: "Reuse referenced business identifiers without alias drift"
+  source_trace_fields:
+    - record_source
+    - source_record_id
+    - lineage_run_id
+status_rules:
+  naming_suffix: "_status"
+  policy:
+    - statuses must represent business lifecycle state
+    - statuses must use enumerated values or documented value sets
+    - free-text statuses are not allowed for critical entities
+timestamp_rules:
+  utc_required: true
+  common_fields:
+    - event_at
+    - created_at
+    - updated_at
+    - effective_at
+amount_rules:
+  naming_suffix: "_amount"
+  representation: decimal(18,2) target semantic
+  companion_currency_field: "<amount_field>_currency_code or transaction_currency_code"
+currency_rules:
+  standard: ISO_4217
+  field_name_pattern: "*_currency_code"
+party_role_definitions:
+  debtor: Account owner or party initiating value movement
+  creditor: Party receiving value or benefit
+  merchant: Accepting counterparty in card or account payments
+  customer: Party relationship holder with the financial institution
+  analyst: Fraud operations user performing investigative work
+  decision_maker: Person or service authorized to adjudicate an alert or case
+required_audit_fields:
+  - record_source
+  - source_record_id
+  - ingested_at
+  - effective_at
+  - created_at
+  - updated_at
+  - created_by
+  - updated_by
+  - change_reason_code
+  - lineage_run_id

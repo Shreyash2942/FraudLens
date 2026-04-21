@@ -1,0 +1,80 @@
+version: v1
+domain: payments
+entity_name: payment_instruction
+classification: critical
+description: Canonical payment intent raised through a banking channel before or during execution.
+standards_alignment:
+  iso_20022_inspired: true
+  bian_inspired_domain: payments
+ownership:
+  business_owner: Fraud Analytics Product Owner
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: payment_instruction_id
+  natural_keys:
+    - source_record_id
+relationships:
+  - debtor_account_id -> accounts.deposit_account.deposit_account_id
+  - debtor_party_id -> parties.party.party_id
+  - creditor_party_id -> parties.party.party_id
+  - channel_event_id -> channels.channel_event.channel_event_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+lineage_intent:
+  source_to_bronze: raw payment event or synthetic payment instruction
+  downstream_targets:
+    - payment_transaction
+    - risk_signal
+fields:
+  - name: payment_instruction_id
+    type: string
+    required: true
+    description: Stable business identifier for the instructed payment.
+  - name: instruction_status
+    type: string
+    required: true
+    allowed_values: [pending, accepted, rejected, cancelled, expired]
+    description: Business lifecycle state of the payment intent.
+  - name: debtor_account_id
+    type: string
+    required: true
+    description: Originating deposit account.
+  - name: debtor_party_id
+    type: string
+    required: true
+    description: Party instructing the payment.
+  - name: creditor_party_id
+    type: string
+    required: true
+    description: Receiving party or merchant.
+  - name: instructed_amount
+    type: decimal
+    required: true
+    description: Requested payment amount.
+  - name: instructed_currency_code
+    type: string
+    required: true
+    description: ISO 4217 currency for the instructed amount.
+  - name: payment_purpose_code
+    type: string
+    required: false
+    description: Business purpose or category of the payment.
+  - name: channel_event_id
+    type: string
+    required: true
+    description: Origin channel context.
+  - name: card_id
+    type: string
+    required: false
+    description: Card instrument when applicable.
+  - name: device_id
+    type: string
+    required: false
+    description: Device context when captured.
+  - name: event_at
+    type: timestamp
+    required: true
+    description: Time the instruction was raised.

@@ -1,0 +1,41 @@
+version: v1
+domain: dispositions
+entity_name: case_disposition
+classification: critical
+description: Final business outcome for a fraud case after investigation and adjudication are complete.
+standards_alignment:
+  bian_inspired_domain: case_resolution
+ownership:
+  business_owner: Fraud Operations Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: disposition_id
+relationships:
+  - decision_id -> decisions.decision_record.decision_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: disposition_id
+    type: string
+    required: true
+    description: Stable identifier for the final disposition.
+  - name: decision_id
+    type: string
+    required: true
+    description: Decision driving the disposition.
+  - name: disposition_code
+    type: string
+    required: true
+    allowed_values: [confirmed_fraud, false_positive, customer_error, recovered, written_off]
+    description: Final business resolution.
+  - name: financial_impact_amount
+    type: decimal
+    required: false
+    description: Monetary impact recognized after disposition.
+  - name: outcome_at
+    type: timestamp
+    required: true
+    description: Timestamp of final recorded outcome.

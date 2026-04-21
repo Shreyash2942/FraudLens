@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: FraudLens Standards
+    url: https://github.com/Shreyash2942/FraudLens
+    about: Review repository standards, specs, and governance artifacts before opening an issue.

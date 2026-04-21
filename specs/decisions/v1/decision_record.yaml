@@ -1,0 +1,46 @@
+version: v1
+domain: decisions
+entity_name: decision_record
+classification: critical
+description: Decision taken on a fraud case, alert, or payment treatment path.
+standards_alignment:
+  bian_inspired_domain: fraud_decisioning
+ownership:
+  business_owner: Fraud Risk Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: decision_id
+relationships:
+  - fraud_case_id -> cases.fraud_case.fraud_case_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: decision_id
+    type: string
+    required: true
+    description: Stable identifier for the decision.
+  - name: fraud_case_id
+    type: string
+    required: true
+    description: Related fraud case.
+  - name: decision_type
+    type: string
+    required: true
+    allowed_values: [approve, decline, hold, challenge, file_sar, close_no_fraud]
+    description: Decision taken for the case.
+  - name: decision_status
+    type: string
+    required: true
+    allowed_values: [proposed, approved, executed, superseded]
+    description: Lifecycle state of the decision.
+  - name: decision_maker_party_id
+    type: string
+    required: true
+    description: Party who approved or produced the decision.
+  - name: decided_at
+    type: timestamp
+    required: true
+    description: Timestamp of decision approval.

@@ -1,0 +1,37 @@
+version: v1
+domain: cards
+entity_name: payment_card
+classification: governed
+description: Card instrument context associated with payment activity.
+standards_alignment:
+  bian_inspired_domain: card_transaction_capture
+ownership:
+  business_owner: Cards Product Lead
+  technical_steward: Data Platform Lead
+  approval_model: steward_review
+keys:
+  primary_key: card_id
+relationships:
+  - linked_account_id -> accounts.deposit_account.deposit_account_id
+controls:
+  financial_reporting_relevant: false
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: card_id
+    type: string
+    required: true
+    description: Stable identifier for the card instrument.
+  - name: linked_account_id
+    type: string
+    required: true
+    description: Deposit account supporting the card.
+  - name: card_status
+    type: string
+    required: true
+    allowed_values: [active, blocked, expired, reissued, closed]
+    description: Current card lifecycle status.
+  - name: card_network_code
+    type: string
+    required: false
+    description: Card network or scheme code.

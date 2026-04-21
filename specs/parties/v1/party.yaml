@@ -1,0 +1,41 @@
+version: v1
+domain: parties
+entity_name: party
+classification: critical
+description: Canonical party record representing a person, merchant, organization, or operational actor.
+standards_alignment:
+  iso_20022_inspired: true
+  bian_inspired_domain: party_reference_data
+ownership:
+  business_owner: Customer And Counterparty Data Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: party_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: party_id
+    type: string
+    required: true
+    description: Stable business identifier for the party.
+  - name: party_type
+    type: string
+    required: true
+    allowed_values: [individual, organization, merchant, analyst, service]
+    description: Business classification of the party.
+  - name: party_status
+    type: string
+    required: true
+    allowed_values: [active, inactive, restricted, closed]
+    description: Business status for the party relationship.
+  - name: domicile_country_code
+    type: string
+    required: false
+    description: ISO country code for legal or residential domicile.
+  - name: risk_segment_code
+    type: string
+    required: false
+    description: Assigned risk segment for analytics and control use.

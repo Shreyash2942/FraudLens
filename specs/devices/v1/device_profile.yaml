@@ -1,0 +1,35 @@
+version: v1
+domain: devices
+entity_name: device_profile
+classification: governed
+description: Device identity and security posture used to evaluate payment and login risk.
+standards_alignment:
+  bian_inspired_domain: device_history
+ownership:
+  business_owner: Fraud Operations Lead
+  technical_steward: Data Platform Lead
+  approval_model: steward_review
+keys:
+  primary_key: device_id
+controls:
+  financial_reporting_relevant: false
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: device_id
+    type: string
+    required: true
+    description: Stable device fingerprint or synthetic device identifier.
+  - name: device_status
+    type: string
+    required: true
+    allowed_values: [trusted, known, new, risky, blocked]
+    description: Current trust state of the device.
+  - name: operating_system_code
+    type: string
+    required: false
+    description: Operating system family or code.
+  - name: device_risk_band
+    type: string
+    required: false
+    description: Simplified risk band derived from device signals.

@@ -1,0 +1,39 @@
+version: v1
+domain: channels
+entity_name: channel_event
+classification: governed
+description: Origin and session context for a customer or payment interaction.
+standards_alignment:
+  bian_inspired_domain: channel_activity_history
+ownership:
+  business_owner: Digital Channels Lead
+  technical_steward: Data Platform Lead
+  approval_model: steward_review
+keys:
+  primary_key: channel_event_id
+controls:
+  financial_reporting_relevant: false
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: channel_event_id
+    type: string
+    required: true
+    description: Stable business identifier for the channel interaction.
+  - name: channel_code
+    type: string
+    required: true
+    allowed_values: [mobile, online, branch, atm, api, contact_center]
+    description: Originating channel.
+  - name: session_id
+    type: string
+    required: false
+    description: Session or conversation identifier.
+  - name: branch_id
+    type: string
+    required: false
+    description: Branch identifier when the event occurred in a branch context.
+  - name: event_at
+    type: timestamp
+    required: true
+    description: Timestamp of the interaction.

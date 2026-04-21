@@ -1,0 +1,45 @@
+version: v1
+domain: risk
+entity_name: risk_signal
+classification: critical
+description: Scored or rule-based fraud indicator generated for a payment instruction or related interaction.
+standards_alignment:
+  bian_inspired_domain: fraud_evaluation
+ownership:
+  business_owner: Fraud Risk Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: risk_signal_id
+relationships:
+  - payment_instruction_id -> payments.payment_instruction.payment_instruction_id
+controls:
+  financial_reporting_relevant: false
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: risk_signal_id
+    type: string
+    required: true
+    description: Stable identifier for the risk record.
+  - name: payment_instruction_id
+    type: string
+    required: true
+    description: Payment instruction evaluated by the risk process.
+  - name: signal_type_code
+    type: string
+    required: true
+    description: Type of rule, score, or model output produced.
+  - name: signal_score_amount
+    type: decimal
+    required: false
+    description: Numeric signal score when the signal is quantitative.
+  - name: risk_level
+    type: string
+    required: true
+    allowed_values: [low, medium, high, severe]
+    description: Interpreted risk level.
+  - name: event_at
+    type: timestamp
+    required: true
+    description: Time the signal was generated.

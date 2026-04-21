@@ -1,0 +1,14 @@
+version: v1
+project: FraudLens
+milestones:
+  - Phase 0 - Project Initialization And Planning
+  - Phase 1 - Platform Foundation
+  - Phase 2 - Dataset And Data Design
+  - Phase 3 - Warehouse Setup
+  - Phase 4 - Transformation Layer
+  - Phase 5 - Data Quality And Governance
+  - Phase 6 - Orchestration
+  - Phase 7 - Observability And Lineage
+  - Phase 8 - CI/CD
+  - Phase 9 - Analytics And Dashboards
+  - Phase 10 - Finalization And Professionalization

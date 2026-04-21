@@ -1,0 +1,45 @@
+version: v1
+domain: cases
+entity_name: fraud_case
+classification: critical
+description: Fraud operations case opened to investigate one or more related alerts or suspicious events.
+standards_alignment:
+  bian_inspired_domain: case_management
+ownership:
+  business_owner: Fraud Operations Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: fraud_case_id
+relationships:
+  - primary_alert_id -> alerts.fraud_alert.fraud_alert_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: fraud_case_id
+    type: string
+    required: true
+    description: Stable case identifier.
+  - name: primary_alert_id
+    type: string
+    required: true
+    description: Triggering alert for the case.
+  - name: case_status
+    type: string
+    required: true
+    allowed_values: [open, assigned, investigating, pending_decision, closed]
+    description: Case lifecycle status.
+  - name: assigned_analyst_party_id
+    type: string
+    required: false
+    description: Analyst currently assigned to the case.
+  - name: opened_at
+    type: timestamp
+    required: true
+    description: Time the case was opened.
+  - name: closed_at
+    type: timestamp
+    required: false
+    description: Time the case was closed.
