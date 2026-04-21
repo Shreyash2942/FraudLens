@@ -1,0 +1,46 @@
+version: v1
+domain: alerts
+entity_name: fraud_alert
+classification: critical
+description: Operational alert raised from risk evidence that may require analyst review or automated treatment.
+standards_alignment:
+  bian_inspired_domain: fraud_alert_management
+ownership:
+  business_owner: Fraud Operations Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: fraud_alert_id
+relationships:
+  - risk_signal_id -> risk.risk_signal.risk_signal_id
+controls:
+  financial_reporting_relevant: false
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: fraud_alert_id
+    type: string
+    required: true
+    description: Stable identifier for the alert.
+  - name: risk_signal_id
+    type: string
+    required: true
+    description: Risk signal that caused the alert.
+  - name: alert_status
+    type: string
+    required: true
+    allowed_values: [open, triaged, escalated, resolved, cancelled]
+    description: Operational lifecycle state of the alert.
+  - name: alert_severity
+    type: string
+    required: true
+    allowed_values: [low, medium, high, critical]
+    description: Operational severity of the alert.
+  - name: queue_code
+    type: string
+    required: false
+    description: Queue or workbasket owning initial review.
+  - name: created_at
+    type: timestamp
+    required: true
+    description: Timestamp the alert was created.

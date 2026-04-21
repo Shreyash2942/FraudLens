@@ -1,0 +1,68 @@
+version: v1
+project: FraudLens
+relationships:
+  - from: payments.payment_instruction
+    to: accounts.deposit_account
+    via: debtor_account_id
+    cardinality: many_to_one
+    purpose: identifies the originating account
+  - from: payments.payment_instruction
+    to: parties.party
+    via: debtor_party_id
+    cardinality: many_to_one
+    purpose: identifies the initiating party
+  - from: payments.payment_instruction
+    to: parties.party
+    via: creditor_party_id
+    cardinality: many_to_one
+    purpose: identifies the receiving party
+  - from: payments.payment_instruction
+    to: channels.channel_event
+    via: channel_event_id
+    cardinality: many_to_one
+    purpose: captures origination touchpoint
+  - from: payments.payment_instruction
+    to: cards.payment_card
+    via: card_id
+    cardinality: many_to_one
+    purpose: links card-present or card-not-present payment context
+  - from: payments.payment_instruction
+    to: devices.device_profile
+    via: device_id
+    cardinality: many_to_one
+    purpose: captures device and session context
+  - from: payments.payment_transaction
+    to: payments.payment_instruction
+    via: payment_instruction_id
+    cardinality: many_to_one
+    purpose: execution event for the instructed payment
+  - from: risk.risk_signal
+    to: payments.payment_instruction
+    via: payment_instruction_id
+    cardinality: many_to_one
+    purpose: stores fraud indicators generated for the payment
+  - from: alerts.fraud_alert
+    to: risk.risk_signal
+    via: risk_signal_id
+    cardinality: many_to_one
+    purpose: alert generated from scored or rule-based risk evidence
+  - from: cases.fraud_case
+    to: alerts.fraud_alert
+    via: primary_alert_id
+    cardinality: many_to_one
+    purpose: case opened from a triggering alert
+  - from: investigations.investigation_event
+    to: cases.fraud_case
+    via: fraud_case_id
+    cardinality: many_to_one
+    purpose: analyst action or evidence captured during investigation
+  - from: decisions.decision_record
+    to: cases.fraud_case
+    via: fraud_case_id
+    cardinality: many_to_one
+    purpose: adjudication or treatment decision tied to a case
+  - from: dispositions.case_disposition
+    to: decisions.decision_record
+    via: decision_id
+    cardinality: many_to_one
+    purpose: final reporting and closure outcome

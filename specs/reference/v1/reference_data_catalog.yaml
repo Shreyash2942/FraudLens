@@ -1,0 +1,34 @@
+version: v1
+domain: reference
+entity_name: reference_data_catalog
+classification: governed
+description: Catalog of shared code sets used across FraudLens contracts.
+standards_alignment:
+  bian_inspired_domain: reference_data_directory
+ownership:
+  business_owner: Data Governance Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: code_set_name
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: code_set_name
+    type: string
+    required: true
+    description: Stable name of the shared code set.
+  - name: code_value
+    type: string
+    required: true
+    description: Allowed value within the set.
+  - name: code_description
+    type: string
+    required: true
+    description: Human-readable meaning of the value.
+  - name: is_active
+    type: boolean
+    required: true
+    description: Indicates whether the value is valid for use.

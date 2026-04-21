@@ -1,0 +1,50 @@
+version: v1
+domain: accounts
+entity_name: deposit_account
+classification: critical
+description: Customer-facing deposit account used as the source or destination for payments.
+standards_alignment:
+  iso_20022_inspired: true
+  bian_inspired_domain: current_account
+ownership:
+  business_owner: Core Banking Domain Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: deposit_account_id
+relationships:
+  - primary_party_id -> parties.party.party_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: deposit_account_id
+    type: string
+    required: true
+    description: Stable business identifier for the deposit account.
+  - name: account_status
+    type: string
+    required: true
+    allowed_values: [open, dormant, blocked, closed, suspended]
+    description: Current business status of the account.
+  - name: product_type_code
+    type: string
+    required: true
+    description: Product classification for the account.
+  - name: primary_party_id
+    type: string
+    required: true
+    description: Primary customer or organization linked to the account.
+  - name: account_currency_code
+    type: string
+    required: true
+    description: ISO 4217 base currency of the account.
+  - name: available_balance_amount
+    type: decimal
+    required: false
+    description: Available balance snapshot when captured.
+  - name: opened_at
+    type: timestamp
+    required: true
+    description: Timestamp the account became active.

@@ -1,0 +1,8 @@
+# Default ownership for standards-first artifacts
+* @Shreyash2942
+
+# Specs and standards require explicit review
+/specs/ @Shreyash2942
+/standards/ @Shreyash2942
+/documents/ @Shreyash2942
+/.github/ @Shreyash2942

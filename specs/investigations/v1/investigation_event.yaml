@@ -1,0 +1,41 @@
+version: v1
+domain: investigations
+entity_name: investigation_event
+classification: critical
+description: Analyst or system event recorded during case investigation.
+standards_alignment:
+  bian_inspired_domain: investigation_management
+ownership:
+  business_owner: Fraud Operations Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: investigation_event_id
+relationships:
+  - fraud_case_id -> cases.fraud_case.fraud_case_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: investigation_event_id
+    type: string
+    required: true
+    description: Stable identifier for the investigation event.
+  - name: fraud_case_id
+    type: string
+    required: true
+    description: Related fraud case.
+  - name: investigation_event_type
+    type: string
+    required: true
+    allowed_values: [note_added, evidence_attached, outreach_attempted, review_completed, escalation]
+    description: Type of investigative action recorded.
+  - name: actor_party_id
+    type: string
+    required: true
+    description: Analyst or system actor performing the event.
+  - name: event_at
+    type: timestamp
+    required: true
+    description: Timestamp of the event.
