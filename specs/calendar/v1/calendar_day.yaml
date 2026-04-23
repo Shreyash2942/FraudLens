@@ -1,0 +1,64 @@
+version: v1
+domain: calendar
+entity_name: calendar_day
+classification: governed
+description: Canonical calendar day dimension for period-based reporting and time controls.
+ownership:
+  business_owner: BI Governance Lead
+  technical_steward: Data Platform Lead
+  approval_model: steward_review
+keys:
+  primary_key: calendar_date
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: calendar_date
+    type: date
+    required: true
+    description: Canonical calendar date.
+  - name: calendar_year
+    type: integer
+    required: true
+    description: Four-digit calendar year.
+  - name: calendar_quarter
+    type: string
+    required: true
+    description: Quarter label for the date.
+  - name: calendar_month
+    type: integer
+    required: true
+    description: Numeric month for the date.
+  - name: calendar_month_name
+    type: string
+    required: true
+    description: Month name for the date.
+  - name: week_of_year
+    type: integer
+    required: true
+    description: ISO-like week number for the date.
+  - name: day_of_week
+    type: integer
+    required: true
+    description: Numeric day of week.
+  - name: day_name
+    type: string
+    required: true
+    description: Name of the day of week.
+  - name: is_weekend
+    type: boolean
+    required: true
+    description: Indicates whether the day falls on a weekend.
+  - name: is_month_end
+    type: boolean
+    required: true
+    description: Indicates whether the date is the final day of the month.
+  - name: is_quarter_end
+    type: boolean
+    required: true
+    description: Indicates whether the date is the final day of the quarter.
+  - name: is_holiday
+    type: boolean
+    required: true
+    description: Indicates whether the date is marked as a synthetic holiday.
