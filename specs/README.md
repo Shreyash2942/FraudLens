@@ -17,6 +17,9 @@
 
 - `payments/`
 - `accounts/`
+- `calendar/`
+- `geography/`
+- `organization/`
 - `parties/`
 - `channels/`
 - `cards/`

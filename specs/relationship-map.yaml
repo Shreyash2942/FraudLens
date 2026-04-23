@@ -1,11 +1,81 @@
 version: v1
 project: FraudLens
 relationships:
+  - from: geography.branch_territory
+    to: geography.region
+    via: region_id
+    cardinality: many_to_one
+    purpose: groups branch territories under a management region
+  - from: geography.branch_location
+    to: geography.branch_territory
+    via: branch_territory_id
+    cardinality: many_to_one
+    purpose: links a branch to its territory
+  - from: geography.branch_location
+    to: geography.region
+    via: region_id
+    cardinality: many_to_one
+    purpose: links a branch to its region
+  - from: organization.business_unit
+    to: geography.region
+    via: region_id
+    cardinality: many_to_one
+    purpose: assigns the business unit to a region
+  - from: organization.analyst_team
+    to: organization.business_unit
+    via: business_unit_id
+    cardinality: many_to_one
+    purpose: assigns the analyst team to a business unit
+  - from: organization.analyst_team
+    to: geography.region
+    via: region_id
+    cardinality: many_to_one
+    purpose: assigns the analyst team to a region
+  - from: organization.party_org_assignment
+    to: parties.party
+    via: party_id
+    cardinality: many_to_one
+    purpose: links a party to an effective-dated organizational assignment
+  - from: organization.party_org_assignment
+    to: organization.business_unit
+    via: business_unit_id
+    cardinality: many_to_one
+    purpose: records business-unit assignment for the party
+  - from: organization.party_org_assignment
+    to: organization.analyst_team
+    via: analyst_team_id
+    cardinality: many_to_one
+    purpose: records analyst-team assignment for the party
+  - from: organization.party_org_assignment
+    to: geography.branch_location
+    via: branch_id
+    cardinality: many_to_one
+    purpose: records branch assignment for the party
   - from: payments.payment_instruction
     to: accounts.deposit_account
     via: debtor_account_id
     cardinality: many_to_one
     purpose: identifies the originating account
+  - from: parties.party
+    to: geography.region
+    via: residency_region_id
+    cardinality: many_to_one
+    purpose: records regional residence or registration of the party
+  - from: accounts.deposit_account
+    to: geography.branch_location
+    via: opened_branch_id
+    cardinality: many_to_one
+    purpose: identifies the branch where the account was opened
+  - from: accounts.deposit_account
+    to: organization.business_unit
+    via: servicing_business_unit_id
+    cardinality: many_to_one
+    purpose: identifies the business unit servicing the account
+  - from: accounts.deposit_account
+    to: geography.region
+    via: account_region_id
+    cardinality: many_to_one
+    purpose: identifies the regional ownership for the account
   - from: payments.payment_instruction
     to: parties.party
     via: debtor_party_id
@@ -46,11 +116,36 @@ relationships:
     via: risk_signal_id
     cardinality: many_to_one
     purpose: alert generated from scored or rule-based risk evidence
+  - from: alerts.fraud_alert
+    to: organization.business_unit
+    via: owning_business_unit_id
+    cardinality: many_to_one
+    purpose: identifies the business unit owning the alert
+  - from: alerts.fraud_alert
+    to: organization.analyst_team
+    via: owning_analyst_team_id
+    cardinality: many_to_one
+    purpose: identifies the analyst team owning the alert
   - from: cases.fraud_case
     to: alerts.fraud_alert
     via: primary_alert_id
     cardinality: many_to_one
     purpose: case opened from a triggering alert
+  - from: cases.fraud_case
+    to: organization.business_unit
+    via: owning_business_unit_id
+    cardinality: many_to_one
+    purpose: identifies the business unit owning the case
+  - from: cases.fraud_case
+    to: organization.analyst_team
+    via: owning_analyst_team_id
+    cardinality: many_to_one
+    purpose: identifies the analyst team owning the case
+  - from: cases.fraud_case
+    to: geography.region
+    via: handling_region_id
+    cardinality: many_to_one
+    purpose: identifies the region handling the case
   - from: investigations.investigation_event
     to: cases.fraud_case
     via: fraud_case_id
