@@ -1,0 +1,49 @@
+metadata:
+  name: account_takeover_showcase
+  description: Concentrated account-takeover batch with strong new-device and off-hours signals.
+generation:
+  recommended_profile: medium_demo
+  default_days: 45
+  default_seed: 142
+  batch_style: single_scenario
+  scenario_families:
+    - account_takeover
+    - suspicious_new_device
+    - false_positive
+scenario_controls:
+  scenario_counts:
+    account_takeover: 520
+    suspicious_new_device: 180
+    false_positive: 80
+  confirmed_fraud_target: 620
+  false_positive_target: 160
+  timing_style: concentrated_burst
+lifecycle_controls:
+  risk_signal_count: 1200
+  alert_count: 420
+  case_count: 240
+  decision_count: 220
+  disposition_count: 210
+outcome_controls:
+  decision_mix:
+    decline: 100
+    hold: 70
+    file_sar: 30
+    close_no_fraud: 20
+  disposition_mix:
+    confirmed_fraud: 85
+    recovered: 75
+    written_off: 20
+    false_positive: 30
+  ratio_expectations:
+    alert_ratio: 0.35
+    case_ratio: 0.57
+realism_controls:
+  emphasize_new_device_behavior: true
+  emphasize_new_payees: true
+  emphasize_off_hours: true
+  emphasize_reversals: true
+  emphasize_recoveries: true
+validation:
+  dominant_scenario: account_takeover
+  ratio_tolerance: 0.08

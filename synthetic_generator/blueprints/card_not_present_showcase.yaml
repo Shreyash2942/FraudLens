@@ -1,0 +1,49 @@
+metadata:
+  name: card_not_present_showcase
+  description: High-volume digital card abuse with reversal-heavy transaction outcomes.
+generation:
+  recommended_profile: medium_demo
+  default_days: 35
+  default_seed: 307
+  batch_style: single_scenario
+  scenario_families:
+    - card_not_present
+    - suspicious_new_device
+    - false_positive
+scenario_controls:
+  scenario_counts:
+    card_not_present: 600
+    suspicious_new_device: 200
+    false_positive: 120
+  confirmed_fraud_target: 700
+  false_positive_target: 220
+  timing_style: distributed
+lifecycle_controls:
+  risk_signal_count: 1350
+  alert_count: 500
+  case_count: 280
+  decision_count: 240
+  disposition_count: 220
+outcome_controls:
+  decision_mix:
+    decline: 120
+    hold: 60
+    file_sar: 20
+    close_no_fraud: 20
+    approve: 20
+  disposition_mix:
+    confirmed_fraud: 90
+    recovered: 45
+    written_off: 35
+    false_positive: 35
+    customer_error: 15
+  ratio_expectations:
+    alert_ratio: 0.37
+    case_ratio: 0.56
+realism_controls:
+  emphasize_new_device_behavior: true
+  emphasize_reversals: true
+  emphasize_new_payees: true
+validation:
+  dominant_scenario: card_not_present
+  ratio_tolerance: 0.08
