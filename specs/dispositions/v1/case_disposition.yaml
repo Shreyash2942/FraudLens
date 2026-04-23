@@ -39,3 +39,19 @@ fields:
     type: timestamp
     required: true
     description: Timestamp of final recorded outcome.
+  - name: loss_amount
+    type: decimal
+    required: false
+    description: Gross loss amount recognized for the case.
+  - name: recovered_amount
+    type: decimal
+    required: false
+    description: Amount recovered through fraud operations or chargeback flow.
+  - name: write_off_amount
+    type: decimal
+    required: false
+    description: Amount written off after final resolution.
+  - name: recovery_status_code
+    type: string
+    required: false
+    description: Recovery lifecycle status associated to the disposition.

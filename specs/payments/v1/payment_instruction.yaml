@@ -78,3 +78,23 @@ fields:
     type: timestamp
     required: true
     description: Time the instruction was raised.
+  - name: payment_rail_code
+    type: string
+    required: false
+    description: Payment rail or network used for execution.
+  - name: is_cross_border
+    type: boolean
+    required: false
+    description: Indicates whether the payment is cross-border.
+  - name: merchant_country_code
+    type: string
+    required: false
+    description: Country associated to the merchant or creditor.
+  - name: counterparty_bank_country_code
+    type: string
+    required: false
+    description: Country of the counterparty financial institution.
+  - name: booking_date
+    type: date
+    required: false
+    description: Accounting date associated to the payment instruction.
