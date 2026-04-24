@@ -1,0 +1,55 @@
+version: v1
+domain: organization
+entity_name: party_org_assignment
+classification: governed
+description: Effective-dated organizational assignment linking a party to branch, business unit, and analyst team structures.
+standards_alignment:
+  bian_inspired_domain: resource_assignment_management
+ownership:
+  business_owner: Operations Governance Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: party_org_assignment_id
+relationships:
+  - party_id -> parties.party.party_id
+  - business_unit_id -> organization.business_unit.business_unit_id
+  - analyst_team_id -> organization.analyst_team.analyst_team_id
+  - branch_id -> geography.branch_location.branch_id
+controls:
+  financial_reporting_relevant: false
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: party_org_assignment_id
+    type: string
+    required: true
+    description: Stable identifier for the organizational assignment.
+  - name: party_id
+    type: string
+    required: true
+    description: Party assigned to the organization structure.
+  - name: business_unit_id
+    type: string
+    required: false
+    description: Business unit assignment for the party.
+  - name: analyst_team_id
+    type: string
+    required: false
+    description: Analyst team assignment when the party acts operationally.
+  - name: branch_id
+    type: string
+    required: false
+    description: Branch assignment when the party belongs to a branch footprint.
+  - name: assignment_role_code
+    type: string
+    required: true
+    description: Role of the organizational assignment.
+  - name: effective_from_at
+    type: timestamp
+    required: true
+    description: Start of assignment validity.
+  - name: effective_to_at
+    type: timestamp
+    required: false
+    description: End of assignment validity when closed.

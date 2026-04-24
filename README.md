@@ -52,4 +52,4 @@ Start with these documents:
 
 ## Current Status
 
-Phase 0 is implemented as a repo baseline. Phase 1 is implemented as an external-runtime integration layer with documentation, service contracts, and local configuration examples. Later phases will add executable assets on top of these standards and platform conventions.
+Phase 0 is implemented as a repo baseline. Phase 1 is implemented as an external-runtime integration layer with documentation, service contracts, and local configuration examples. Phase 2 adds a deterministic synthetic dataset generator with mixed and blueprint-curated batch modes, seeded Faker-backed realism, 21 governed CSV datasets, batch-style landing/control/quality outputs, validation reporting, organization-aware dashboard controls, and optional MinIO upload for local data-foundation work.

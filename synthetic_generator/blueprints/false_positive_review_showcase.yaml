@@ -1,0 +1,84 @@
+metadata:
+  name: false_positive_review_showcase
+  description: Review-heavy batch where risky behavior generates alerts but mostly closes as no-fraud.
+generation:
+  recommended_profile: medium_demo
+  default_days: 40
+  default_seed: 411
+  batch_style: multi_scenario
+  scenario_families:
+    - false_positive
+    - suspicious_new_device
+    - burst_velocity
+scenario_controls:
+  scenario_counts:
+    false_positive: 520
+    suspicious_new_device: 160
+    burst_velocity: 90
+  confirmed_fraud_target: 140
+  false_positive_target: 630
+  timing_style: distributed
+lifecycle_controls:
+  risk_signal_count: 1100
+  alert_count: 440
+  case_count: 220
+  decision_count: 200
+  disposition_count: 180
+outcome_controls:
+  decision_mix:
+    close_no_fraud: 120
+    approve: 40
+    challenge: 20
+    decline: 20
+  disposition_mix:
+    false_positive: 120
+    customer_error: 35
+    confirmed_fraud: 10
+    recovered: 10
+    written_off: 5
+  ratio_expectations:
+    alert_ratio: 0.4
+    case_ratio: 0.5
+calendar_controls:
+  start_year: 2025
+  start_month: 2
+  end_year: 2025
+  end_month: 3
+  month_weighting:
+    "2": 1.0
+    "3": 1.25
+  quarter_end_spike: true
+geography_controls:
+  region_mix:
+    NAM_EAST: 1.4
+    NAM_WEST: 1.1
+    EUR_CORE: 0.8
+organization_controls:
+  business_unit_mix:
+    fraud_operations: 1.8
+    retail_banking: 1.1
+customer_controls:
+  customer_segment_mix:
+    mass_market: 0.7
+    affluent: 0.2
+    small_business: 0.1
+payment_controls:
+  cross_border_ratio: 0.1
+fraud_ops_controls:
+  alert_source_mix:
+    rules_engine: 1.4
+    ml_model: 1.1
+  case_priority_mix:
+    p3: 1.5
+    p4: 1.2
+  decision_reason_mix:
+    analyst_override: 1.4
+    customer_confirmed: 1.1
+  recovery_status_mix:
+    not_applicable: 1.8
+realism_controls:
+  emphasize_new_device_behavior: true
+  emphasize_off_hours: false
+validation:
+  dominant_scenario: false_positive
+  ratio_tolerance: 0.1

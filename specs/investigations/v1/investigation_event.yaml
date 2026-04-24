@@ -39,3 +39,11 @@ fields:
     type: timestamp
     required: true
     description: Timestamp of the event.
+  - name: event_result_code
+    type: string
+    required: false
+    description: Outcome recorded for the investigation step.
+  - name: elapsed_minutes
+    type: integer
+    required: false
+    description: Elapsed duration attributed to the investigation step.

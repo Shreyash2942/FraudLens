@@ -1,0 +1,53 @@
+version: v1
+domain: geography
+entity_name: branch_location
+classification: governed
+description: Physical branch location used for servicing, origination, and territory reporting.
+standards_alignment:
+  bian_inspired_domain: branch_location_reference
+ownership:
+  business_owner: Branch Network Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: branch_id
+relationships:
+  - branch_territory_id -> geography.branch_territory.branch_territory_id
+  - region_id -> geography.region.region_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: branch_id
+    type: string
+    required: true
+    description: Stable identifier for the branch location.
+  - name: branch_code
+    type: string
+    required: true
+    description: Short code used for branch operations.
+  - name: branch_name
+    type: string
+    required: true
+    description: Descriptive branch name.
+  - name: branch_territory_id
+    type: string
+    required: true
+    description: Territory owning the branch.
+  - name: region_id
+    type: string
+    required: true
+    description: Region containing the branch.
+  - name: country_code
+    type: string
+    required: true
+    description: Country code of the branch location.
+  - name: city_name
+    type: string
+    required: true
+    description: City of the branch location.
+  - name: is_active
+    type: boolean
+    required: true
+    description: Indicates whether the branch is active.

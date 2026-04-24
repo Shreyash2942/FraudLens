@@ -23,7 +23,9 @@ FraudLens is delivered in controlled phases. Each phase produces a testable and 
 ### Phase 2 - Dataset And Data Design
 
 - refine and extend domain contracts
-- generate synthetic banking and fraud data aligned to the design
+- generate 21 governed synthetic datasets aligned to the design
+- implement deterministic CSV export, validation reporting, and optional MinIO upload
+- model realistic banking behavior, rich fraud operations lifecycle data, and org/calendar dimensions for dashboard control
 
 ### Phase 3 - Warehouse Setup
 

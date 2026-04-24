@@ -1,0 +1,45 @@
+version: v1
+domain: organization
+entity_name: analyst_team
+classification: critical
+description: Fraud operations team used for work allocation, accountability, and staffing dashboards.
+standards_alignment:
+  bian_inspired_domain: operational_team_management
+ownership:
+  business_owner: Fraud Operations Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: analyst_team_id
+relationships:
+  - business_unit_id -> organization.business_unit.business_unit_id
+  - region_id -> geography.region.region_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: analyst_team_id
+    type: string
+    required: true
+    description: Stable identifier for the analyst team.
+  - name: analyst_team_code
+    type: string
+    required: true
+    description: Short code for the analyst team.
+  - name: analyst_team_name
+    type: string
+    required: true
+    description: Display name of the analyst team.
+  - name: business_unit_id
+    type: string
+    required: true
+    description: Business unit owning the team.
+  - name: region_id
+    type: string
+    required: true
+    description: Region of primary team responsibility.
+  - name: is_active
+    type: boolean
+    required: true
+    description: Indicates whether the analyst team is active.

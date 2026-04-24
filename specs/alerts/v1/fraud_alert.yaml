@@ -44,3 +44,23 @@ fields:
     type: timestamp
     required: true
     description: Timestamp the alert was created.
+  - name: alert_type_code
+    type: string
+    required: false
+    description: Business category of the alert.
+  - name: alert_source_code
+    type: string
+    required: false
+    description: Originating source of the alert such as rules or model.
+  - name: owning_business_unit_id
+    type: string
+    required: false
+    description: Business unit owning the alert workflow.
+  - name: owning_analyst_team_id
+    type: string
+    required: false
+    description: Analyst team responsible for review.
+  - name: service_level_due_at
+    type: timestamp
+    required: false
+    description: SLA due time for the alert review.

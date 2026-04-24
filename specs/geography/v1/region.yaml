@@ -1,0 +1,38 @@
+version: v1
+domain: geography
+entity_name: region
+classification: governed
+description: Regional management hierarchy used for dashboard rollups and operating ownership.
+standards_alignment:
+  bian_inspired_domain: geographic_market_management
+ownership:
+  business_owner: Regional Operations Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: region_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: region_id
+    type: string
+    required: true
+    description: Stable identifier for the management region.
+  - name: region_code
+    type: string
+    required: true
+    description: Short code for the region.
+  - name: region_name
+    type: string
+    required: true
+    description: Descriptive region name.
+  - name: country_group_code
+    type: string
+    required: true
+    description: Grouping of countries covered by the region.
+  - name: is_active
+    type: boolean
+    required: true
+    description: Indicates whether the region is active.

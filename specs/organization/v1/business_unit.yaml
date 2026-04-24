@@ -1,0 +1,44 @@
+version: v1
+domain: organization
+entity_name: business_unit
+classification: critical
+description: Operating business unit responsible for servicing, fraud review, or customer management.
+standards_alignment:
+  bian_inspired_domain: business_unit_management
+ownership:
+  business_owner: Fraud Operations Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: business_unit_id
+relationships:
+  - region_id -> geography.region.region_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: business_unit_id
+    type: string
+    required: true
+    description: Stable identifier for the business unit.
+  - name: business_unit_code
+    type: string
+    required: true
+    description: Short code for the business unit.
+  - name: business_unit_name
+    type: string
+    required: true
+    description: Display name of the business unit.
+  - name: business_unit_type
+    type: string
+    required: true
+    description: Operating model type for the business unit.
+  - name: region_id
+    type: string
+    required: true
+    description: Region primarily owning the business unit.
+  - name: is_active
+    type: boolean
+    required: true
+    description: Indicates whether the business unit is active.

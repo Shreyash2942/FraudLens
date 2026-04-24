@@ -52,3 +52,15 @@ fields:
     type: string
     required: false
     description: Reason for reversal or return when applicable.
+  - name: posted_date
+    type: date
+    required: false
+    description: Posting date for the transaction.
+  - name: value_date
+    type: date
+    required: false
+    description: Value date used for balance and settlement views.
+  - name: transaction_direction_code
+    type: string
+    required: false
+    description: Direction of funds from the account perspective.

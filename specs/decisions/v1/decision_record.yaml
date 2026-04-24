@@ -44,3 +44,19 @@ fields:
     type: timestamp
     required: true
     description: Timestamp of decision approval.
+  - name: decision_reason_code
+    type: string
+    required: false
+    description: Primary reason driving the decision.
+  - name: decision_channel_code
+    type: string
+    required: false
+    description: Channel through which the decision was produced.
+  - name: policy_name
+    type: string
+    required: false
+    description: Policy or policy family used to make the decision.
+  - name: rule_set_version
+    type: string
+    required: false
+    description: Rule set or strategy version applied at decision time.

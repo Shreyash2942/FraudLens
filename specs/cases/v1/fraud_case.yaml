@@ -43,3 +43,27 @@ fields:
     type: timestamp
     required: false
     description: Time the case was closed.
+  - name: case_type_code
+    type: string
+    required: false
+    description: Fraud case category.
+  - name: case_priority_code
+    type: string
+    required: false
+    description: Priority assigned for the case workflow.
+  - name: owning_business_unit_id
+    type: string
+    required: false
+    description: Business unit responsible for the case.
+  - name: owning_analyst_team_id
+    type: string
+    required: false
+    description: Analyst team responsible for the case.
+  - name: handling_region_id
+    type: string
+    required: false
+    description: Region handling the case.
+  - name: escalation_level_code
+    type: string
+    required: false
+    description: Escalation tier applied during case handling.

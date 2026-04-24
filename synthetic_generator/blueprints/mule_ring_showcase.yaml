@@ -1,0 +1,48 @@
+metadata:
+  name: mule_ring_showcase
+  description: Linked mule-transfer batch with clustered beneficiaries and high case conversion.
+generation:
+  recommended_profile: medium_demo
+  default_days: 30
+  default_seed: 241
+  batch_style: single_scenario
+  scenario_families:
+    - mule_transfer
+    - repeat_offender
+    - burst_velocity
+scenario_controls:
+  scenario_counts:
+    mule_transfer: 540
+    repeat_offender: 220
+    burst_velocity: 160
+  confirmed_fraud_target: 820
+  false_positive_target: 100
+  timing_style: concentrated_burst
+lifecycle_controls:
+  risk_signal_count: 1400
+  alert_count: 520
+  case_count: 360
+  decision_count: 320
+  disposition_count: 300
+outcome_controls:
+  decision_mix:
+    decline: 110
+    hold: 110
+    file_sar: 70
+    challenge: 30
+  disposition_mix:
+    confirmed_fraud: 110
+    recovered: 105
+    written_off: 55
+    customer_error: 30
+  ratio_expectations:
+    alert_ratio: 0.37
+    case_ratio: 0.69
+realism_controls:
+  emphasize_shared_device_clustering: true
+  emphasize_new_payees: true
+  emphasize_off_hours: true
+  emphasize_recoveries: true
+validation:
+  dominant_scenario: mule_transfer
+  ratio_tolerance: 0.08

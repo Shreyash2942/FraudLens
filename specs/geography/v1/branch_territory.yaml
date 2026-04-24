@@ -1,0 +1,40 @@
+version: v1
+domain: geography
+entity_name: branch_territory
+classification: governed
+description: Sales and servicing territory grouping for branch locations.
+standards_alignment:
+  bian_inspired_domain: branch_network_management
+ownership:
+  business_owner: Branch Network Lead
+  technical_steward: Data Platform Lead
+  approval_model: owner_and_steward_review
+keys:
+  primary_key: branch_territory_id
+relationships:
+  - region_id -> geography.region.region_id
+controls:
+  financial_reporting_relevant: true
+  fraud_decision_relevant: true
+  required_audit_fields_inherited: true
+fields:
+  - name: branch_territory_id
+    type: string
+    required: true
+    description: Stable identifier for the branch territory.
+  - name: branch_territory_code
+    type: string
+    required: true
+    description: Short code for the territory.
+  - name: branch_territory_name
+    type: string
+    required: true
+    description: Descriptive territory name.
+  - name: region_id
+    type: string
+    required: true
+    description: Region containing the territory.
+  - name: is_active
+    type: boolean
+    required: true
+    description: Indicates whether the territory is active.

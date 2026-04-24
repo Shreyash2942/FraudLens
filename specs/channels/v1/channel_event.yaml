@@ -37,3 +37,19 @@ fields:
     type: timestamp
     required: true
     description: Timestamp of the interaction.
+  - name: event_country_code
+    type: string
+    required: false
+    description: Country where the interaction was observed.
+  - name: ip_country_code
+    type: string
+    required: false
+    description: Country inferred from network address or session telemetry.
+  - name: authentication_result_code
+    type: string
+    required: false
+    description: Result of the authentication or challenge flow.
+  - name: session_risk_code
+    type: string
+    required: false
+    description: Risk classification assigned to the session context.

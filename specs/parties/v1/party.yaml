@@ -39,3 +39,23 @@ fields:
     type: string
     required: false
     description: Assigned risk segment for analytics and control use.
+  - name: customer_segment_code
+    type: string
+    required: false
+    description: Customer segmentation code used in analytics and dashboard filtering.
+  - name: customer_type_code
+    type: string
+    required: false
+    description: Customer type grouping such as retail, affluent, or business.
+  - name: industry_sector_code
+    type: string
+    required: false
+    description: Industry sector classification for merchants or business customers.
+  - name: residency_region_id
+    type: string
+    required: false
+    description: Region associated to the party's main residence or registration.
+  - name: customer_since_at
+    type: timestamp
+    required: false
+    description: Timestamp the customer or party relationship began.
