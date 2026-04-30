@@ -40,12 +40,11 @@ from .validation import validate_generation
 
 def main(argv: list[str] | None = None) -> int:
     _load_local_env_if_present()
+    try:
+        _load_runtime_env_config(_extract_runtime_config_path(argv))
+    except (ValueError, RuntimeError) as exc:
+        raise SystemExit(str(exc)) from exc
     parser = argparse.ArgumentParser(description="Generate FraudLens Phase 2 synthetic datasets.")
-    parser.add_argument("--mode", choices=["mixed", "blueprint"], default="mixed", help="Generation mode.")
-    parser.add_argument("--blueprint", help="Built-in blueprint name or path to a YAML blueprint file.")
-    parser.add_argument("--list-blueprints", action="store_true", help="List available built-in blueprints and exit.")
-    parser.add_argument("--output-dir", default="data", help="Base output directory for generated batch runs.")
-    parser.add_argument("--days", type=int, help="Number of days to cover in the generated dataset.")
     parser.add_argument(
         "--runtime-config",
         help=(
@@ -53,6 +52,11 @@ def main(argv: list[str] | None = None) -> int:
             "If omitted, synthetic_generator/runtime_config.yaml is auto-loaded when present."
         ),
     )
+    parser.add_argument("--mode", choices=["mixed", "blueprint"], default="mixed", help="Generation mode.")
+    parser.add_argument("--blueprint", help="Built-in blueprint name or path to a YAML blueprint file.")
+    parser.add_argument("--list-blueprints", action="store_true", help="List available built-in blueprints and exit.")
+    parser.add_argument("--output-dir", default="data", help="Base output directory for generated batch runs.")
+    parser.add_argument("--days", type=int, help="Number of days to cover in the generated dataset.")
     parser.add_argument("--profile", choices=sorted(SCALE_PROFILES), help="Generation scale profile.")
     parser.add_argument("--seed", type=int, help="Deterministic random seed.")
     parser.add_argument("--validate", action="store_true", help="Run validation after generation.")
@@ -72,7 +76,7 @@ def main(argv: list[str] | None = None) -> int:
     profile = plan.profile
     start_at, end_at = _resolve_date_range(plan.days, plan.calendar_controls)
     batch_label = f"{plan.mode}_{_slug(plan.blueprint.name) if plan.blueprint else plan.profile_name}"
-    batch_id = f"phase2_{batch_label}_{end_at.strftime('%Y%m%dT%H%M%SZ')}_seed{plan.seed}"
+    batch_id = f"fraudlens_synthetic_{batch_label}_{end_at.strftime('%Y%m%dT%H%M%SZ')}_seed{plan.seed}"
     batch_dir = Path(args.output_dir) / "batches" / batch_id
     rng = random.Random(plan.seed)
     fake = build_faker(plan.seed)
@@ -213,7 +217,7 @@ def main(argv: list[str] | None = None) -> int:
 
     batch_control = {
         "batch_id": batch_id,
-        "batch_type": "phase2_synthetic_generation",
+        "batch_type": "fraudlens_synthetic_generation",
         "mode": plan.mode,
         "profile": profile.name,
         "status": "completed",
@@ -404,11 +408,88 @@ def _load_local_env_if_present() -> None:
             if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
                 value = value[1:-1]
             os.environ.setdefault(key, value)
+
+
 def _extract_runtime_config_path(argv: list[str] | None) -> str | None:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--runtime-config")
     args, _ = parser.parse_known_args(argv if argv is not None else sys.argv[1:])
     return args.runtime_config
+
+
+def _load_runtime_env_config(config_path: str | None) -> Path | None:
+    resolved_path = _resolve_runtime_config_path(config_path)
+    if resolved_path is None:
+        return None
+    payload = _read_yaml_mapping(resolved_path, "runtime config")
+    _apply_runtime_env_mapping(payload.get("env", {}), source=resolved_path)
+    _apply_runtime_env_mapping(_minio_to_env_mapping(payload.get("minio", {})), source=resolved_path)
+    return resolved_path
+
+
+def _resolve_runtime_config_path(config_path: str | None) -> Path | None:
+    if config_path:
+        path = Path(config_path).expanduser()
+        if not path.exists():
+            raise ValueError(f"Runtime config not found: {config_path}")
+        return path
+    candidates = [
+        Path.cwd() / "synthetic_generator" / "runtime_config.yaml",
+        Path(__file__).resolve().parent / "runtime_config.yaml",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def _read_yaml_mapping(path: Path, label: str) -> dict:
+    try:
+        import yaml
+    except ImportError as exc:  # pragma: no cover - environment-specific
+        raise RuntimeError(f"PyYAML is required for {label}. Install requirements-phase2.txt.") from exc
+    with path.open("r", encoding="utf-8") as handle:
+        payload = yaml.safe_load(handle)
+    if payload is None:
+        return {}
+    if not isinstance(payload, dict):
+        raise ValueError(f"{label} file must contain a YAML mapping: {path}")
+    return payload
+
+
+def _apply_runtime_env_mapping(mapping: dict[str, object], source: Path) -> None:
+    if mapping is None:
+        return
+    if not isinstance(mapping, dict):
+        raise ValueError(f"Runtime config section must be a mapping: {source}")
+    for key, value in mapping.items():
+        if not isinstance(key, str):
+            raise ValueError(f"Runtime config env keys must be strings: {source}")
+        if value is None:
+            continue
+        os.environ[key] = str(value).strip()
+
+
+def _minio_to_env_mapping(minio_config: dict[str, object]) -> dict[str, object]:
+    if minio_config is None:
+        return {}
+    if not isinstance(minio_config, dict):
+        raise ValueError("Runtime config minio section must be a mapping")
+    key_mapping = {
+        "endpoint": "DATALAB_MINIO_ENDPOINT",
+        "endpoint_outside": "DATALAB_MINIO_ENDPOINT_OUTSIDE",
+        "access_key": "DATALAB_MINIO_ACCESS_KEY",
+        "secret_key": "DATALAB_MINIO_SECRET_KEY",
+        "region": "DATALAB_MINIO_REGION",
+        "bucket": "DATALAB_MINIO_BUCKET",
+        "prefix_root": "PHASE2_MINIO_PREFIX",
+    }
+    translated: dict[str, object] = {}
+    for key, env_name in key_mapping.items():
+        if key in minio_config and minio_config[key] is not None:
+            translated[env_name] = minio_config[key]
+    return translated
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
