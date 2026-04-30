@@ -30,3 +30,8 @@ Rules:
 - If `graphify-out/wiki/index.md` exists, navigate it instead of reading raw files first.
 - After modifying code files in this session, run `py -m graphify update .` to refresh the code graph.
 - If major docs/specs change, rebuild or refresh the graph so the project memory stays aligned with the repo state.
+
+Codex command compatibility:
+- The installed graphify CLI uses subcommands, for example `py -m graphify update .`, `py -m graphify query "..."`, `py -m graphify path "A" "B"`, and `py -m graphify explain "X"`.
+- Do not use `py -m graphify . --update`; this CLI treats `.` as an unknown command.
+- Project-local `.codex/hooks.json` is not a reliable way to inject graphify context in Codex. Prefer these `AGENTS.md` instructions and explicit graphify CLI commands.
