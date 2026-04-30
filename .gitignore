@@ -1,4 +1,5 @@
 .env
+synthetic_generator/runtime_config.yaml
 __pycache__/
 *.pyc
 .graphify_*.json
