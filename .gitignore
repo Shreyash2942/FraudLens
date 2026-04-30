@@ -1,7 +1,16 @@
 .env
 synthetic_generator/runtime_config.yaml
+
+# Python caches
 __pycache__/
 *.pyc
+
+# Local Codex state
+.codex/
+
+# Local graphify workspace and outputs
+graphify-out/
+# Fallback ignores in case ad-hoc graphify runs write scratch files to repo root
 .graphify_*.json
 .graphify_incremental.json
 .graphify_old.json
@@ -13,8 +22,12 @@ __pycache__/
 .graphify_labels.json
 .graphify_uncached.txt
 .graphify_transcripts.json
-.codex/hooks.json
-graphify-out/
+/detect.py
+/ast_extract.py
+/check_cache.py
+/split_chunks.py
+
+# Generated synthetic data
 data/batches/
 data/synthetic/runs/
 data/synthetic/tmp/
