@@ -14,5 +14,6 @@ This directory contains the canonical written documentation for the project.
 - `platform-validation-runbook.md` Phase 1 validation and connectivity checks
 - `phase-2-dataset-design.md` Phase 2 dataset architecture, generator, and export design
 - `phase-2-github-issues.md` GitHub-ready epic and task issue text for the Phase 2 milestone
+- `graphify-workflow.md` Graphify usage and branch portability workflow
 
 Legacy `.docx` files are retained as reference sources only. Active planning and design content should be maintained in Markdown and YAML.
