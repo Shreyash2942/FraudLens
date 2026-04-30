@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import random
+import sys
 from time import perf_counter
 
 from .behavior import (
@@ -45,6 +46,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--list-blueprints", action="store_true", help="List available built-in blueprints and exit.")
     parser.add_argument("--output-dir", default="data", help="Base output directory for generated batch runs.")
     parser.add_argument("--days", type=int, help="Number of days to cover in the generated dataset.")
+    parser.add_argument(
+        "--runtime-config",
+        help=(
+            "Path to generator runtime YAML config for env values. "
+            "If omitted, synthetic_generator/runtime_config.yaml is auto-loaded when present."
+        ),
+    )
     parser.add_argument("--profile", choices=sorted(SCALE_PROFILES), help="Generation scale profile.")
     parser.add_argument("--seed", type=int, help="Deterministic random seed.")
     parser.add_argument("--validate", action="store_true", help="Run validation after generation.")
@@ -396,7 +404,11 @@ def _load_local_env_if_present() -> None:
             if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
                 value = value[1:-1]
             os.environ.setdefault(key, value)
-
+def _extract_runtime_config_path(argv: list[str] | None) -> str | None:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--runtime-config")
+    args, _ = parser.parse_known_args(argv if argv is not None else sys.argv[1:])
+    return args.runtime_config
 
 if __name__ == "__main__":
     raise SystemExit(main())
