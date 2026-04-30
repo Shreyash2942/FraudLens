@@ -5,6 +5,7 @@ import calendar
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 import json
+import os
 from pathlib import Path
 import random
 from time import perf_counter
@@ -37,6 +38,7 @@ from .validation import validate_generation
 
 
 def main(argv: list[str] | None = None) -> int:
+    _load_local_env_if_present()
     parser = argparse.ArgumentParser(description="Generate FraudLens Phase 2 synthetic datasets.")
     parser.add_argument("--mode", choices=["mixed", "blueprint"], default="mixed", help="Generation mode.")
     parser.add_argument("--blueprint", help="Built-in blueprint name or path to a YAML blueprint file.")
@@ -369,6 +371,31 @@ def _bounded_month(value: int | None) -> int | None:
     if value is None:
         return None
     return max(1, min(value, 12))
+
+
+def _load_local_env_if_present() -> None:
+    candidates = [Path.cwd() / ".env", Path(__file__).resolve().parents[1] / ".env"]
+    loaded_paths: set[Path] = set()
+    for env_path in candidates:
+        if env_path in loaded_paths or not env_path.exists():
+            continue
+        loaded_paths.add(env_path)
+        for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("export "):
+                line = line[7:].strip()
+            if "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip()
+            if not key:
+                continue
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+                value = value[1:-1]
+            os.environ.setdefault(key, value)
 
 
 if __name__ == "__main__":
