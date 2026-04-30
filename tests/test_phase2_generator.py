@@ -281,6 +281,7 @@ class MinioConfigCompatibilityTest(unittest.TestCase):
             self.assertEqual(_FakeMinio.init_calls[-1]["endpoint"], "localhost:9011")
             self.assertEqual(_FakeMinio.init_calls[-1]["access_key"], "runtime_user")
             self.assertTrue(any(bucket == "runtime-bucket" for bucket, _, _ in _FakeMinio.uploaded))
+            self.assertTrue(any("runtime/prefix" in object_name for _, object_name, _ in _FakeMinio.uploaded))
 
 
 if __name__ == "__main__":
