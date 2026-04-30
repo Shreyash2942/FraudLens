@@ -61,9 +61,15 @@ Success criteria:
 
 Checks:
 
-- `MINIO_ENDPOINT` is reachable
+- `MINIO_ENDPOINT` or `DATALAB_MINIO_ENDPOINT(_OUTSIDE)` is reachable
 - the MinIO console loads if exposed
 - the default FraudLens bucket can be listed or created according to local permissions
+
+Common Data-Lab mapping:
+
+- inside container endpoint: `http://localhost:9004`
+- host endpoint: `http://localhost:9009`
+- console on host: `http://localhost:9010`
 
 Success criteria:
 

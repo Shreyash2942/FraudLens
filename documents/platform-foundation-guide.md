@@ -60,7 +60,7 @@ The list below describes logical capabilities FraudLens depends on. They do not 
 - Expected console endpoint: `http://localhost:9001`
 - Expected health signal: console loads and a configured FraudLens bucket is accessible
 - Future FraudLens dependency: raw zone, staged files, dataset exchange, landing-to-warehouse patterns
-- Default bucket convention: `fraudlens-raw` for initial raw-zone landing, with future expansion for curated or transient buckets as later phases require
+- Default bucket convention: `fraudlensdata` for initial raw-zone landing, with future expansion for curated or transient buckets as later phases require
 
 ### Prometheus
 

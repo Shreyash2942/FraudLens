@@ -7,12 +7,47 @@ from urllib.parse import urlparse
 from .progress import ProgressReporter
 
 
+def _first_non_empty_env(*names: str) -> str:
+    for name in names:
+        value = os.getenv(name, "").strip()
+        if value:
+            return value
+    return ""
+
+
+def _resolve_minio_config() -> dict[str, str]:
+    endpoint = _first_non_empty_env("MINIO_ENDPOINT", "DATALAB_MINIO_ENDPOINT", "DATALAB_MINIO_ENDPOINT_OUTSIDE")
+    access_key = _first_non_empty_env("MINIO_ACCESS_KEY", "DATALAB_MINIO_ACCESS_KEY")
+    secret_key = _first_non_empty_env("MINIO_SECRET_KEY", "DATALAB_MINIO_SECRET_KEY")
+    bucket = _first_non_empty_env("MINIO_DEFAULT_BUCKET", "DATALAB_MINIO_BUCKET") or "fraudlensdata"
+    prefix_root = _first_non_empty_env("PHASE2_MINIO_PREFIX") or "fraudlens/synthetic_data/batches"
+    return {
+        "endpoint": endpoint,
+        "access_key": access_key,
+        "secret_key": secret_key,
+        "bucket": bucket,
+        "prefix_root": prefix_root,
+    }
+
+
+def _professional_minio_subpath(path: Path) -> str:
+    parts = list(path.parts)
+    if len(parts) >= 2 and parts[0] == "landing" and parts[1] == "csv":
+        return str(Path("raw_zone") / "csv" / Path(*parts[2:])).replace("\\", "/")
+    if parts and parts[0] == "control":
+        return str(Path("governance") / "control" / Path(*parts[1:])).replace("\\", "/")
+    if parts and parts[0] == "quality":
+        return str(Path("governance") / "quality" / Path(*parts[1:])).replace("\\", "/")
+    return path.as_posix()
+
+
 def upload_run_to_minio(run_dir: Path, run_id: str, progress: ProgressReporter | None = None) -> dict:
-    endpoint = os.getenv("MINIO_ENDPOINT", "").strip()
-    access_key = os.getenv("MINIO_ACCESS_KEY", "").strip()
-    secret_key = os.getenv("MINIO_SECRET_KEY", "").strip()
-    bucket = os.getenv("MINIO_DEFAULT_BUCKET", "fraudlens-raw").strip() or "fraudlens-raw"
-    prefix_root = os.getenv("PHASE2_MINIO_PREFIX", "phase2").strip() or "phase2"
+    config = _resolve_minio_config()
+    endpoint = config["endpoint"]
+    access_key = config["access_key"]
+    secret_key = config["secret_key"]
+    bucket = config["bucket"]
+    prefix_root = config["prefix_root"]
 
     if not endpoint or not access_key or not secret_key:
         return {"status": "skipped", "reason": "missing_minio_configuration", "bucket": bucket, "prefix": f"{prefix_root}/{run_id}"}
@@ -37,7 +72,8 @@ def upload_run_to_minio(run_dir: Path, run_id: str, progress: ProgressReporter |
         for index, file_path in enumerate(files, start=1):
             if not file_path.is_file():
                 continue
-            object_name = f"{prefix}/{file_path.relative_to(run_dir).as_posix()}"
+            object_subpath = _professional_minio_subpath(file_path.relative_to(run_dir))
+            object_name = f"{prefix}/{object_subpath}"
             client.fput_object(bucket, object_name, str(file_path))
             uploaded_files.append(object_name)
             if progress:

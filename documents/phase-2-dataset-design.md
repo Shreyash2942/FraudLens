@@ -66,7 +66,7 @@ Phase 2 includes:
 - dashboard-control dimensions for region, branch territory, business unit, analyst team, and calendar periods
 - batch-style export into landing, control, and quality areas
 - validation reporting
-- optional MinIO upload to `fraudlens-raw/phase2/<run_id>/`
+- optional MinIO upload to `fraudlensdata/fraudlens/synthetic_data/batches/<run_id>/`
 
 ## CLI Shape
 

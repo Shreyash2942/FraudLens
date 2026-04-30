@@ -1,0 +1,16 @@
+# Synthetic generator runtime config
+# Copy to synthetic_generator/runtime_config.yaml for local use.
+# Keep secrets out of source control.
+
+minio:
+  endpoint: http://localhost:9004
+  endpoint_outside: http://localhost:9009
+  access_key: minio_admin
+  secret_key: minioadmin
+  region: us-east-1
+  bucket: fraudlensdata
+  prefix_root: fraudlens/synthetic_data/batches
+
+# Optional generic env overrides (applied after .env loading):
+# env:
+#   SOME_KEY: some_value
