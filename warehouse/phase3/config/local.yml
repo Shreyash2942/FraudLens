@@ -1,0 +1,26 @@
+environment: local
+engine: spark_iceberg_trino
+
+object_storage:
+  provider: minio
+  endpoint: http://localhost:9009
+  bucket: fraudlensdata
+  prefix: fraudlens/synthetic_data/batches
+
+warehouse:
+  database: fraudlens
+  schemas:
+    bronze: bronze
+    silver: silver
+    gold: gold
+  standards:
+    object_prefix: fl_
+    audit_columns:
+      - ingestion_batch_id
+      - source_file_name
+      - ingested_at_utc
+
+connectivity:
+  check_minio: true
+  check_snowflake: false
+  check_trino: true

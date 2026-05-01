@@ -1,0 +1,29 @@
+environment: cloud
+engine: snowflake
+
+object_storage:
+  provider: s3_compatible
+  endpoint: "<set-in-secret-env>"
+  bucket: "<set-in-secret-env>"
+  prefix: fraudlens/synthetic_data/batches
+
+warehouse:
+  account: "<set-in-secret-env>"
+  database: FRAUDLENS
+  schemas:
+    bronze: BRONZE
+    silver: SILVER
+    gold: GOLD
+  warehouse_name: FRAUDLENS_WH_XS
+  role_name: FRAUDLENS_ENGINEER_ROLE
+  standards:
+    object_prefix: FL_
+    audit_columns:
+      - INGESTION_BATCH_ID
+      - SOURCE_FILE_NAME
+      - INGESTED_AT_UTC
+
+connectivity:
+  check_minio: false
+  check_snowflake: true
+  check_trino: false
