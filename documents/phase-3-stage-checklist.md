@@ -4,17 +4,17 @@ This checklist tracks implementation progress for the Phase 3 milestone and keep
 
 ## Stage 1 (`#39`) Environment And Access
 
-- [ ] `warehouse/phase-3/config/local.yml` finalized
-- [ ] `warehouse/phase-3/config/cloud.yml` finalized
-- [ ] secrets contract prepared from `warehouse/phase-3/config/env.example`
-- [ ] `warehouse/phase-3/scripts/print_runtime_config.py` validated
-- [ ] `warehouse/phase-3/scripts/check_connectivity.py` passing in chosen environment
+- [ ] `warehouse/snowflake-warehouse-setup/config/local.yml` finalized
+- [ ] `warehouse/snowflake-warehouse-setup/config/cloud.yml` finalized
+- [ ] secrets contract prepared from `warehouse/snowflake-warehouse-setup/config/env.example`
+- [ ] `warehouse/snowflake-warehouse-setup/scripts/print_runtime_config.py` validated
+- [ ] `warehouse/snowflake-warehouse-setup/scripts/check_connectivity.py` passing in chosen environment
 
 ## Stage 2 (`#40`) Structure And Naming Standards
 
-- [ ] `warehouse/phase-3/sql/ddl/create_database_and_schemas.sql` reviewed and executed
-- [ ] `warehouse/phase-3/sql/ddl/create_roles_and_grants.sql` reviewed and executed
-- [ ] naming conventions approved from `warehouse/phase-3/sql/naming/naming_convention_reference.sql`
+- [ ] `warehouse/snowflake-warehouse-setup/sql/ddl/create_database_and_schemas.sql` reviewed and executed
+- [ ] `warehouse/snowflake-warehouse-setup/sql/ddl/create_roles_and_grants.sql` reviewed and executed
+- [ ] naming conventions approved from `warehouse/snowflake-warehouse-setup/sql/naming/naming_convention_reference.sql`
 - [ ] structure and naming references documented in Phase 3 runbook
 
 ## Stage 3 (`#41`) Bronze Tables
@@ -46,4 +46,5 @@ This checklist tracks implementation progress for the Phase 3 milestone and keep
 
 - [ ] setup runbook completed
 - [ ] troubleshooting notes completed
+
 
