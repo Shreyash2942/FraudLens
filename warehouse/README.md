@@ -1,7 +1,8 @@
-# Warehouse
+﻿# Warehouse
 
 Warehouse-specific assets for Phase 3 and later live under this directory.
 
-- `phase3/` contains Stage 1 and Stage 2 implementation assets for:
+- `phase-3/` contains Stage 1 and Stage 2 implementation assets for:
   - environment/access checks (`#39`)
   - structure/naming standards (`#40`)
+

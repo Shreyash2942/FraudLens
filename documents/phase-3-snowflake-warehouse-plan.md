@@ -1,4 +1,4 @@
-# Phase 3 Snowflake Warehouse Plan
+﻿# Phase 3 Snowflake Warehouse Plan
 
 ## Purpose
 
@@ -174,20 +174,20 @@ This section defines the concrete script inventory to be created in Phase 3 so i
 
 ### Directory Blueprint
 
-- `warehouse/phase3/sql/ddl/`
-- `warehouse/phase3/sql/dml/`
-- `warehouse/phase3/sql/staging/`
-- `warehouse/phase3/sql/validation/`
-- `warehouse/phase3/scripts/`
-- `warehouse/phase3/spark/`
-- `warehouse/phase3/config/`
+- `warehouse/phase-3/sql/ddl/`
+- `warehouse/phase-3/sql/dml/`
+- `warehouse/phase-3/sql/staging/`
+- `warehouse/phase-3/sql/validation/`
+- `warehouse/phase-3/scripts/`
+- `warehouse/phase-3/spark/`
+- `warehouse/phase-3/config/`
 
 ### 1) Environment And Access Scripts (`#39`)
 
-- `warehouse/phase3/config/local.yml`
-- `warehouse/phase3/config/cloud.yml`
-- `warehouse/phase3/scripts/check_connectivity.py`
-- `warehouse/phase3/scripts/print_runtime_config.py`
+- `warehouse/phase-3/config/local.yml`
+- `warehouse/phase-3/config/cloud.yml`
+- `warehouse/phase-3/scripts/check_connectivity.py`
+- `warehouse/phase-3/scripts/print_runtime_config.py`
 
 Purpose:
 
@@ -197,9 +197,9 @@ Purpose:
 
 ### 2) Naming And Structure Scripts (`#40`)
 
-- `warehouse/phase3/sql/ddl/00_create_database_and_schemas.sql`
-- `warehouse/phase3/sql/ddl/01_create_roles_and_grants.sql`
-- `warehouse/phase3/sql/ddl/02_naming_convention_reference.sql` (commented reference SQL)
+- `warehouse/phase-3/sql/ddl/create_database_and_schemas.sql`
+- `warehouse/phase-3/sql/ddl/create_roles_and_grants.sql`
+- `warehouse/phase-3/sql/ddl/naming_convention_reference.sql` (commented reference SQL)
 
 Purpose:
 
@@ -208,9 +208,9 @@ Purpose:
 
 ### 3) Bronze DDL Scripts (`#41`)
 
-- `warehouse/phase3/sql/ddl/10_create_bronze_tables_core.sql`
-- `warehouse/phase3/sql/ddl/11_create_bronze_tables_dimensions.sql`
-- `warehouse/phase3/sql/ddl/12_create_bronze_audit_tables.sql`
+- `warehouse/phase-3/sql/ddl/10_create_bronze_tables_core.sql`
+- `warehouse/phase-3/sql/ddl/11_create_bronze_tables_dimensions.sql`
+- `warehouse/phase-3/sql/ddl/12_create_bronze_audit_tables.sql`
 
 Purpose:
 
@@ -219,9 +219,9 @@ Purpose:
 
 ### 4) Staging And File Format Scripts (`#43`)
 
-- `warehouse/phase3/sql/staging/20_create_file_formats.sql`
-- `warehouse/phase3/sql/staging/21_create_stages.sql`
-- `warehouse/phase3/sql/staging/22_list_stage_files.sql`
+- `warehouse/phase-3/sql/staging/20_create_file_formats.sql`
+- `warehouse/phase-3/sql/staging/21_create_stages.sql`
+- `warehouse/phase-3/sql/staging/22_list_stage_files.sql`
 
 Purpose:
 
@@ -232,19 +232,19 @@ Purpose:
 
 Cloud/Snowflake-oriented SQL:
 
-- `warehouse/phase3/sql/dml/30_copy_into_bronze_core.sql`
-- `warehouse/phase3/sql/dml/31_copy_into_bronze_dimensions.sql`
+- `warehouse/phase-3/sql/dml/30_copy_into_bronze_core.sql`
+- `warehouse/phase-3/sql/dml/31_copy_into_bronze_dimensions.sql`
 
 Local execution helpers:
 
-- `warehouse/phase3/scripts/load_batch.py`
-- `warehouse/phase3/scripts/load_one_dataset.py`
-- `warehouse/phase3/scripts/retry_failed_loads.py`
+- `warehouse/phase-3/scripts/load_batch.py`
+- `warehouse/phase-3/scripts/load_one_dataset.py`
+- `warehouse/phase-3/scripts/retry_failed_loads.py`
 
 Spark local-ingestion support:
 
-- `warehouse/phase3/spark/bronze_ingest_job.py`
-- `warehouse/phase3/spark/bronze_manifest_loader.py`
+- `warehouse/phase-3/spark/bronze_ingest_job.py`
+- `warehouse/phase-3/spark/bronze_manifest_loader.py`
 
 Purpose:
 
@@ -253,10 +253,10 @@ Purpose:
 
 ### 6) Validation Scripts (`#44`)
 
-- `warehouse/phase3/sql/validation/40_row_count_reconciliation.sql`
-- `warehouse/phase3/sql/validation/41_null_and_key_checks.sql`
-- `warehouse/phase3/sql/validation/42_domain_sanity_checks.sql`
-- `warehouse/phase3/scripts/validate_load.py`
+- `warehouse/phase-3/sql/validation/40_row_count_reconciliation.sql`
+- `warehouse/phase-3/sql/validation/41_null_and_key_checks.sql`
+- `warehouse/phase-3/sql/validation/42_domain_sanity_checks.sql`
+- `warehouse/phase-3/scripts/validate_load.py`
 
 Purpose:
 
@@ -265,8 +265,8 @@ Purpose:
 
 ### 7) Performance Baseline Scripts (`#45`)
 
-- `warehouse/phase3/scripts/benchmark_load.py`
-- `warehouse/phase3/sql/validation/50_load_performance_report.sql`
+- `warehouse/phase-3/scripts/benchmark_load.py`
+- `warehouse/phase-3/sql/validation/50_load_performance_report.sql`
 
 Purpose:
 
@@ -326,3 +326,4 @@ Purpose:
 - implement Phase 3 on `snowflake-warehouse-setup`
 - merge from `main` before starting each major workstream
 - keep one focused PR per workstream or tightly related workstream pair
+
