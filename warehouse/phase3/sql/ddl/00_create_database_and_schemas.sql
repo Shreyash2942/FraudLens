@@ -1,0 +1,8 @@
+-- Phase 3 Stage 2 (#40): database and schema structure
+-- Adjust identifiers if your account requires different naming.
+
+CREATE DATABASE IF NOT EXISTS FRAUDLENS;
+
+CREATE SCHEMA IF NOT EXISTS FRAUDLENS.BRONZE;
+CREATE SCHEMA IF NOT EXISTS FRAUDLENS.SILVER;
+CREATE SCHEMA IF NOT EXISTS FRAUDLENS.GOLD;
