@@ -78,11 +78,23 @@ For local script-only contract test (without Spark cluster):
 py warehouse/snowflake-warehouse-setup/scripts/run_dataset_spark_job.py --layer bronze --dataset region --batch-id <batch_id> --profile local --spark-submit-cmd python
 ```
 
+## 5.1) Local Hive DDL/DML Check (Per Dataset)
+
+Generate and execute local Hive Bronze DDL/DML for one dataset:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/run_local_hive_bronze_check.py --dataset region --batch-id <batch_id> --execute
+```
+
 ## 6) Airflow DAG
 
 Dataset-level orchestration DAG:
 
 - `airflow/dags/phase3_layer_dataset_orchestration.py`
+
+Local Bronze Spark + Hive validation DAG:
+
+- `airflow/dags/phase3_bronze_local_hive_validation.py`
 
 Trigger with `dag_run.conf`:
 

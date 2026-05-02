@@ -68,6 +68,24 @@ Trigger with a batch id in `dag_run.conf`, for example:
 
 - `{"batch_id": "20260501_010203"}`
 
+Local Bronze Spark + Hive validation DAG:
+
+- `airflow/dags/phase3_bronze_local_hive_validation.py`
+
+Purpose:
+
+- validates per-dataset Bronze Spark job contracts
+- executes local Hive Bronze DDL/DML checks using Beeline
+
+Environment variables used by this DAG:
+
+- `HIVE_CMD`
+- `HIVE_JDBC_URL`
+- `HIVE_USER`
+- `HIVE_PASSWORD`
+- `HIVE_DATABASE`
+- `BRONZE_LOCAL_SPARK_CMD`
+
 ## 5) Bronze SQL Execution
 
 Apply shared setup first:

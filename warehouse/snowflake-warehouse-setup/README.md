@@ -47,6 +47,8 @@ The `scripts/` folder contains reusable execution helpers through Stage 4.
   - emits ordered `COPY INTO` statements for all datasets in a batch manifest
 - `run_dataset_spark_job.py`
   - runs one layer/dataset Spark job with standard contract args
+- `run_local_hive_bronze_check.py`
+  - validates one Bronze dataset in local Hive by executing generated DDL/DML checks
 
 Example usage:
 
@@ -64,4 +66,5 @@ py warehouse/snowflake-warehouse-setup/scripts/generate_layer_assets.py --layers
 4. generate layer assets with `scripts/generate_layer_assets.py`
 5. apply DDL and staging files in `sql/ddl/`, `sql/staging/`, and `sql/bronze/`
 6. execute dataset-level Bronze SQL or build runtime SQL with `scripts/load_batch.py`
-7. run per-dataset Spark jobs using `scripts/run_dataset_spark_job.py` or Airflow DAG `airflow/dags/phase3_layer_dataset_orchestration.py`
+7. run per-dataset Spark jobs using `scripts/run_dataset_spark_job.py`
+8. run local Bronze Hive validation using `scripts/run_local_hive_bronze_check.py` or Airflow DAG `airflow/dags/phase3_bronze_local_hive_validation.py`

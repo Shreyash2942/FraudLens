@@ -43,3 +43,12 @@ Phase 3 dataset-level orchestration uses additional non-secret controls in both 
 - `layers.<layer>.datasets`
   - set to `from_contract` to use governed `DATASET_ORDER`
   - or set explicit dataset list for targeted runs
+
+Local Hive validation environment variables (used by local Bronze DAG and scripts):
+
+- `HIVE_CMD` (default: `beeline`)
+- `HIVE_JDBC_URL` (default: `jdbc:hive2://localhost:10000/default`)
+- `HIVE_USER`
+- `HIVE_PASSWORD`
+- `HIVE_DATABASE` (default: `fraudlens_local`)
+- `BRONZE_LOCAL_SPARK_CMD` (default: `python`, can be `spark-submit`)

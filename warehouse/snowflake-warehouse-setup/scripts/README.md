@@ -117,6 +117,20 @@ Example:
 py warehouse/snowflake-warehouse-setup/scripts/run_dataset_spark_job.py --layer bronze --dataset payment_instruction --batch-id 20260501_010203 --profile local
 ```
 
+### `run_local_hive_bronze_check.py`
+
+Runs a local Hive validation for one Bronze dataset:
+
+- prepares local stage file from `data/batches/<batch_id>/landing/csv/<dataset>.csv`
+- generates runtime Hive DDL/DML SQL files
+- optionally executes DDL, DML, and row-count verify query via `beeline`
+
+Example:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/run_local_hive_bronze_check.py --dataset region --batch-id 20260501_010203 --execute
+```
+
 ## Expected Workflow
 
 1. Set profile and secrets (`PHASE3_ENV`, `.env.local` or `.env.cloud`)
@@ -125,4 +139,5 @@ py warehouse/snowflake-warehouse-setup/scripts/run_dataset_spark_job.py --layer 
 4. Generate dataset-level assets with `generate_layer_assets.py`
 5. Apply setup SQL in `../sql/ddl/`, `../sql/staging/`, and `../sql/bronze/`
 6. Build ingestion SQL with `load_one_dataset.py` or `load_batch.py`
-7. Run per-dataset Spark jobs manually with `run_dataset_spark_job.py` or through Airflow DAG orchestration
+7. Run per-dataset Spark jobs manually with `run_dataset_spark_job.py`
+8. Validate local Hive DDL/DML with `run_local_hive_bronze_check.py` or Airflow local Bronze DAG
