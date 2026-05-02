@@ -11,7 +11,24 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+def _resolve_repo_root() -> Path:
+    configured = os.getenv("FRAUDLENS_REPO_ROOT", "").strip()
+    candidates = []
+    if configured:
+        candidates.append(Path(configured))
+    candidates.extend(
+        [
+            Path("/home/datalab/fraudlens"),
+            Path(__file__).resolve().parents[2],
+        ]
+    )
+    for candidate in candidates:
+        if (candidate / "synthetic_generator" / "contracts.py").exists():
+            return candidate
+    return Path(__file__).resolve().parents[2]
+
+
+REPO_ROOT = _resolve_repo_root()
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 

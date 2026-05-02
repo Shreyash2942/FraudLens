@@ -101,3 +101,9 @@ Trigger with `dag_run.conf`:
 ```json
 {"batch_id": "20260501_010203"}
 ```
+
+If DAGs are not visible in Airflow UI because the UI is not mounted to this repo path, sync DAG files to container DAG folder:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/sync_airflow_dags_to_fraudlens_container.ps1
+```
