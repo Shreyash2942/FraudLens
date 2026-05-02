@@ -1,0 +1,32 @@
+-- Auto-generated Bronze COPY INTO for dataset: branch_location
+SET BATCH_ID = '<replace_with_batch_id>';
+
+COPY INTO FRAUDLENS.BRONZE.BRONZE_BRANCH_LOCATION (
+  BRANCH_ID,
+  BRANCH_CODE,
+  BRANCH_NAME,
+  BRANCH_TERRITORY_ID,
+  REGION_ID,
+  COUNTRY_CODE,
+  CITY_NAME,
+  IS_ACTIVE,
+  INGESTION_BATCH_ID,
+  SOURCE_FILE_NAME,
+  INGESTED_AT_UTC
+)
+FROM (
+  SELECT
+    t.$1,
+    t.$2,
+    t.$3,
+    t.$4,
+    t.$5,
+    t.$6,
+    t.$7,
+    t.$8,
+    $BATCH_ID,
+    METADATA$FILENAME,
+    CURRENT_TIMESTAMP()
+  FROM @FRAUDLENS.BRONZE.STG_BRONZE_MINIO_RAW/$BATCH_ID/raw_zone/csv/branch_location.csv (FILE_FORMAT => FRAUDLENS.BRONZE.FF_BRONZE_CSV_V1) t
+)
+ON_ERROR = 'ABORT_STATEMENT';

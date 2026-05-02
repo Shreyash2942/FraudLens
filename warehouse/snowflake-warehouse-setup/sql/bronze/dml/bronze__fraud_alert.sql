@@ -1,0 +1,38 @@
+-- Auto-generated Bronze COPY INTO for dataset: fraud_alert
+SET BATCH_ID = '<replace_with_batch_id>';
+
+COPY INTO FRAUDLENS.BRONZE.BRONZE_FRAUD_ALERT (
+  FRAUD_ALERT_ID,
+  RISK_SIGNAL_ID,
+  ALERT_STATUS,
+  ALERT_SEVERITY,
+  QUEUE_CODE,
+  CREATED_AT,
+  ALERT_TYPE_CODE,
+  ALERT_SOURCE_CODE,
+  OWNING_BUSINESS_UNIT_ID,
+  OWNING_ANALYST_TEAM_ID,
+  SERVICE_LEVEL_DUE_AT,
+  INGESTION_BATCH_ID,
+  SOURCE_FILE_NAME,
+  INGESTED_AT_UTC
+)
+FROM (
+  SELECT
+    t.$1,
+    t.$2,
+    t.$3,
+    t.$4,
+    t.$5,
+    t.$6,
+    t.$7,
+    t.$8,
+    t.$9,
+    t.$10,
+    t.$11,
+    $BATCH_ID,
+    METADATA$FILENAME,
+    CURRENT_TIMESTAMP()
+  FROM @FRAUDLENS.BRONZE.STG_BRONZE_MINIO_RAW/$BATCH_ID/raw_zone/csv/fraud_alert.csv (FILE_FORMAT => FRAUDLENS.BRONZE.FF_BRONZE_CSV_V1) t
+)
+ON_ERROR = 'ABORT_STATEMENT';

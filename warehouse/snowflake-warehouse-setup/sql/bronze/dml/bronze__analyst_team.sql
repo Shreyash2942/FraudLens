@@ -1,0 +1,28 @@
+-- Auto-generated Bronze COPY INTO for dataset: analyst_team
+SET BATCH_ID = '<replace_with_batch_id>';
+
+COPY INTO FRAUDLENS.BRONZE.BRONZE_ANALYST_TEAM (
+  ANALYST_TEAM_ID,
+  ANALYST_TEAM_CODE,
+  ANALYST_TEAM_NAME,
+  BUSINESS_UNIT_ID,
+  REGION_ID,
+  IS_ACTIVE,
+  INGESTION_BATCH_ID,
+  SOURCE_FILE_NAME,
+  INGESTED_AT_UTC
+)
+FROM (
+  SELECT
+    t.$1,
+    t.$2,
+    t.$3,
+    t.$4,
+    t.$5,
+    t.$6,
+    $BATCH_ID,
+    METADATA$FILENAME,
+    CURRENT_TIMESTAMP()
+  FROM @FRAUDLENS.BRONZE.STG_BRONZE_MINIO_RAW/$BATCH_ID/raw_zone/csv/analyst_team.csv (FILE_FORMAT => FRAUDLENS.BRONZE.FF_BRONZE_CSV_V1) t
+)
+ON_ERROR = 'ABORT_STATEMENT';

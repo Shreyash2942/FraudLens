@@ -1,0 +1,40 @@
+-- Auto-generated Bronze COPY INTO for dataset: calendar_day
+SET BATCH_ID = '<replace_with_batch_id>';
+
+COPY INTO FRAUDLENS.BRONZE.BRONZE_CALENDAR_DAY (
+  CALENDAR_DATE,
+  CALENDAR_YEAR,
+  CALENDAR_QUARTER,
+  CALENDAR_MONTH,
+  CALENDAR_MONTH_NAME,
+  WEEK_OF_YEAR,
+  DAY_OF_WEEK,
+  DAY_NAME,
+  IS_WEEKEND,
+  IS_MONTH_END,
+  IS_QUARTER_END,
+  IS_HOLIDAY,
+  INGESTION_BATCH_ID,
+  SOURCE_FILE_NAME,
+  INGESTED_AT_UTC
+)
+FROM (
+  SELECT
+    t.$1,
+    t.$2,
+    t.$3,
+    t.$4,
+    t.$5,
+    t.$6,
+    t.$7,
+    t.$8,
+    t.$9,
+    t.$10,
+    t.$11,
+    t.$12,
+    $BATCH_ID,
+    METADATA$FILENAME,
+    CURRENT_TIMESTAMP()
+  FROM @FRAUDLENS.BRONZE.STG_BRONZE_MINIO_RAW/$BATCH_ID/raw_zone/csv/calendar_day.csv (FILE_FORMAT => FRAUDLENS.BRONZE.FF_BRONZE_CSV_V1) t
+)
+ON_ERROR = 'ABORT_STATEMENT';

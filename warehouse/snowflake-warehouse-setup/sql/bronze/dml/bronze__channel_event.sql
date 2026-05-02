@@ -1,0 +1,34 @@
+-- Auto-generated Bronze COPY INTO for dataset: channel_event
+SET BATCH_ID = '<replace_with_batch_id>';
+
+COPY INTO FRAUDLENS.BRONZE.BRONZE_CHANNEL_EVENT (
+  CHANNEL_EVENT_ID,
+  CHANNEL_CODE,
+  SESSION_ID,
+  BRANCH_ID,
+  EVENT_AT,
+  EVENT_COUNTRY_CODE,
+  IP_COUNTRY_CODE,
+  AUTHENTICATION_RESULT_CODE,
+  SESSION_RISK_CODE,
+  INGESTION_BATCH_ID,
+  SOURCE_FILE_NAME,
+  INGESTED_AT_UTC
+)
+FROM (
+  SELECT
+    t.$1,
+    t.$2,
+    t.$3,
+    t.$4,
+    t.$5,
+    t.$6,
+    t.$7,
+    t.$8,
+    t.$9,
+    $BATCH_ID,
+    METADATA$FILENAME,
+    CURRENT_TIMESTAMP()
+  FROM @FRAUDLENS.BRONZE.STG_BRONZE_MINIO_RAW/$BATCH_ID/raw_zone/csv/channel_event.csv (FILE_FORMAT => FRAUDLENS.BRONZE.FF_BRONZE_CSV_V1) t
+)
+ON_ERROR = 'ABORT_STATEMENT';
