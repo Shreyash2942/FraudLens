@@ -1,6 +1,6 @@
 # Phase 3 Scripts
 
-This folder contains runtime helper scripts for Phase 3 (`#39` to `#42`) setup, Bronze asset generation, and ingestion execution.
+This folder contains runtime helper scripts for Phase 3 (`#39` to `#42`) setup, layer-first asset generation, and dataset-level execution.
 
 ## Why These Scripts Exist
 
@@ -60,24 +60,27 @@ Responsibilities:
 - classifies core vs dimension datasets
 - provides reusable naming/path helpers for Bronze table and stage paths
 
-### `generate_bronze_assets.py`
+### `generate_layer_assets.py`
 
-Generates Stage 3 and Stage 4 SQL files based on current dataset contracts.
+Generates dataset-level SQL and Spark job assets for selected layers (`bronze`, `silver`, `gold`).
 
-Output targets:
+Outputs:
 
-- `../sql/ddl/create_bronze_tables_dimensions.sql`
-- `../sql/ddl/create_bronze_tables_core.sql`
-- `../sql/staging/create_csv_file_format.sql`
-- `../sql/staging/create_minio_external_stage.sql`
-- `../sql/dml/copy_into_bronze_dimensions.sql`
-- `../sql/dml/copy_into_bronze_core.sql`
+- per-dataset SQL under `../sql/<layer>/ddl/` and `../sql/<layer>/dml/`
+- per-layer ordered index files:
+  - `../sql/<layer>/_index_ordered.txt`
+  - `../sql/<layer>/dataset_index.json`
+- optional per-dataset Spark job templates under `../spark/<layer>/jobs/`
 
 Example:
 
 ```powershell
-py warehouse/snowflake-warehouse-setup/scripts/generate_bronze_assets.py
+py warehouse/snowflake-warehouse-setup/scripts/generate_layer_assets.py --layers bronze --clean --emit-spark-jobs
 ```
+
+### `generate_bronze_assets.py`
+
+Compatibility wrapper that delegates to `generate_layer_assets.py --layers bronze`.
 
 ### `load_one_dataset.py`
 
@@ -99,11 +102,27 @@ Example:
 py warehouse/snowflake-warehouse-setup/scripts/load_batch.py --batch-id 20260501_010203
 ```
 
+### `run_dataset_spark_job.py`
+
+Runs one per-dataset Spark job script with required contract args:
+
+- `--layer`
+- `--dataset`
+- `--batch-id`
+- `--profile`
+
+Example:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/run_dataset_spark_job.py --layer bronze --dataset payment_instruction --batch-id 20260501_010203 --profile local
+```
+
 ## Expected Workflow
 
 1. Set profile and secrets (`PHASE3_ENV`, `.env.local` or `.env.cloud`)
 2. Run `print_runtime_config.py`
 3. Run `check_connectivity.py`
-4. Generate Bronze SQL assets with `generate_bronze_assets.py`
-5. Apply setup SQL in `../sql/ddl/` and `../sql/staging/`
+4. Generate dataset-level assets with `generate_layer_assets.py`
+5. Apply setup SQL in `../sql/ddl/`, `../sql/staging/`, and `../sql/bronze/`
 6. Build ingestion SQL with `load_one_dataset.py` or `load_batch.py`
+7. Run per-dataset Spark jobs manually with `run_dataset_spark_job.py` or through Airflow DAG orchestration

@@ -1,19 +1,9 @@
 # Phase 3 DML SQL
 
-This folder contains Stage 4 (`#42`) Bronze ingestion SQL bundles.
+This folder contains legacy grouped Stage 4 (`#42`) Bronze ingestion bundles.
 
-## Files
+Dataset-level Bronze ingestion scripts now live under:
 
-- `copy_into_bronze_dimensions.sql`
-  - batch-aware `COPY INTO` statements for dimension datasets
-- `copy_into_bronze_core.sql`
-  - batch-aware `COPY INTO` statements for core banking/fraud datasets
+- `../bronze/dml/bronze__<dataset>.sql`
 
-## Execution Notes
-
-- set `BATCH_ID` at the top of each script before running
-- run dimension load first, then core load
-- statements include Bronze audit fields:
-  - `INGESTION_BATCH_ID`
-  - `SOURCE_FILE_NAME`
-  - `INGESTED_AT_UTC`
+This folder is retained for migration reference only.

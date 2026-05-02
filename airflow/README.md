@@ -1,5 +1,10 @@
 # Airflow
 
-Reserved for future orchestration assets such as DAGs, plugins, and deployment-specific configuration.
+Airflow orchestration assets for FraudLens.
 
-Phase 0 intentionally keeps this directory as a placeholder only.
+Phase 3 adds:
+
+- `dags/phase3_layer_dataset_orchestration.py`
+  - dynamic dataset-level Bronze tasks
+  - Bronze-complete dependency gate before Silver/Gold
+  - Silver/Gold task groups scaffolded and config-controlled (`enabled: false` by default)

@@ -24,8 +24,8 @@ This checklist tracks implementation progress for the Phase 3 milestone and keep
 
 ## Stage 4 (`#43`) Staging And File Formats
 
-- [ ] file format SQL created
-- [ ] stage SQL created
+- [x] file format SQL created
+- [x] stage SQL created
 
 ## Stage 5 (`#42`) Ingestion From MinIO
 

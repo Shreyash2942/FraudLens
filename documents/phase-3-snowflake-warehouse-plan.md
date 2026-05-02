@@ -175,7 +175,13 @@ This section defines the concrete script inventory to be created in Phase 3 so i
 ### Directory Blueprint
 
 - `warehouse/snowflake-warehouse-setup/sql/ddl/`
-- `warehouse/snowflake-warehouse-setup/sql/dml/`
+- `warehouse/snowflake-warehouse-setup/sql/bronze/ddl/`
+- `warehouse/snowflake-warehouse-setup/sql/bronze/dml/`
+- `warehouse/snowflake-warehouse-setup/sql/silver/ddl/`
+- `warehouse/snowflake-warehouse-setup/sql/silver/dml/`
+- `warehouse/snowflake-warehouse-setup/sql/gold/ddl/`
+- `warehouse/snowflake-warehouse-setup/sql/gold/dml/`
+- `warehouse/snowflake-warehouse-setup/sql/dml/` (legacy grouped path retained for migration reference)
 - `warehouse/snowflake-warehouse-setup/sql/staging/`
 - `warehouse/snowflake-warehouse-setup/sql/validation/`
 - `warehouse/snowflake-warehouse-setup/scripts/`
@@ -199,7 +205,7 @@ Purpose:
 
 - `warehouse/snowflake-warehouse-setup/sql/ddl/create_database_and_schemas.sql`
 - `warehouse/snowflake-warehouse-setup/sql/ddl/create_roles_and_grants.sql`
-- `warehouse/snowflake-warehouse-setup/sql/ddl/naming_convention_reference.sql` (commented reference SQL)
+- `warehouse/snowflake-warehouse-setup/sql/naming/naming_convention_reference.sql` (commented reference SQL)
 
 Purpose:
 
@@ -208,8 +214,8 @@ Purpose:
 
 ### 3) Bronze DDL Scripts (`#41`)
 
-- `warehouse/snowflake-warehouse-setup/sql/ddl/create_bronze_tables_core.sql`
-- `warehouse/snowflake-warehouse-setup/sql/ddl/create_bronze_tables_dimensions.sql`
+- `warehouse/snowflake-warehouse-setup/sql/bronze/ddl/bronze__<dataset>.sql`
+- `warehouse/snowflake-warehouse-setup/sql/bronze/dataset_index.json`
 
 Purpose:
 
@@ -230,24 +236,24 @@ Purpose:
 
 Cloud/Snowflake-oriented SQL:
 
-- `warehouse/snowflake-warehouse-setup/sql/dml/copy_into_bronze_core.sql`
-- `warehouse/snowflake-warehouse-setup/sql/dml/copy_into_bronze_dimensions.sql`
+- `warehouse/snowflake-warehouse-setup/sql/bronze/dml/bronze__<dataset>.sql`
 
 Local execution helpers:
 
 - `warehouse/snowflake-warehouse-setup/scripts/load_batch.py`
 - `warehouse/snowflake-warehouse-setup/scripts/load_one_dataset.py`
-- `warehouse/snowflake-warehouse-setup/scripts/retry_failed_loads.py`
+- `warehouse/snowflake-warehouse-setup/scripts/run_dataset_spark_job.py`
 
 Spark local-ingestion support:
 
-- `warehouse/snowflake-warehouse-setup/spark/bronze_ingest_job.py`
-- `warehouse/snowflake-warehouse-setup/spark/bronze_manifest_loader.py`
+- `warehouse/snowflake-warehouse-setup/spark/bronze/jobs/bronze__<dataset>_job.py`
+- `warehouse/snowflake-warehouse-setup/spark/common/dataset_job_contract.py`
 
 Purpose:
 
 - load MinIO-backed files into Bronze targets with batch-aware execution
 - support first local-only execution while keeping cloud SQL artifacts ready
+- standardize per-dataset job outputs for Airflow and manual execution
 
 ### 6) Validation Scripts (`#44`)
 

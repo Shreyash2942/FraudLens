@@ -29,3 +29,19 @@ connectivity:
   check_minio: false
   check_snowflake: true
   check_trino: false
+
+orchestration:
+  mode: airflow
+
+dependency_policy: bronze_strict
+
+layers:
+  bronze:
+    enabled: true
+    datasets: from_contract
+  silver:
+    enabled: false
+    datasets: from_contract
+  gold:
+    enabled: false
+    datasets: from_contract

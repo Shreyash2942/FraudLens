@@ -38,17 +38,22 @@ The `scripts/` folder contains reusable execution helpers through Stage 4.
   - local mode checks Trino/MinIO endpoint reachability
   - cloud mode checks required `SNOWFLAKE_*` variables are set
 - `generate_bronze_assets.py`
-  - generates Bronze DDL and ingestion SQL from governed dataset contracts
+  - compatibility wrapper for bronze-only generation
+- `generate_layer_assets.py`
+  - generates dataset-level SQL and Spark job assets for Bronze/Silver/Gold
 - `load_one_dataset.py`
   - emits one dataset-specific `COPY INTO` statement for a batch id
 - `load_batch.py`
   - emits ordered `COPY INTO` statements for all datasets in a batch manifest
+- `run_dataset_spark_job.py`
+  - runs one layer/dataset Spark job with standard contract args
 
 Example usage:
 
 ```powershell
 py warehouse/snowflake-warehouse-setup/scripts/print_runtime_config.py local
 py warehouse/snowflake-warehouse-setup/scripts/check_connectivity.py
+py warehouse/snowflake-warehouse-setup/scripts/generate_layer_assets.py --layers bronze --clean --emit-spark-jobs
 ```
 
 ## Execution Order
@@ -56,6 +61,7 @@ py warehouse/snowflake-warehouse-setup/scripts/check_connectivity.py
 1. review and adapt `config/local.yml` or `config/cloud.yml`
 2. run `scripts/print_runtime_config.py` to confirm resolved values
 3. run `scripts/check_connectivity.py` for environment validation
-4. generate Stage 3/4 SQL with `scripts/generate_bronze_assets.py`
-5. apply DDL and staging files in `sql/ddl/` and `sql/staging/`
-6. execute load SQL from `sql/dml/` or build runtime SQL with `scripts/load_batch.py`
+4. generate layer assets with `scripts/generate_layer_assets.py`
+5. apply DDL and staging files in `sql/ddl/`, `sql/staging/`, and `sql/bronze/`
+6. execute dataset-level Bronze SQL or build runtime SQL with `scripts/load_batch.py`
+7. run per-dataset Spark jobs using `scripts/run_dataset_spark_job.py` or Airflow DAG `airflow/dags/phase3_layer_dataset_orchestration.py`

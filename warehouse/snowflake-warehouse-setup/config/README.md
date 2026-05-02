@@ -28,3 +28,18 @@ Required local secret values for MinIO stage setup:
 - `MINIO_SECRET_KEY`
 - `MINIO_BUCKET`
 - `MINIO_PREFIX`
+
+## Layer And Orchestration Controls
+
+Phase 3 dataset-level orchestration uses additional non-secret controls in both `local.yml` and `cloud.yml`:
+
+- `orchestration.mode`
+  - default: `airflow`
+  - options: `airflow`, `manual`
+- `dependency_policy`
+  - default: `bronze_strict`
+- `layers.<layer>.enabled`
+  - enables task generation for `bronze`, `silver`, `gold`
+- `layers.<layer>.datasets`
+  - set to `from_contract` to use governed `DATASET_ORDER`
+  - or set explicit dataset list for targeted runs
