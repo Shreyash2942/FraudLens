@@ -32,12 +32,28 @@ def bronze_table_name(dataset: str) -> str:
     return f"BRONZE_{dataset.upper()}"
 
 
+def silver_table_name(dataset: str) -> str:
+    return f"SILVER_{dataset.upper()}"
+
+
+def gold_table_name(dataset: str) -> str:
+    return f"GOLD_{dataset.upper()}"
+
+
 def bronze_file_name(dataset: str) -> str:
     return f"{dataset}.csv"
 
 
 def bronze_batch_stage_path(dataset: str, batch_id: str) -> str:
     return f"{batch_id}/raw_zone/csv/{bronze_file_name(dataset)}"
+
+
+def layer_sql_file_name(layer: str, dataset: str) -> str:
+    return f"{layer.lower()}__{dataset}.sql"
+
+
+def layer_spark_job_file_name(layer: str, dataset: str) -> str:
+    return f"{layer.lower()}__{dataset}_job.py"
 
 
 def infer_snowflake_type(column_name: str) -> str:
