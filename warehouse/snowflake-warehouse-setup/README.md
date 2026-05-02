@@ -13,10 +13,14 @@ This directory contains executable assets for Phase 3 (`#39` to `#46`) with loca
 
 - `config/` environment profile files
 - `scripts/` executable helpers (connectivity, SQL generation, load SQL builders)
-- `sql/ddl/` database/schema, role/grant, and Bronze DDL
+- `sql/bronze/` dataset-level Bronze SQL
+- `sql/silver/` dataset-level Silver scaffold SQL
+- `sql/gold/` dataset-level Gold scaffold SQL
+- `sql/ddl/` shared/admin DDL (database/schema/roles/grants)
 - `sql/staging/` file format and external stage SQL
-- `sql/dml/` batch ingestion `COPY INTO` SQL bundles
+- `sql/dml/` legacy grouped Bronze `COPY INTO` SQL (migration path)
 - `sql/naming/` naming standard reference SQL
+- `spark/` layer-first Spark job assets and shared job contracts
 
 ## Scripts
 

@@ -4,8 +4,11 @@ This folder contains SQL assets for Snowflake warehouse setup and loading patter
 
 ## Subfolders
 
-- `ddl/`: database, schema, role, and table creation scripts
-- `staging/`: file format and stage creation SQL
-- `dml/`: Bronze `COPY INTO` ingestion SQL
+- `bronze/`: dataset-level Bronze SQL (`ddl/` + `dml/`)
+- `silver/`: dataset-level Silver scaffold SQL (`ddl/` + `dml/`)
+- `gold/`: dataset-level Gold scaffold SQL (`ddl/` + `dml/`)
+- `ddl/`: shared/admin DDL (database, schema, role, grants)
+- `staging/`: stage and file-format SQL
+- `dml/`: legacy grouped Bronze load SQL (to be retired after migration)
 - `naming/`: naming and standardization reference SQL
 - `validation/`: reconciliation and quality SQL (future stage)
