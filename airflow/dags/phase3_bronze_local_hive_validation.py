@@ -35,7 +35,7 @@ from synthetic_generator.contracts import DATASET_ORDER
 
 
 def _batch_expr() -> str:
-    return "{{ dag_run.conf.get('batch_id', 'manual_batch') }}"
+    return "{{ dag_run.conf.get('batch_id', 'latest') }}"
 
 
 def _spark_submit_cmd() -> str:
@@ -62,6 +62,10 @@ def _hive_db() -> str:
     return os.getenv("HIVE_DATABASE", "fraudlens_local")
 
 
+def _hive_dml_mode_expr() -> str:
+    return "{{ dag_run.conf.get('hive_dml_mode', 'explain') }}"
+
+
 def _spark_check_command(dataset: str) -> str:
     script = (REPO_ROOT / "warehouse" / "snowflake-warehouse-setup" / "scripts" / "run_dataset_spark_job.py").as_posix()
     return (
@@ -79,7 +83,7 @@ def _hive_check_command(dataset: str) -> str:
         f"python {script} "
         f"--dataset {dataset} --batch-id {_batch_expr()} --data-root data "
         f"--database-name {_hive_db()} --hive-cmd {_hive_cmd()} --hive-jdbc-url {_hive_jdbc_url()} "
-        f"{user_arg} {pass_arg} --execute"
+        f"{user_arg} {pass_arg} --execute --dml-mode {_hive_dml_mode_expr()}"
     )
 
 

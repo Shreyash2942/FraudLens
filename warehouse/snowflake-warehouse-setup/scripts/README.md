@@ -131,6 +131,12 @@ Example:
 py warehouse/snowflake-warehouse-setup/scripts/run_local_hive_bronze_check.py --dataset region --batch-id 20260501_010203 --execute
 ```
 
+Optional flags:
+
+- `--batch-id latest` to auto-pick newest batch
+- `--dml-mode explain` for fast DML syntax/plan validation (default)
+- `--dml-mode execute` for full physical DML execution
+
 ## Expected Workflow
 
 1. Set profile and secrets (`PHASE3_ENV`, `.env.local` or `.env.cloud`)

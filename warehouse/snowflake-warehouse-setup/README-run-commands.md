@@ -83,7 +83,7 @@ py warehouse/snowflake-warehouse-setup/scripts/run_dataset_spark_job.py --layer 
 Generate and execute local Hive Bronze DDL/DML for one dataset:
 
 ```powershell
-py warehouse/snowflake-warehouse-setup/scripts/run_local_hive_bronze_check.py --dataset region --batch-id <batch_id> --execute
+py warehouse/snowflake-warehouse-setup/scripts/run_local_hive_bronze_check.py --dataset region --batch-id latest --execute --dml-mode explain
 ```
 
 ## 6) Airflow DAG
@@ -100,6 +100,18 @@ Trigger with `dag_run.conf`:
 
 ```json
 {"batch_id": "20260501_010203"}
+```
+
+Recommended trigger for local Bronze Hive validation DAG:
+
+```json
+{"batch_id":"latest","hive_dml_mode":"explain"}
+```
+
+If you want full physical DML execution (slower, heavier):
+
+```json
+{"batch_id":"latest","hive_dml_mode":"execute"}
 ```
 
 If DAGs are not visible in Airflow UI because the UI is not mounted to this repo path, sync DAG files to container DAG folder:
