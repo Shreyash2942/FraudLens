@@ -208,9 +208,8 @@ Purpose:
 
 ### 3) Bronze DDL Scripts (`#41`)
 
-- `warehouse/snowflake-warehouse-setup/sql/ddl/10_create_bronze_tables_core.sql`
-- `warehouse/snowflake-warehouse-setup/sql/ddl/11_create_bronze_tables_dimensions.sql`
-- `warehouse/snowflake-warehouse-setup/sql/ddl/12_create_bronze_audit_tables.sql`
+- `warehouse/snowflake-warehouse-setup/sql/ddl/create_bronze_tables_core.sql`
+- `warehouse/snowflake-warehouse-setup/sql/ddl/create_bronze_tables_dimensions.sql`
 
 Purpose:
 
@@ -219,9 +218,8 @@ Purpose:
 
 ### 4) Staging And File Format Scripts (`#43`)
 
-- `warehouse/snowflake-warehouse-setup/sql/staging/20_create_file_formats.sql`
-- `warehouse/snowflake-warehouse-setup/sql/staging/21_create_stages.sql`
-- `warehouse/snowflake-warehouse-setup/sql/staging/22_list_stage_files.sql`
+- `warehouse/snowflake-warehouse-setup/sql/staging/create_csv_file_format.sql`
+- `warehouse/snowflake-warehouse-setup/sql/staging/create_minio_external_stage.sql`
 
 Purpose:
 
@@ -232,8 +230,8 @@ Purpose:
 
 Cloud/Snowflake-oriented SQL:
 
-- `warehouse/snowflake-warehouse-setup/sql/dml/30_copy_into_bronze_core.sql`
-- `warehouse/snowflake-warehouse-setup/sql/dml/31_copy_into_bronze_dimensions.sql`
+- `warehouse/snowflake-warehouse-setup/sql/dml/copy_into_bronze_core.sql`
+- `warehouse/snowflake-warehouse-setup/sql/dml/copy_into_bronze_dimensions.sql`
 
 Local execution helpers:
 

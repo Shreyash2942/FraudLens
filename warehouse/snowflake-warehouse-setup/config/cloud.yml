@@ -14,6 +14,8 @@ warehouse:
     bronze: BRONZE
     silver: SILVER
     gold: GOLD
+  file_format_name: FF_BRONZE_CSV_V1
+  external_stage_name: STG_BRONZE_MINIO_RAW
   warehouse_name: FRAUDLENS_WH_XS
   role_name: FRAUDLENS_ENGINEER_ROLE
   standards:

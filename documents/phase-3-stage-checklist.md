@@ -19,7 +19,7 @@ This checklist tracks implementation progress for the Phase 3 milestone and keep
 
 ## Stage 3 (`#41`) Bronze Tables
 
-- [ ] Bronze DDL scripts created
+- [x] Bronze DDL scripts created
 - [ ] Bronze tables deployed
 
 ## Stage 4 (`#43`) Staging And File Formats
@@ -29,7 +29,7 @@ This checklist tracks implementation progress for the Phase 3 milestone and keep
 
 ## Stage 5 (`#42`) Ingestion From MinIO
 
-- [ ] batch load scripts created
+- [x] batch load scripts created
 - [ ] first dataset loaded end-to-end
 
 ## Stage 6 (`#44`) Validation

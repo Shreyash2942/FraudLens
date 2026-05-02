@@ -13,3 +13,18 @@ This folder stores non-secret runtime profiles for Phase 3 setup.
 - select profile with `PHASE3_ENV` (`local` or `cloud`)
 - run `../scripts/print_runtime_config.py` to verify resolved settings
 - keep credentials in local env files or secret manager, not in YAML
+
+## Phase 3 Stage 4 Inputs
+
+These profile files also define Bronze ingestion object names used by Stage 4 scripts:
+
+- `warehouse.file_format_name` (default `FF_BRONZE_CSV_V1`)
+- `warehouse.external_stage_name` (default `STG_BRONZE_MINIO_RAW`)
+
+Required local secret values for MinIO stage setup:
+
+- `MINIO_ENDPOINT`
+- `MINIO_ACCESS_KEY`
+- `MINIO_SECRET_KEY`
+- `MINIO_BUCKET`
+- `MINIO_PREFIX`

@@ -5,10 +5,7 @@ This folder contains SQL assets for Snowflake warehouse setup and loading patter
 ## Subfolders
 
 - `ddl/`: database, schema, role, and table creation scripts
+- `staging/`: file format and stage creation SQL
+- `dml/`: Bronze `COPY INTO` ingestion SQL
 - `naming/`: naming and standardization reference SQL
-
-Planned future subfolders:
-
-- `staging/`: stage and file format SQL
-- `dml/`: load SQL (`COPY INTO`, merge/load patterns)
-- `validation/`: reconciliation and quality SQL
+- `validation/`: reconciliation and quality SQL (future stage)

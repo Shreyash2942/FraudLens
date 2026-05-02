@@ -13,6 +13,8 @@ warehouse:
     bronze: bronze
     silver: silver
     gold: gold
+  file_format_name: FF_BRONZE_CSV_V1
+  external_stage_name: STG_BRONZE_MINIO_RAW
   standards:
     object_prefix: fl_
     audit_columns:

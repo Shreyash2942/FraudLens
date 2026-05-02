@@ -1,6 +1,6 @@
 # Phase 3 Scripts
 
-This folder contains Stage 1 runtime helper scripts for Phase 3 (`#39`) environment setup and validation.
+This folder contains runtime helper scripts for Phase 3 (`#39` to `#42`) setup, Bronze asset generation, and ingestion execution.
 
 ## Why These Scripts Exist
 
@@ -50,9 +50,60 @@ Example:
 py warehouse/snowflake-warehouse-setup/scripts/check_connectivity.py
 ```
 
+### `_dataset_layout.py`
+
+Shared dataset contract adapter for Stage 3 and Stage 4.
+
+Responsibilities:
+
+- reads governed dataset order and CSV field definitions from `synthetic_generator/contracts.py`
+- classifies core vs dimension datasets
+- provides reusable naming/path helpers for Bronze table and stage paths
+
+### `generate_bronze_assets.py`
+
+Generates Stage 3 and Stage 4 SQL files based on current dataset contracts.
+
+Output targets:
+
+- `../sql/ddl/create_bronze_tables_dimensions.sql`
+- `../sql/ddl/create_bronze_tables_core.sql`
+- `../sql/staging/create_csv_file_format.sql`
+- `../sql/staging/create_minio_external_stage.sql`
+- `../sql/dml/copy_into_bronze_dimensions.sql`
+- `../sql/dml/copy_into_bronze_core.sql`
+
+Example:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/generate_bronze_assets.py
+```
+
+### `load_one_dataset.py`
+
+Builds a single-dataset `COPY INTO` statement for one batch id.
+
+Example:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/load_one_dataset.py --batch-id 20260501_010203 --dataset payment_instruction --write-sql
+```
+
+### `load_batch.py`
+
+Builds a full batch SQL bundle by reading `data/batches/<batch_id>/control/manifest.json` and emitting ordered `COPY INTO` statements for all discovered datasets.
+
+Example:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/load_batch.py --batch-id 20260501_010203
+```
+
 ## Expected Workflow
 
 1. Set profile and secrets (`PHASE3_ENV`, `.env.local` or `.env.cloud`)
 2. Run `print_runtime_config.py`
 3. Run `check_connectivity.py`
-4. Proceed with SQL setup in `../sql/ddl/`
+4. Generate Bronze SQL assets with `generate_bronze_assets.py`
+5. Apply setup SQL in `../sql/ddl/` and `../sql/staging/`
+6. Build ingestion SQL with `load_one_dataset.py` or `load_batch.py`
