@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import os
 import sys
 from datetime import datetime
@@ -85,22 +84,19 @@ def _hive_check_command(dataset: str) -> str:
 
 
 def _precheck_command() -> str:
-    payload = {
-        "expected_datasets": len(DATASET_ORDER),
-        "bronze_ddl_glob": "warehouse/snowflake-warehouse-setup/sql/bronze/ddl/bronze__*.sql",
-        "bronze_dml_glob": "warehouse/snowflake-warehouse-setup/sql/bronze/dml/bronze__*.sql",
-    }
-    return (
-        "python -c \""
-        "from pathlib import Path; import json; "
-        f"payload={json.dumps(payload)}; "
-        "ddl=len(list(Path('.').glob(payload['bronze_ddl_glob']))); "
-        "dml=len(list(Path('.').glob(payload['bronze_dml_glob']))); "
-        "exp=payload['expected_datasets']; "
-        "assert ddl==exp, f'Expected {exp} bronze DDL files, got {ddl}'; "
-        "assert dml==exp, f'Expected {exp} bronze DML files, got {dml}'; "
-        "print(json.dumps({'status':'ok','bronze_ddl_files':ddl,'bronze_dml_files':dml}))\""
-    )
+    expected = len(DATASET_ORDER)
+    return f"""
+python - <<'PY'
+from pathlib import Path
+import json
+expected = {expected}
+ddl = len(list(Path('.').glob("warehouse/snowflake-warehouse-setup/sql/bronze/ddl/bronze__*.sql")))
+dml = len(list(Path('.').glob("warehouse/snowflake-warehouse-setup/sql/bronze/dml/bronze__*.sql")))
+assert ddl == expected, f"Expected {{expected}} bronze DDL files, got {{ddl}}"
+assert dml == expected, f"Expected {{expected}} bronze DML files, got {{dml}}"
+print(json.dumps({{"status": "ok", "bronze_ddl_files": ddl, "bronze_dml_files": dml}}))
+PY
+""".strip()
 
 
 with DAG(
