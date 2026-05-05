@@ -1,6 +1,6 @@
 # Phase 3 Scripts
 
-This folder contains runtime helper scripts for Phase 3 (`#39` to `#42`) setup, layer-first asset generation, and dataset-level execution.
+This folder contains runtime helper scripts for Phase 3 (`#39` to `#45`) setup, layer-first asset generation, dataset-level execution, validation, and load benchmarking.
 
 ## Why These Scripts Exist
 
@@ -137,6 +137,35 @@ Optional flags:
 - `--dml-mode explain` for fast DML syntax/plan validation (default)
 - `--dml-mode execute` for full physical DML execution
 
+### `validate_load.py`
+
+Builds batch-specific validation SQL inputs from the manifest for Stage 6 checks.
+
+Example:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/validate_load.py --batch-id latest --emit-row-count-sql
+```
+
+Output:
+
+- `../sql/runtime/validation/bronze_row_count_reconciliation_<batch_id>.sql`
+
+### `benchmark_load.py`
+
+Runs repeatable Bronze dataset job benchmarks and writes runtime performance artifacts.
+
+Outputs:
+
+- `../sql/runtime/performance/benchmark_<batch_id>_<timestamp>.json`
+- `../sql/runtime/performance/benchmark_<batch_id>_<timestamp>.md`
+
+Example:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/benchmark_load.py --batch-id latest --profile local --runs 1 --spark-submit-cmd python
+```
+
 ## Expected Workflow
 
 1. Set profile and secrets (`PHASE3_ENV`, `.env.local` or `.env.cloud`)
@@ -147,3 +176,5 @@ Optional flags:
 6. Build ingestion SQL with `load_one_dataset.py` or `load_batch.py`
 7. Run per-dataset Spark jobs manually with `run_dataset_spark_job.py`
 8. Validate local Hive DDL/DML with `run_local_hive_bronze_check.py` or Airflow local Bronze DAG
+9. Generate/execute Bronze validation SQL with `validate_load.py` and files in `../sql/validation/`
+10. Capture baseline performance with `benchmark_load.py`

@@ -11,4 +11,8 @@ This folder contains SQL assets for Snowflake warehouse setup and loading patter
 - `staging/`: stage and file-format SQL
 - `dml/`: legacy grouped Bronze load SQL (to be retired after migration)
 - `naming/`: naming and standardization reference SQL
-- `validation/`: reconciliation and quality SQL (future stage)
+- `validation/`: reconciliation, quality, and performance report SQL (`#44`, `#45`)
+  - `bronze_row_count_reconciliation.sql`
+  - `bronze_null_key_checks.sql`
+  - `bronze_domain_sanity_checks.sql`
+  - `bronze_load_performance_report.sql`

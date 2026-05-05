@@ -86,7 +86,21 @@ Generate and execute local Hive Bronze DDL/DML for one dataset:
 py warehouse/snowflake-warehouse-setup/scripts/run_local_hive_bronze_check.py --dataset region --batch-id latest --execute --dml-mode explain
 ```
 
-## 6) Airflow DAG
+## 6) Validation SQL (Issue #44)
+
+Generate batch-specific row-count reconciliation SQL:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/validate_load.py --batch-id latest --emit-row-count-sql
+```
+
+Then run:
+
+- `warehouse/snowflake-warehouse-setup/sql/runtime/validation/bronze_row_count_reconciliation_<batch_id>.sql`
+- `warehouse/snowflake-warehouse-setup/sql/validation/bronze_null_key_checks.sql`
+- `warehouse/snowflake-warehouse-setup/sql/validation/bronze_domain_sanity_checks.sql`
+
+## 7) Airflow DAG
 
 Dataset-level orchestration DAG:
 
@@ -119,3 +133,22 @@ If DAGs are not visible in Airflow UI because the UI is not mounted to this repo
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/sync_airflow_dags_to_fraudlens_container.ps1
 ```
+
+## 8) Baseline Performance Benchmark (Issue #45)
+
+Benchmark all Bronze datasets for the latest batch:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/benchmark_load.py --batch-id latest --profile local --runs 1 --spark-submit-cmd python
+```
+
+Benchmark only selected datasets:
+
+```powershell
+py warehouse/snowflake-warehouse-setup/scripts/benchmark_load.py --batch-id latest --datasets region,payment_instruction --runs 2 --spark-submit-cmd python
+```
+
+## 9) Operator Documentation (Issue #46)
+
+- setup runbook: `documents/phase-3-warehouse-setup-runbook.md`
+- troubleshooting: `documents/phase-3-troubleshooting.md`

@@ -2,12 +2,16 @@
 
 This directory contains executable assets for Phase 3 (`#39` to `#46`) with local-first and cloud-ready configuration patterns.
 
-## Stage 1 to Stage 4 Scope
+## Stage 1 to Stage 8 Scope
 
 - Stage 1 (`#39`): environment config and access checks
 - Stage 2 (`#40`): warehouse structure and naming standards
 - Stage 3 (`#41`): Bronze table creation assets
 - Stage 4 (`#42`): MinIO ingestion SQL patterns and execution helpers
+- Stage 5 (`#43`): stage and file-format handling
+- Stage 6 (`#44`): validation SQL patterns
+- Stage 7 (`#45`): baseline load performance benchmarking
+- Stage 8 (`#46`): runbook and troubleshooting documentation
 
 ## Directory Layout
 
@@ -20,11 +24,12 @@ This directory contains executable assets for Phase 3 (`#39` to `#46`) with loca
 - `sql/staging/` file format and external stage SQL
 - `sql/dml/` legacy grouped Bronze `COPY INTO` SQL (migration path)
 - `sql/naming/` naming standard reference SQL
+- `sql/validation/` load validation and benchmark reporting SQL
 - `spark/` layer-first Spark job assets and shared job contracts
 
 ## Scripts
 
-The `scripts/` folder contains reusable execution helpers through Stage 4.
+The `scripts/` folder contains reusable execution helpers through Stage 7.
 
 - `_config_loader.py`
   - shared loader used by other scripts
@@ -49,6 +54,10 @@ The `scripts/` folder contains reusable execution helpers through Stage 4.
   - runs one layer/dataset Spark job with standard contract args
 - `run_local_hive_bronze_check.py`
   - validates one Bronze dataset in local Hive by executing generated DDL/DML checks
+- `validate_load.py`
+  - generates batch-specific row-count reconciliation SQL and validation inputs from manifest metadata
+- `benchmark_load.py`
+  - executes repeatable dataset-run benchmarks and writes runtime performance reports
 
 Example usage:
 
@@ -68,3 +77,5 @@ py warehouse/snowflake-warehouse-setup/scripts/generate_layer_assets.py --layers
 6. execute dataset-level Bronze SQL or build runtime SQL with `scripts/load_batch.py`
 7. run per-dataset Spark jobs using `scripts/run_dataset_spark_job.py`
 8. run local Bronze Hive validation using `scripts/run_local_hive_bronze_check.py` or Airflow DAG `airflow/dags/phase3_bronze_local_hive_validation.py`
+9. generate/execute validation SQL using `scripts/validate_load.py` and `sql/validation/`
+10. capture baseline benchmark outputs using `scripts/benchmark_load.py`
