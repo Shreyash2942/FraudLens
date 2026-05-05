@@ -34,17 +34,17 @@ This checklist tracks implementation progress for the Phase 3 milestone and keep
 
 ## Stage 6 (`#44`) Validation
 
-- [ ] row-count reconciliation checks added
-- [ ] null/key/domain checks added
+- [x] row-count reconciliation checks added (`bronze_row_count_reconciliation.sql`, `validate_load.py`)
+- [x] null/key/domain checks added (`bronze_null_key_checks.sql`, `bronze_domain_sanity_checks.sql`)
 
 ## Stage 7 (`#45`) Initial Performance
 
-- [ ] baseline load benchmark captured
-- [ ] first tuning notes documented
+- [x] baseline load benchmark captured (`benchmark_load.py`, 21-dataset local run on 2026-05-05)
+- [x] first tuning notes documented (`benchmark_load.py`, `bronze_load_performance_report.sql`, runbook benchmark section)
 
 ## Stage 8 (`#46`) Documentation
 
-- [ ] setup runbook completed
-- [ ] troubleshooting notes completed
+- [x] setup runbook completed (`documents/phase-3-warehouse-setup-runbook.md`)
+- [x] troubleshooting notes completed (`documents/phase-3-troubleshooting.md`)
 
 

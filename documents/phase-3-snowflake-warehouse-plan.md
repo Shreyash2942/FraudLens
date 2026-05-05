@@ -257,9 +257,9 @@ Purpose:
 
 ### 6) Validation Scripts (`#44`)
 
-- `warehouse/snowflake-warehouse-setup/sql/validation/40_row_count_reconciliation.sql`
-- `warehouse/snowflake-warehouse-setup/sql/validation/41_null_and_key_checks.sql`
-- `warehouse/snowflake-warehouse-setup/sql/validation/42_domain_sanity_checks.sql`
+- `warehouse/snowflake-warehouse-setup/sql/validation/bronze_row_count_reconciliation.sql`
+- `warehouse/snowflake-warehouse-setup/sql/validation/bronze_null_key_checks.sql`
+- `warehouse/snowflake-warehouse-setup/sql/validation/bronze_domain_sanity_checks.sql`
 - `warehouse/snowflake-warehouse-setup/scripts/validate_load.py`
 
 Purpose:
@@ -270,7 +270,7 @@ Purpose:
 ### 7) Performance Baseline Scripts (`#45`)
 
 - `warehouse/snowflake-warehouse-setup/scripts/benchmark_load.py`
-- `warehouse/snowflake-warehouse-setup/sql/validation/50_load_performance_report.sql`
+- `warehouse/snowflake-warehouse-setup/sql/validation/bronze_load_performance_report.sql`
 
 Purpose:
 
