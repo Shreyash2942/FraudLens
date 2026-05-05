@@ -1,5 +1,9 @@
-# Warehouse
+﻿# Warehouse
 
-Reserved for future warehouse-specific assets such as DDL, loading patterns, environment notes, and data platform mappings.
+Warehouse-specific assets for Phase 3 and later live under this directory.
 
-Phase 0 intentionally keeps this directory as a placeholder only.
+- `snowflake-warehouse-setup/` contains Stage 1 and Stage 2 implementation assets for:
+  - environment/access checks (`#39`)
+  - structure/naming standards (`#40`)
+
+

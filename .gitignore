@@ -35,3 +35,7 @@ data/**/*.csv
 data/**/manifest.json
 data/**/batch_control.json
 data/**/validation_report.json
+
+# Local Hive runtime artifacts
+warehouse/snowflake-warehouse-setup/sql/bronze/hive/runtime_sql/
+derby.log

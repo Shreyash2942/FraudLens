@@ -1,0 +1,32 @@
+-- Auto-generated Bronze COPY INTO for dataset: party_org_assignment
+SET BATCH_ID = '<replace_with_batch_id>';
+
+COPY INTO FRAUDLENS.BRONZE.BRONZE_PARTY_ORG_ASSIGNMENT (
+  PARTY_ORG_ASSIGNMENT_ID,
+  PARTY_ID,
+  BUSINESS_UNIT_ID,
+  ANALYST_TEAM_ID,
+  BRANCH_ID,
+  ASSIGNMENT_ROLE_CODE,
+  EFFECTIVE_FROM_AT,
+  EFFECTIVE_TO_AT,
+  INGESTION_BATCH_ID,
+  SOURCE_FILE_NAME,
+  INGESTED_AT_UTC
+)
+FROM (
+  SELECT
+    t.$1,
+    t.$2,
+    t.$3,
+    t.$4,
+    t.$5,
+    t.$6,
+    t.$7,
+    t.$8,
+    $BATCH_ID,
+    METADATA$FILENAME,
+    CURRENT_TIMESTAMP()
+  FROM @FRAUDLENS.BRONZE.STG_BRONZE_MINIO_RAW/$BATCH_ID/raw_zone/csv/party_org_assignment.csv (FILE_FORMAT => FRAUDLENS.BRONZE.FF_BRONZE_CSV_V1) t
+)
+ON_ERROR = 'ABORT_STATEMENT';

@@ -1,0 +1,157 @@
+{
+  "layer": "gold",
+  "enabled_default": false,
+  "dependency_policy": "bronze_strict",
+  "requires_layers": [
+    "bronze"
+  ],
+  "datasets": [
+    {
+      "order": 1,
+      "dataset": "reference_data_catalog",
+      "sql_ddl_path": "sql/gold/ddl/gold__reference_data_catalog.sql",
+      "sql_dml_path": "sql/gold/dml/gold__reference_data_catalog.sql",
+      "spark_job_path": "spark/gold/jobs/gold__reference_data_catalog_job.py"
+    },
+    {
+      "order": 2,
+      "dataset": "calendar_day",
+      "sql_ddl_path": "sql/gold/ddl/gold__calendar_day.sql",
+      "sql_dml_path": "sql/gold/dml/gold__calendar_day.sql",
+      "spark_job_path": "spark/gold/jobs/gold__calendar_day_job.py"
+    },
+    {
+      "order": 3,
+      "dataset": "region",
+      "sql_ddl_path": "sql/gold/ddl/gold__region.sql",
+      "sql_dml_path": "sql/gold/dml/gold__region.sql",
+      "spark_job_path": "spark/gold/jobs/gold__region_job.py"
+    },
+    {
+      "order": 4,
+      "dataset": "branch_territory",
+      "sql_ddl_path": "sql/gold/ddl/gold__branch_territory.sql",
+      "sql_dml_path": "sql/gold/dml/gold__branch_territory.sql",
+      "spark_job_path": "spark/gold/jobs/gold__branch_territory_job.py"
+    },
+    {
+      "order": 5,
+      "dataset": "branch_location",
+      "sql_ddl_path": "sql/gold/ddl/gold__branch_location.sql",
+      "sql_dml_path": "sql/gold/dml/gold__branch_location.sql",
+      "spark_job_path": "spark/gold/jobs/gold__branch_location_job.py"
+    },
+    {
+      "order": 6,
+      "dataset": "business_unit",
+      "sql_ddl_path": "sql/gold/ddl/gold__business_unit.sql",
+      "sql_dml_path": "sql/gold/dml/gold__business_unit.sql",
+      "spark_job_path": "spark/gold/jobs/gold__business_unit_job.py"
+    },
+    {
+      "order": 7,
+      "dataset": "analyst_team",
+      "sql_ddl_path": "sql/gold/ddl/gold__analyst_team.sql",
+      "sql_dml_path": "sql/gold/dml/gold__analyst_team.sql",
+      "spark_job_path": "spark/gold/jobs/gold__analyst_team_job.py"
+    },
+    {
+      "order": 8,
+      "dataset": "party",
+      "sql_ddl_path": "sql/gold/ddl/gold__party.sql",
+      "sql_dml_path": "sql/gold/dml/gold__party.sql",
+      "spark_job_path": "spark/gold/jobs/gold__party_job.py"
+    },
+    {
+      "order": 9,
+      "dataset": "party_org_assignment",
+      "sql_ddl_path": "sql/gold/ddl/gold__party_org_assignment.sql",
+      "sql_dml_path": "sql/gold/dml/gold__party_org_assignment.sql",
+      "spark_job_path": "spark/gold/jobs/gold__party_org_assignment_job.py"
+    },
+    {
+      "order": 10,
+      "dataset": "deposit_account",
+      "sql_ddl_path": "sql/gold/ddl/gold__deposit_account.sql",
+      "sql_dml_path": "sql/gold/dml/gold__deposit_account.sql",
+      "spark_job_path": "spark/gold/jobs/gold__deposit_account_job.py"
+    },
+    {
+      "order": 11,
+      "dataset": "payment_card",
+      "sql_ddl_path": "sql/gold/ddl/gold__payment_card.sql",
+      "sql_dml_path": "sql/gold/dml/gold__payment_card.sql",
+      "spark_job_path": "spark/gold/jobs/gold__payment_card_job.py"
+    },
+    {
+      "order": 12,
+      "dataset": "device_profile",
+      "sql_ddl_path": "sql/gold/ddl/gold__device_profile.sql",
+      "sql_dml_path": "sql/gold/dml/gold__device_profile.sql",
+      "spark_job_path": "spark/gold/jobs/gold__device_profile_job.py"
+    },
+    {
+      "order": 13,
+      "dataset": "channel_event",
+      "sql_ddl_path": "sql/gold/ddl/gold__channel_event.sql",
+      "sql_dml_path": "sql/gold/dml/gold__channel_event.sql",
+      "spark_job_path": "spark/gold/jobs/gold__channel_event_job.py"
+    },
+    {
+      "order": 14,
+      "dataset": "payment_instruction",
+      "sql_ddl_path": "sql/gold/ddl/gold__payment_instruction.sql",
+      "sql_dml_path": "sql/gold/dml/gold__payment_instruction.sql",
+      "spark_job_path": "spark/gold/jobs/gold__payment_instruction_job.py"
+    },
+    {
+      "order": 15,
+      "dataset": "payment_transaction",
+      "sql_ddl_path": "sql/gold/ddl/gold__payment_transaction.sql",
+      "sql_dml_path": "sql/gold/dml/gold__payment_transaction.sql",
+      "spark_job_path": "spark/gold/jobs/gold__payment_transaction_job.py"
+    },
+    {
+      "order": 16,
+      "dataset": "risk_signal",
+      "sql_ddl_path": "sql/gold/ddl/gold__risk_signal.sql",
+      "sql_dml_path": "sql/gold/dml/gold__risk_signal.sql",
+      "spark_job_path": "spark/gold/jobs/gold__risk_signal_job.py"
+    },
+    {
+      "order": 17,
+      "dataset": "fraud_alert",
+      "sql_ddl_path": "sql/gold/ddl/gold__fraud_alert.sql",
+      "sql_dml_path": "sql/gold/dml/gold__fraud_alert.sql",
+      "spark_job_path": "spark/gold/jobs/gold__fraud_alert_job.py"
+    },
+    {
+      "order": 18,
+      "dataset": "fraud_case",
+      "sql_ddl_path": "sql/gold/ddl/gold__fraud_case.sql",
+      "sql_dml_path": "sql/gold/dml/gold__fraud_case.sql",
+      "spark_job_path": "spark/gold/jobs/gold__fraud_case_job.py"
+    },
+    {
+      "order": 19,
+      "dataset": "investigation_event",
+      "sql_ddl_path": "sql/gold/ddl/gold__investigation_event.sql",
+      "sql_dml_path": "sql/gold/dml/gold__investigation_event.sql",
+      "spark_job_path": "spark/gold/jobs/gold__investigation_event_job.py"
+    },
+    {
+      "order": 20,
+      "dataset": "decision_record",
+      "sql_ddl_path": "sql/gold/ddl/gold__decision_record.sql",
+      "sql_dml_path": "sql/gold/dml/gold__decision_record.sql",
+      "spark_job_path": "spark/gold/jobs/gold__decision_record_job.py"
+    },
+    {
+      "order": 21,
+      "dataset": "case_disposition",
+      "sql_ddl_path": "sql/gold/ddl/gold__case_disposition.sql",
+      "sql_dml_path": "sql/gold/dml/gold__case_disposition.sql",
+      "spark_job_path": "spark/gold/jobs/gold__case_disposition_job.py"
+    }
+  ]
+}

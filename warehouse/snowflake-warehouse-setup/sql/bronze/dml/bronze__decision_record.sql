@@ -1,0 +1,36 @@
+-- Auto-generated Bronze COPY INTO for dataset: decision_record
+SET BATCH_ID = '<replace_with_batch_id>';
+
+COPY INTO FRAUDLENS.BRONZE.BRONZE_DECISION_RECORD (
+  DECISION_ID,
+  FRAUD_CASE_ID,
+  DECISION_TYPE,
+  DECISION_STATUS,
+  DECISION_MAKER_PARTY_ID,
+  DECIDED_AT,
+  DECISION_REASON_CODE,
+  DECISION_CHANNEL_CODE,
+  POLICY_NAME,
+  RULE_SET_VERSION,
+  INGESTION_BATCH_ID,
+  SOURCE_FILE_NAME,
+  INGESTED_AT_UTC
+)
+FROM (
+  SELECT
+    t.$1,
+    t.$2,
+    t.$3,
+    t.$4,
+    t.$5,
+    t.$6,
+    t.$7,
+    t.$8,
+    t.$9,
+    t.$10,
+    $BATCH_ID,
+    METADATA$FILENAME,
+    CURRENT_TIMESTAMP()
+  FROM @FRAUDLENS.BRONZE.STG_BRONZE_MINIO_RAW/$BATCH_ID/raw_zone/csv/decision_record.csv (FILE_FORMAT => FRAUDLENS.BRONZE.FF_BRONZE_CSV_V1) t
+)
+ON_ERROR = 'ABORT_STATEMENT';

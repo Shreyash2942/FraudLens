@@ -1,0 +1,7 @@
+-- Scaffold-only GOLD DDL for dataset: party_org_assignment
+-- TODO: replace placeholder columns with curated model design.
+CREATE TABLE IF NOT EXISTS FRAUDLENS.GOLD.GOLD_PARTY_ORG_ASSIGNMENT (
+  PLACEHOLDER_RECORD_ID VARCHAR,
+  SOURCE_BATCH_ID VARCHAR,
+  PIPELINE_CREATED_AT_UTC TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
+);

@@ -38,6 +38,10 @@ The external runtime source:
 - `standards/` naming, modeling, controls, and auditability standards
 - `airflow/`, `dbt/`, `warehouse/`, `monitoring/`, `analytics/`, `data/`, `platform/` integration and future implementation roots
 
+## Architecture Diagram
+
+![FraudLens Project Architecture](documents/assets/fraudlens-project-architecture-diagram.png)
+
 ## Getting Started
 
 Start with these documents:
