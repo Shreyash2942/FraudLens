@@ -13,8 +13,6 @@ select
     src.IS_MONTH_END as is_month_end,
     src.IS_QUARTER_END as is_quarter_end,
     src.IS_HOLIDAY as is_holiday,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'calendar_day') }} as src
 {{ fraudlens_batch_where('src') }}

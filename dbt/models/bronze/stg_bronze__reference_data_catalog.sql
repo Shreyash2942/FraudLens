@@ -5,8 +5,6 @@ select
     src.CODE_VALUE as code_value,
     src.CODE_DESCRIPTION as code_description,
     src.IS_ACTIVE as is_active,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'reference_data_catalog') }} as src
 {{ fraudlens_batch_where('src') }}

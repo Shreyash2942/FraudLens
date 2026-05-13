@@ -18,8 +18,6 @@ select
     src.MERCHANT_COUNTRY_CODE as merchant_country_code,
     src.COUNTERPARTY_BANK_COUNTRY_CODE as counterparty_bank_country_code,
     src.BOOKING_DATE as booking_date,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'payment_instruction') }} as src
 {{ fraudlens_batch_where('src') }}

@@ -11,8 +11,6 @@ select
     src.INDUSTRY_SECTOR_CODE as industry_sector_code,
     src.RESIDENCY_REGION_ID as residency_region_id,
     src.CUSTOMER_SINCE_AT as customer_since_at,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'party') }} as src
 {{ fraudlens_batch_where('src') }}

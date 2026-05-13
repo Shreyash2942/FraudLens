@@ -11,8 +11,6 @@ select
     src.DECISION_CHANNEL_CODE as decision_channel_code,
     src.POLICY_NAME as policy_name,
     src.RULE_SET_VERSION as rule_set_version,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'decision_record') }} as src
 {{ fraudlens_batch_where('src') }}

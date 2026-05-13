@@ -10,8 +10,6 @@ select
     src.IP_COUNTRY_CODE as ip_country_code,
     src.AUTHENTICATION_RESULT_CODE as authentication_result_code,
     src.SESSION_RISK_CODE as session_risk_code,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'channel_event') }} as src
 {{ fraudlens_batch_where('src') }}

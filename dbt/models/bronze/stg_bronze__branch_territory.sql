@@ -6,8 +6,6 @@ select
     src.BRANCH_TERRITORY_NAME as branch_territory_name,
     src.REGION_ID as region_id,
     src.IS_ACTIVE as is_active,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'branch_territory') }} as src
 {{ fraudlens_batch_where('src') }}

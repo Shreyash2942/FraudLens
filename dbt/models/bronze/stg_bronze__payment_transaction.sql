@@ -12,8 +12,6 @@ select
     src.POSTED_DATE as posted_date,
     src.VALUE_DATE as value_date,
     src.TRANSACTION_DIRECTION_CODE as transaction_direction_code,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'payment_transaction') }} as src
 {{ fraudlens_batch_where('src') }}

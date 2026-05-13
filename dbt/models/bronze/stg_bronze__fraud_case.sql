@@ -13,8 +13,6 @@ select
     src.OWNING_ANALYST_TEAM_ID as owning_analyst_team_id,
     src.HANDLING_REGION_ID as handling_region_id,
     src.ESCALATION_LEVEL_CODE as escalation_level_code,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'fraud_case') }} as src
 {{ fraudlens_batch_where('src') }}

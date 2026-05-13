@@ -8,8 +8,6 @@ select
     src.EVENT_AT as event_at,
     src.EVENT_RESULT_CODE as event_result_code,
     src.ELAPSED_MINUTES as elapsed_minutes,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'investigation_event') }} as src
 {{ fraudlens_batch_where('src') }}

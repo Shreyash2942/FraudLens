@@ -10,8 +10,6 @@ select
     src.RECOVERED_AMOUNT as recovered_amount,
     src.WRITE_OFF_AMOUNT as write_off_amount,
     src.RECOVERY_STATUS_CODE as recovery_status_code,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'case_disposition') }} as src
 {{ fraudlens_batch_where('src') }}

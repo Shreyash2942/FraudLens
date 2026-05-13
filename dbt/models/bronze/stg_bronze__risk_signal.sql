@@ -7,8 +7,6 @@ select
     src.SIGNAL_SCORE_AMOUNT as signal_score_amount,
     src.RISK_LEVEL as risk_level,
     src.EVENT_AT as event_at,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'risk_signal') }} as src
 {{ fraudlens_batch_where('src') }}

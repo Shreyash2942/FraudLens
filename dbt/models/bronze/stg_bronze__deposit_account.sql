@@ -12,8 +12,6 @@ select
     src.SERVICING_BUSINESS_UNIT_ID as servicing_business_unit_id,
     src.ACCOUNT_REGION_ID as account_region_id,
     src.CLOSED_AT as closed_at,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'deposit_account') }} as src
 {{ fraudlens_batch_where('src') }}

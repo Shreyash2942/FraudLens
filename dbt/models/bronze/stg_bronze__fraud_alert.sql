@@ -12,8 +12,6 @@ select
     src.OWNING_BUSINESS_UNIT_ID as owning_business_unit_id,
     src.OWNING_ANALYST_TEAM_ID as owning_analyst_team_id,
     src.SERVICE_LEVEL_DUE_AT as service_level_due_at,
-    src.INGESTION_BATCH_ID as ingestion_batch_id,
-    src.SOURCE_FILE_NAME as source_file_name,
-    src.INGESTED_AT_UTC as ingested_at_utc
+    {{ fraudlens_pipeline_audit_projection('src') }}
 from {{ source('bronze', 'fraud_alert') }} as src
 {{ fraudlens_batch_where('src') }}
