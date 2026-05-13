@@ -31,57 +31,57 @@ models:
     description: "Bronze staging view for payment instructions."
     columns:
       - name: payment_instruction_id
-        tests: [not_null, unique]
+        data_tests: [not_null, unique]
       - name: ingestion_batch_id
-        tests: [not_null]
+        data_tests: [not_null]
       - name: source_file_name
-        tests: [not_null]
+        data_tests: [not_null]
       - name: ingested_at_utc
-        tests: [not_null]
+        data_tests: [not_null]
   - name: stg_bronze__payment_transaction
     description: "Bronze staging view for payment transactions."
     columns:
       - name: payment_transaction_id
-        tests: [not_null, unique]
+        data_tests: [not_null, unique]
       - name: ingestion_batch_id
-        tests: [not_null]
+        data_tests: [not_null]
       - name: source_file_name
-        tests: [not_null]
+        data_tests: [not_null]
       - name: ingested_at_utc
-        tests: [not_null]
+        data_tests: [not_null]
   - name: stg_bronze__risk_signal
     description: "Bronze staging view for risk signals."
     columns:
       - name: risk_signal_id
-        tests: [not_null, unique]
+        data_tests: [not_null, unique]
       - name: ingestion_batch_id
-        tests: [not_null]
+        data_tests: [not_null]
       - name: source_file_name
-        tests: [not_null]
+        data_tests: [not_null]
       - name: ingested_at_utc
-        tests: [not_null]
+        data_tests: [not_null]
   - name: stg_bronze__fraud_alert
     description: "Bronze staging view for fraud alerts."
     columns:
       - name: fraud_alert_id
-        tests: [not_null, unique]
+        data_tests: [not_null, unique]
       - name: ingestion_batch_id
-        tests: [not_null]
+        data_tests: [not_null]
       - name: source_file_name
-        tests: [not_null]
+        data_tests: [not_null]
       - name: ingested_at_utc
-        tests: [not_null]
+        data_tests: [not_null]
   - name: stg_bronze__fraud_case
     description: "Bronze staging view for fraud cases."
     columns:
       - name: fraud_case_id
-        tests: [not_null, unique]
+        data_tests: [not_null, unique]
       - name: ingestion_batch_id
-        tests: [not_null]
+        data_tests: [not_null]
       - name: source_file_name
-        tests: [not_null]
+        data_tests: [not_null]
       - name: ingested_at_utc
-        tests: [not_null]
+        data_tests: [not_null]
   - name: stg_bronze__investigation_event
     description: "Bronze staging view for investigation events."
   - name: stg_bronze__decision_record
