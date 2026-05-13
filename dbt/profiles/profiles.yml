@@ -1,0 +1,58 @@
+# Local default profile file for repository and CI structure validation.
+# Real credentials should be supplied through environment variables.
+
+fraudlens_snowflake:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('DBT_SNOWFLAKE_ACCOUNT', 'local_account') }}"
+      user: "{{ env_var('DBT_SNOWFLAKE_USER', 'local_user') }}"
+      password: "{{ env_var('DBT_SNOWFLAKE_PASSWORD', 'local_password') }}"
+      role: "{{ env_var('DBT_SNOWFLAKE_ROLE', 'SYSADMIN') }}"
+      warehouse: "{{ env_var('DBT_SNOWFLAKE_WAREHOUSE', 'COMPUTE_WH') }}"
+      database: "{{ env_var('DBT_SNOWFLAKE_DATABASE', 'FRAUDLENS') }}"
+      schema: "{{ env_var('DBT_SNOWFLAKE_DEV_SCHEMA', 'BRONZE') }}"
+      threads: "{{ env_var('DBT_SNOWFLAKE_THREADS', '4') | int }}"
+      client_session_keep_alive: false
+      query_tag: fraudlens_dbt_dev
+    ci:
+      type: snowflake
+      account: "{{ env_var('DBT_SNOWFLAKE_ACCOUNT', 'local_account') }}"
+      user: "{{ env_var('DBT_SNOWFLAKE_USER', 'local_user') }}"
+      password: "{{ env_var('DBT_SNOWFLAKE_PASSWORD', 'local_password') }}"
+      role: "{{ env_var('DBT_SNOWFLAKE_ROLE', 'SYSADMIN') }}"
+      warehouse: "{{ env_var('DBT_SNOWFLAKE_WAREHOUSE', 'COMPUTE_WH') }}"
+      database: "{{ env_var('DBT_SNOWFLAKE_DATABASE', 'FRAUDLENS') }}"
+      schema: "{{ env_var('DBT_SNOWFLAKE_CI_SCHEMA', 'BRONZE') }}"
+      threads: "{{ env_var('DBT_SNOWFLAKE_THREADS', '4') | int }}"
+      client_session_keep_alive: false
+      query_tag: fraudlens_dbt_ci
+    prod:
+      type: snowflake
+      account: "{{ env_var('DBT_SNOWFLAKE_ACCOUNT', 'local_account') }}"
+      user: "{{ env_var('DBT_SNOWFLAKE_USER', 'local_user') }}"
+      password: "{{ env_var('DBT_SNOWFLAKE_PASSWORD', 'local_password') }}"
+      role: "{{ env_var('DBT_SNOWFLAKE_ROLE', 'SYSADMIN') }}"
+      warehouse: "{{ env_var('DBT_SNOWFLAKE_WAREHOUSE', 'COMPUTE_WH') }}"
+      database: "{{ env_var('DBT_SNOWFLAKE_DATABASE', 'FRAUDLENS') }}"
+      schema: "{{ env_var('DBT_SNOWFLAKE_PROD_SCHEMA', 'BRONZE') }}"
+      threads: "{{ env_var('DBT_SNOWFLAKE_THREADS', '8') | int }}"
+      client_session_keep_alive: true
+      query_tag: fraudlens_dbt_prod
+
+fraudlens_local_spark:
+  target: local
+  outputs:
+    local:
+      type: spark
+      method: thrift
+      host: "{{ env_var('DBT_SPARK_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_SPARK_PORT', '10000') | int }}"
+      user: "{{ env_var('DBT_SPARK_USER', 'datalab') }}"
+      schema: "{{ env_var('DBT_SPARK_SCHEMA', 'default') }}"
+      threads: "{{ env_var('DBT_SPARK_THREADS', '4') | int }}"
+      connect_retries: 1
+      connect_timeout: 10
+      retry_all: false
+      auth: "{{ env_var('DBT_SPARK_AUTH', 'NOSASL') }}"
