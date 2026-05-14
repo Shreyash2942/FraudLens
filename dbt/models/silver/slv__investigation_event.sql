@@ -28,19 +28,38 @@ ranked as (
             else 1
         end as _dedup_rank
     from standardized
+),
+business_safe as (
+    select
+        ranked.investigation_event_id,
+        ranked.fraud_case_id,
+        ranked.investigation_event_type,
+        ranked.actor_party_id,
+        ranked.event_at,
+        ranked.event_result_code,
+        case
+            when ranked.elapsed_minutes is not null and ranked.elapsed_minutes < 0 then null
+            else ranked.elapsed_minutes
+        end as elapsed_minutes,
+        ranked.ingestion_batch_id,
+        ranked.source_file_name,
+        ranked.ingested_at_utc,
+        ranked.pipeline_processed_at_utc,
+        ranked.lineage_run_id
+    from ranked
+    where ranked._dedup_rank = 1
 )
 select
-    ranked.investigation_event_id,
-    ranked.fraud_case_id,
-    ranked.investigation_event_type,
-    ranked.actor_party_id,
-    ranked.event_at,
-    ranked.event_result_code,
-    ranked.elapsed_minutes,
-    ranked.ingestion_batch_id,
-    ranked.source_file_name,
-    ranked.ingested_at_utc,
-    ranked.pipeline_processed_at_utc,
-    ranked.lineage_run_id
-from ranked
-where ranked._dedup_rank = 1
+    business_safe.investigation_event_id,
+    business_safe.fraud_case_id,
+    business_safe.investigation_event_type,
+    business_safe.actor_party_id,
+    business_safe.event_at,
+    business_safe.event_result_code,
+    business_safe.elapsed_minutes,
+    business_safe.ingestion_batch_id,
+    business_safe.source_file_name,
+    business_safe.ingested_at_utc,
+    business_safe.pipeline_processed_at_utc,
+    business_safe.lineage_run_id
+from business_safe

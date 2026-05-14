@@ -29,20 +29,42 @@ ranked as (
             else 1
         end as _dedup_rank
     from standardized
+),
+business_safe as (
+    select
+        ranked.party_org_assignment_id,
+        ranked.party_id,
+        ranked.business_unit_id,
+        ranked.analyst_team_id,
+        ranked.branch_id,
+        ranked.assignment_role_code,
+        ranked.effective_from_at,
+        case
+            when ranked.effective_to_at is not null
+             and ranked.effective_from_at is not null
+             and ranked.effective_to_at < ranked.effective_from_at then null
+            else ranked.effective_to_at
+        end as effective_to_at,
+        ranked.ingestion_batch_id,
+        ranked.source_file_name,
+        ranked.ingested_at_utc,
+        ranked.pipeline_processed_at_utc,
+        ranked.lineage_run_id
+    from ranked
+    where ranked._dedup_rank = 1
 )
 select
-    ranked.party_org_assignment_id,
-    ranked.party_id,
-    ranked.business_unit_id,
-    ranked.analyst_team_id,
-    ranked.branch_id,
-    ranked.assignment_role_code,
-    ranked.effective_from_at,
-    ranked.effective_to_at,
-    ranked.ingestion_batch_id,
-    ranked.source_file_name,
-    ranked.ingested_at_utc,
-    ranked.pipeline_processed_at_utc,
-    ranked.lineage_run_id
-from ranked
-where ranked._dedup_rank = 1
+    business_safe.party_org_assignment_id,
+    business_safe.party_id,
+    business_safe.business_unit_id,
+    business_safe.analyst_team_id,
+    business_safe.branch_id,
+    business_safe.assignment_role_code,
+    business_safe.effective_from_at,
+    business_safe.effective_to_at,
+    business_safe.ingestion_batch_id,
+    business_safe.source_file_name,
+    business_safe.ingested_at_utc,
+    business_safe.pipeline_processed_at_utc,
+    business_safe.lineage_run_id
+from business_safe

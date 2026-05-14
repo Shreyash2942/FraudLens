@@ -33,24 +33,50 @@ ranked as (
             else 1
         end as _dedup_rank
     from standardized
+),
+business_safe as (
+    select
+        ranked.fraud_case_id,
+        ranked.primary_alert_id,
+        ranked.case_status,
+        ranked.assigned_analyst_party_id,
+        ranked.opened_at,
+        case
+            when ranked.closed_at is not null
+             and ranked.opened_at is not null
+             and ranked.closed_at < ranked.opened_at then null
+            else ranked.closed_at
+        end as closed_at,
+        ranked.case_type_code,
+        ranked.case_priority_code,
+        ranked.owning_business_unit_id,
+        ranked.owning_analyst_team_id,
+        ranked.handling_region_id,
+        ranked.escalation_level_code,
+        ranked.ingestion_batch_id,
+        ranked.source_file_name,
+        ranked.ingested_at_utc,
+        ranked.pipeline_processed_at_utc,
+        ranked.lineage_run_id
+    from ranked
+    where ranked._dedup_rank = 1
 )
 select
-    ranked.fraud_case_id,
-    ranked.primary_alert_id,
-    ranked.case_status,
-    ranked.assigned_analyst_party_id,
-    ranked.opened_at,
-    ranked.closed_at,
-    ranked.case_type_code,
-    ranked.case_priority_code,
-    ranked.owning_business_unit_id,
-    ranked.owning_analyst_team_id,
-    ranked.handling_region_id,
-    ranked.escalation_level_code,
-    ranked.ingestion_batch_id,
-    ranked.source_file_name,
-    ranked.ingested_at_utc,
-    ranked.pipeline_processed_at_utc,
-    ranked.lineage_run_id
-from ranked
-where ranked._dedup_rank = 1
+    business_safe.fraud_case_id,
+    business_safe.primary_alert_id,
+    business_safe.case_status,
+    business_safe.assigned_analyst_party_id,
+    business_safe.opened_at,
+    business_safe.closed_at,
+    business_safe.case_type_code,
+    business_safe.case_priority_code,
+    business_safe.owning_business_unit_id,
+    business_safe.owning_analyst_team_id,
+    business_safe.handling_region_id,
+    business_safe.escalation_level_code,
+    business_safe.ingestion_batch_id,
+    business_safe.source_file_name,
+    business_safe.ingested_at_utc,
+    business_safe.pipeline_processed_at_utc,
+    business_safe.lineage_run_id
+from business_safe

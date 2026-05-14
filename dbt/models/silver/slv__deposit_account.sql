@@ -32,23 +32,48 @@ ranked as (
             else 1
         end as _dedup_rank
     from standardized
+),
+business_safe as (
+    select
+        ranked.deposit_account_id,
+        ranked.account_status,
+        ranked.product_type_code,
+        ranked.primary_party_id,
+        ranked.account_currency_code,
+        ranked.available_balance_amount,
+        ranked.opened_at,
+        ranked.opened_branch_id,
+        ranked.servicing_business_unit_id,
+        ranked.account_region_id,
+        case
+            when ranked.closed_at is not null
+             and ranked.opened_at is not null
+             and ranked.closed_at < ranked.opened_at then null
+            else ranked.closed_at
+        end as closed_at,
+        ranked.ingestion_batch_id,
+        ranked.source_file_name,
+        ranked.ingested_at_utc,
+        ranked.pipeline_processed_at_utc,
+        ranked.lineage_run_id
+    from ranked
+    where ranked._dedup_rank = 1
 )
 select
-    ranked.deposit_account_id,
-    ranked.account_status,
-    ranked.product_type_code,
-    ranked.primary_party_id,
-    ranked.account_currency_code,
-    ranked.available_balance_amount,
-    ranked.opened_at,
-    ranked.opened_branch_id,
-    ranked.servicing_business_unit_id,
-    ranked.account_region_id,
-    ranked.closed_at,
-    ranked.ingestion_batch_id,
-    ranked.source_file_name,
-    ranked.ingested_at_utc,
-    ranked.pipeline_processed_at_utc,
-    ranked.lineage_run_id
-from ranked
-where ranked._dedup_rank = 1
+    business_safe.deposit_account_id,
+    business_safe.account_status,
+    business_safe.product_type_code,
+    business_safe.primary_party_id,
+    business_safe.account_currency_code,
+    business_safe.available_balance_amount,
+    business_safe.opened_at,
+    business_safe.opened_branch_id,
+    business_safe.servicing_business_unit_id,
+    business_safe.account_region_id,
+    business_safe.closed_at,
+    business_safe.ingestion_batch_id,
+    business_safe.source_file_name,
+    business_safe.ingested_at_utc,
+    business_safe.pipeline_processed_at_utc,
+    business_safe.lineage_run_id
+from business_safe
