@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: bronze
     description: "FraudLens Bronze layer raw ingestion tables loaded from governed synthetic batch exports."
-    database: "{{ env_var('DBT_FRAUDLENS_DATABASE', 'FRAUDLENS') if target.type != 'spark' else none }}"
+    database: "{{ env_var('DBT_FRAUDLENS_DATABASE', 'FRAUDLENS') if target.type not in ['spark', 'hive'] else none }}"
     schema: "{{ env_var('DBT_FRAUDLENS_BRONZE_SCHEMA', 'BRONZE') }}"
     loaded_at_field: INGESTED_AT_UTC
     freshness:
