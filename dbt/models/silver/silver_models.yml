@@ -1,0 +1,93 @@
+version: 2
+
+models:
+  - name: slv__payment_instruction
+    description: "Silver conformed payment instruction dataset."
+    columns:
+      - name: payment_instruction_id
+        data_tests: [not_null, unique]
+      - name: debtor_account_id
+        data_tests:
+          - relationships:
+              to: ref('slv__deposit_account')
+              field: deposit_account_id
+      - name: ingestion_batch_id
+        data_tests: [not_null]
+
+  - name: slv__payment_transaction
+    description: "Silver conformed payment transaction dataset."
+    columns:
+      - name: payment_transaction_id
+        data_tests: [not_null, unique]
+      - name: payment_instruction_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('slv__payment_instruction')
+              field: payment_instruction_id
+
+  - name: slv__risk_signal
+    description: "Silver conformed risk signal dataset."
+    columns:
+      - name: risk_signal_id
+        data_tests: [not_null, unique]
+      - name: payment_instruction_id
+        data_tests:
+          - relationships:
+              to: ref('slv__payment_instruction')
+              field: payment_instruction_id
+
+  - name: slv__fraud_alert
+    description: "Silver conformed fraud alert dataset."
+    columns:
+      - name: fraud_alert_id
+        data_tests: [not_null, unique]
+      - name: risk_signal_id
+        data_tests:
+          - relationships:
+              to: ref('slv__risk_signal')
+              field: risk_signal_id
+
+  - name: slv__fraud_case
+    description: "Silver conformed fraud case dataset."
+    columns:
+      - name: fraud_case_id
+        data_tests: [not_null, unique]
+      - name: primary_alert_id
+        data_tests:
+          - relationships:
+              to: ref('slv__fraud_alert')
+              field: fraud_alert_id
+
+  - name: slv__investigation_event
+    description: "Silver conformed investigation event dataset."
+    columns:
+      - name: investigation_event_id
+        data_tests: [not_null, unique]
+      - name: fraud_case_id
+        data_tests:
+          - relationships:
+              to: ref('slv__fraud_case')
+              field: fraud_case_id
+
+  - name: slv__decision_record
+    description: "Silver conformed decision record dataset."
+    columns:
+      - name: decision_id
+        data_tests: [not_null, unique]
+      - name: fraud_case_id
+        data_tests:
+          - relationships:
+              to: ref('slv__fraud_case')
+              field: fraud_case_id
+
+  - name: slv__case_disposition
+    description: "Silver conformed case disposition dataset."
+    columns:
+      - name: disposition_id
+        data_tests: [not_null, unique]
+      - name: decision_id
+        data_tests:
+          - relationships:
+              to: ref('slv__decision_record')
+              field: decision_id
