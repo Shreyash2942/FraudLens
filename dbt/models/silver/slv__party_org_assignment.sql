@@ -21,13 +21,10 @@ with standardized as (
 ranked as (
     select
         standardized.*,
-        case
-            when standardized.party_org_assignment_id is not null then row_number() over (
-                partition by standardized.party_org_assignment_id
-                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
-            )
-            else 1
-        end as _dedup_rank
+        row_number() over (
+            partition by standardized.party_org_assignment_id
+            order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+        ) as dedup_rank
     from standardized
 ),
 business_safe as (
@@ -51,7 +48,7 @@ business_safe as (
         ranked.pipeline_processed_at_utc,
         ranked.lineage_run_id
     from ranked
-    where ranked._dedup_rank = 1
+    where ranked.dedup_rank = 1
 )
 select
     business_safe.party_org_assignment_id,

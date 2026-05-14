@@ -18,13 +18,10 @@ with standardized as (
 ranked as (
     select
         standardized.*,
-        case
-            when standardized.region_id is not null then row_number() over (
-                partition by standardized.region_id
-                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
-            )
-            else 1
-        end as _dedup_rank
+        row_number() over (
+            partition by standardized.region_id
+            order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+        ) as dedup_rank
     from standardized
 )
 select
@@ -39,4 +36,4 @@ select
     ranked.pipeline_processed_at_utc,
     ranked.lineage_run_id
 from ranked
-where ranked._dedup_rank = 1
+where ranked.dedup_rank = 1
