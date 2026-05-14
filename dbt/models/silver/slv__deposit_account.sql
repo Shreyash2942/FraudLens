@@ -1,6 +1,7 @@
 {{ config(alias='SILVER_DEPOSIT_ACCOUNT', tags=['silver', 'conformed']) }}
 
-select
+with standardized as (
+    select
     {{ fraudlens_clean_text('src.deposit_account_id') }} as deposit_account_id,
     {{ fraudlens_clean_text('src.account_status', uppercase=true) }} as account_status,
     {{ fraudlens_clean_text('src.product_type_code', uppercase=true) }} as product_type_code,
@@ -17,5 +18,37 @@ select
     {{ fraudlens_clean_timestamp('src.ingested_at_utc') }} as ingested_at_utc,
     {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }} as pipeline_processed_at_utc,
     {{ fraudlens_clean_text('src.lineage_run_id') }} as lineage_run_id
-from {{ ref('stg_bronze__deposit_account') }} as src
-{{ fraudlens_batch_where('src') }}
+    from {{ ref('stg_bronze__deposit_account') }} as src
+    {{ fraudlens_batch_where('src') }}
+),
+ranked as (
+    select
+        standardized.*,
+        case
+            when standardized.deposit_account_id is not null then row_number() over (
+                partition by standardized.deposit_account_id
+                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+            )
+            else 1
+        end as _dedup_rank
+    from standardized
+)
+select
+    ranked.deposit_account_id,
+    ranked.account_status,
+    ranked.product_type_code,
+    ranked.primary_party_id,
+    ranked.account_currency_code,
+    ranked.available_balance_amount,
+    ranked.opened_at,
+    ranked.opened_branch_id,
+    ranked.servicing_business_unit_id,
+    ranked.account_region_id,
+    ranked.closed_at,
+    ranked.ingestion_batch_id,
+    ranked.source_file_name,
+    ranked.ingested_at_utc,
+    ranked.pipeline_processed_at_utc,
+    ranked.lineage_run_id
+from ranked
+where ranked._dedup_rank = 1

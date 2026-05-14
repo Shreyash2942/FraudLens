@@ -1,6 +1,7 @@
 {{ config(alias='SILVER_PAYMENT_TRANSACTION', tags=['silver', 'conformed']) }}
 
-select
+with standardized as (
+    select
     {{ fraudlens_clean_text('src.payment_transaction_id') }} as payment_transaction_id,
     {{ fraudlens_clean_text('src.payment_instruction_id') }} as payment_instruction_id,
     {{ fraudlens_clean_text('src.transaction_status', uppercase=true) }} as transaction_status,
@@ -17,5 +18,37 @@ select
     {{ fraudlens_clean_timestamp('src.ingested_at_utc') }} as ingested_at_utc,
     {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }} as pipeline_processed_at_utc,
     {{ fraudlens_clean_text('src.lineage_run_id') }} as lineage_run_id
-from {{ ref('stg_bronze__payment_transaction') }} as src
-{{ fraudlens_batch_where('src') }}
+    from {{ ref('stg_bronze__payment_transaction') }} as src
+    {{ fraudlens_batch_where('src') }}
+),
+ranked as (
+    select
+        standardized.*,
+        case
+            when standardized.payment_transaction_id is not null then row_number() over (
+                partition by standardized.payment_transaction_id
+                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+            )
+            else 1
+        end as _dedup_rank
+    from standardized
+)
+select
+    ranked.payment_transaction_id,
+    ranked.payment_instruction_id,
+    ranked.transaction_status,
+    ranked.booking_amount,
+    ranked.transaction_currency_code,
+    ranked.settlement_at,
+    ranked.merchant_category_code,
+    ranked.reversal_reason_code,
+    ranked.posted_date,
+    ranked.value_date,
+    ranked.transaction_direction_code,
+    ranked.ingestion_batch_id,
+    ranked.source_file_name,
+    ranked.ingested_at_utc,
+    ranked.pipeline_processed_at_utc,
+    ranked.lineage_run_id
+from ranked
+where ranked._dedup_rank = 1

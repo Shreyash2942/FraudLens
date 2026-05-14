@@ -1,6 +1,7 @@
 {{ config(alias='SILVER_FRAUD_ALERT', tags=['silver', 'conformed']) }}
 
-select
+with standardized as (
+    select
     {{ fraudlens_clean_text('src.fraud_alert_id') }} as fraud_alert_id,
     {{ fraudlens_clean_text('src.risk_signal_id') }} as risk_signal_id,
     {{ fraudlens_clean_text('src.alert_status', uppercase=true) }} as alert_status,
@@ -17,5 +18,37 @@ select
     {{ fraudlens_clean_timestamp('src.ingested_at_utc') }} as ingested_at_utc,
     {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }} as pipeline_processed_at_utc,
     {{ fraudlens_clean_text('src.lineage_run_id') }} as lineage_run_id
-from {{ ref('stg_bronze__fraud_alert') }} as src
-{{ fraudlens_batch_where('src') }}
+    from {{ ref('stg_bronze__fraud_alert') }} as src
+    {{ fraudlens_batch_where('src') }}
+),
+ranked as (
+    select
+        standardized.*,
+        case
+            when standardized.fraud_alert_id is not null then row_number() over (
+                partition by standardized.fraud_alert_id
+                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+            )
+            else 1
+        end as _dedup_rank
+    from standardized
+)
+select
+    ranked.fraud_alert_id,
+    ranked.risk_signal_id,
+    ranked.alert_status,
+    ranked.alert_severity,
+    ranked.queue_code,
+    ranked.created_at,
+    ranked.alert_type_code,
+    ranked.alert_source_code,
+    ranked.owning_business_unit_id,
+    ranked.owning_analyst_team_id,
+    ranked.service_level_due_at,
+    ranked.ingestion_batch_id,
+    ranked.source_file_name,
+    ranked.ingested_at_utc,
+    ranked.pipeline_processed_at_utc,
+    ranked.lineage_run_id
+from ranked
+where ranked._dedup_rank = 1

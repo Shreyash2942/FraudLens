@@ -1,6 +1,7 @@
 {{ config(alias='SILVER_CHANNEL_EVENT', tags=['silver', 'conformed']) }}
 
-select
+with standardized as (
+    select
     {{ fraudlens_clean_text('src.channel_event_id') }} as channel_event_id,
     {{ fraudlens_clean_text('src.channel_code', uppercase=true) }} as channel_code,
     {{ fraudlens_clean_text('src.session_id') }} as session_id,
@@ -15,5 +16,35 @@ select
     {{ fraudlens_clean_timestamp('src.ingested_at_utc') }} as ingested_at_utc,
     {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }} as pipeline_processed_at_utc,
     {{ fraudlens_clean_text('src.lineage_run_id') }} as lineage_run_id
-from {{ ref('stg_bronze__channel_event') }} as src
-{{ fraudlens_batch_where('src') }}
+    from {{ ref('stg_bronze__channel_event') }} as src
+    {{ fraudlens_batch_where('src') }}
+),
+ranked as (
+    select
+        standardized.*,
+        case
+            when standardized.channel_event_id is not null then row_number() over (
+                partition by standardized.channel_event_id
+                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+            )
+            else 1
+        end as _dedup_rank
+    from standardized
+)
+select
+    ranked.channel_event_id,
+    ranked.channel_code,
+    ranked.session_id,
+    ranked.branch_id,
+    ranked.event_at,
+    ranked.event_country_code,
+    ranked.ip_country_code,
+    ranked.authentication_result_code,
+    ranked.session_risk_code,
+    ranked.ingestion_batch_id,
+    ranked.source_file_name,
+    ranked.ingested_at_utc,
+    ranked.pipeline_processed_at_utc,
+    ranked.lineage_run_id
+from ranked
+where ranked._dedup_rank = 1

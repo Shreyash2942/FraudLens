@@ -1,6 +1,7 @@
 {{ config(alias='SILVER_PARTY_ORG_ASSIGNMENT', tags=['silver', 'conformed']) }}
 
-select
+with standardized as (
+    select
     {{ fraudlens_clean_text('src.party_org_assignment_id') }} as party_org_assignment_id,
     {{ fraudlens_clean_text('src.party_id') }} as party_id,
     {{ fraudlens_clean_text('src.business_unit_id') }} as business_unit_id,
@@ -14,5 +15,34 @@ select
     {{ fraudlens_clean_timestamp('src.ingested_at_utc') }} as ingested_at_utc,
     {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }} as pipeline_processed_at_utc,
     {{ fraudlens_clean_text('src.lineage_run_id') }} as lineage_run_id
-from {{ ref('stg_bronze__party_org_assignment') }} as src
-{{ fraudlens_batch_where('src') }}
+    from {{ ref('stg_bronze__party_org_assignment') }} as src
+    {{ fraudlens_batch_where('src') }}
+),
+ranked as (
+    select
+        standardized.*,
+        case
+            when standardized.party_org_assignment_id is not null then row_number() over (
+                partition by standardized.party_org_assignment_id
+                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+            )
+            else 1
+        end as _dedup_rank
+    from standardized
+)
+select
+    ranked.party_org_assignment_id,
+    ranked.party_id,
+    ranked.business_unit_id,
+    ranked.analyst_team_id,
+    ranked.branch_id,
+    ranked.assignment_role_code,
+    ranked.effective_from_at,
+    ranked.effective_to_at,
+    ranked.ingestion_batch_id,
+    ranked.source_file_name,
+    ranked.ingested_at_utc,
+    ranked.pipeline_processed_at_utc,
+    ranked.lineage_run_id
+from ranked
+where ranked._dedup_rank = 1

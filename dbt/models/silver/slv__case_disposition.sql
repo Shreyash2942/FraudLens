@@ -1,6 +1,7 @@
 {{ config(alias='SILVER_CASE_DISPOSITION', tags=['silver', 'conformed']) }}
 
-select
+with standardized as (
+    select
     {{ fraudlens_clean_text('src.disposition_id') }} as disposition_id,
     {{ fraudlens_clean_text('src.decision_id') }} as decision_id,
     {{ fraudlens_clean_text('src.disposition_code', uppercase=true) }} as disposition_code,
@@ -15,5 +16,35 @@ select
     {{ fraudlens_clean_timestamp('src.ingested_at_utc') }} as ingested_at_utc,
     {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }} as pipeline_processed_at_utc,
     {{ fraudlens_clean_text('src.lineage_run_id') }} as lineage_run_id
-from {{ ref('stg_bronze__case_disposition') }} as src
-{{ fraudlens_batch_where('src') }}
+    from {{ ref('stg_bronze__case_disposition') }} as src
+    {{ fraudlens_batch_where('src') }}
+),
+ranked as (
+    select
+        standardized.*,
+        case
+            when standardized.disposition_id is not null then row_number() over (
+                partition by standardized.disposition_id
+                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+            )
+            else 1
+        end as _dedup_rank
+    from standardized
+)
+select
+    ranked.disposition_id,
+    ranked.decision_id,
+    ranked.disposition_code,
+    ranked.financial_impact_amount,
+    ranked.outcome_at,
+    ranked.loss_amount,
+    ranked.recovered_amount,
+    ranked.write_off_amount,
+    ranked.recovery_status_code,
+    ranked.ingestion_batch_id,
+    ranked.source_file_name,
+    ranked.ingested_at_utc,
+    ranked.pipeline_processed_at_utc,
+    ranked.lineage_run_id
+from ranked
+where ranked._dedup_rank = 1

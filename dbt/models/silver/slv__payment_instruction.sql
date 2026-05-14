@@ -1,6 +1,7 @@
 {{ config(alias='SILVER_PAYMENT_INSTRUCTION', tags=['silver', 'conformed']) }}
 
-select
+with standardized as (
+    select
     {{ fraudlens_clean_text('src.payment_instruction_id') }} as payment_instruction_id,
     {{ fraudlens_clean_text('src.instruction_status', uppercase=true) }} as instruction_status,
     {{ fraudlens_clean_text('src.debtor_account_id') }} as debtor_account_id,
@@ -23,5 +24,43 @@ select
     {{ fraudlens_clean_timestamp('src.ingested_at_utc') }} as ingested_at_utc,
     {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }} as pipeline_processed_at_utc,
     {{ fraudlens_clean_text('src.lineage_run_id') }} as lineage_run_id
-from {{ ref('stg_bronze__payment_instruction') }} as src
-{{ fraudlens_batch_where('src') }}
+    from {{ ref('stg_bronze__payment_instruction') }} as src
+    {{ fraudlens_batch_where('src') }}
+),
+ranked as (
+    select
+        standardized.*,
+        case
+            when standardized.payment_instruction_id is not null then row_number() over (
+                partition by standardized.payment_instruction_id
+                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+            )
+            else 1
+        end as _dedup_rank
+    from standardized
+)
+select
+    ranked.payment_instruction_id,
+    ranked.instruction_status,
+    ranked.debtor_account_id,
+    ranked.debtor_party_id,
+    ranked.creditor_party_id,
+    ranked.instructed_amount,
+    ranked.instructed_currency_code,
+    ranked.payment_purpose_code,
+    ranked.channel_event_id,
+    ranked.card_id,
+    ranked.device_id,
+    ranked.event_at,
+    ranked.payment_rail_code,
+    ranked.is_cross_border,
+    ranked.merchant_country_code,
+    ranked.counterparty_bank_country_code,
+    ranked.booking_date,
+    ranked.ingestion_batch_id,
+    ranked.source_file_name,
+    ranked.ingested_at_utc,
+    ranked.pipeline_processed_at_utc,
+    ranked.lineage_run_id
+from ranked
+where ranked._dedup_rank = 1

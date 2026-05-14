@@ -1,6 +1,7 @@
 {{ config(alias='SILVER_PARTY', tags=['silver', 'conformed']) }}
 
-select
+with standardized as (
+    select
     {{ fraudlens_clean_text('src.party_id') }} as party_id,
     {{ fraudlens_clean_text('src.party_type', uppercase=true) }} as party_type,
     {{ fraudlens_clean_text('src.party_status', uppercase=true) }} as party_status,
@@ -16,5 +17,36 @@ select
     {{ fraudlens_clean_timestamp('src.ingested_at_utc') }} as ingested_at_utc,
     {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }} as pipeline_processed_at_utc,
     {{ fraudlens_clean_text('src.lineage_run_id') }} as lineage_run_id
-from {{ ref('stg_bronze__party') }} as src
-{{ fraudlens_batch_where('src') }}
+    from {{ ref('stg_bronze__party') }} as src
+    {{ fraudlens_batch_where('src') }}
+),
+ranked as (
+    select
+        standardized.*,
+        case
+            when standardized.party_id is not null then row_number() over (
+                partition by standardized.party_id
+                order by standardized.ingested_at_utc desc, standardized.pipeline_processed_at_utc desc, standardized.source_file_name desc
+            )
+            else 1
+        end as _dedup_rank
+    from standardized
+)
+select
+    ranked.party_id,
+    ranked.party_type,
+    ranked.party_status,
+    ranked.domicile_country_code,
+    ranked.risk_segment_code,
+    ranked.customer_segment_code,
+    ranked.customer_type_code,
+    ranked.industry_sector_code,
+    ranked.residency_region_id,
+    ranked.customer_since_at,
+    ranked.ingestion_batch_id,
+    ranked.source_file_name,
+    ranked.ingested_at_utc,
+    ranked.pipeline_processed_at_utc,
+    ranked.lineage_run_id
+from ranked
+where ranked._dedup_rank = 1
