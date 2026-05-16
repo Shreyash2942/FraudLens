@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: fact_transactions
+    description: "Gold fact model at payment transaction grain with fraud exposure context."
+    columns:
+      - name: fact_transaction_sk
+        data_tests: [not_null, unique]
+      - name: payment_transaction_id
+        data_tests: [not_null, unique]
+      - name: payment_instruction_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('slv__payment_instruction')
+              field: payment_instruction_id
+      - name: transaction_date
+        data_tests: [not_null]
+
+  - name: fact_fraud_alerts
+    description: "Gold fact model at fraud alert grain with risk, case, and disposition outcomes."
+    columns:
+      - name: fact_fraud_alert_sk
+        data_tests: [not_null, unique]
+      - name: fraud_alert_id
+        data_tests: [not_null, unique]
+      - name: risk_signal_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('slv__risk_signal')
+              field: risk_signal_id
+      - name: payment_instruction_id
+        data_tests:
+          - relationships:
+              to: ref('slv__payment_instruction')
+              field: payment_instruction_id
+
+  - name: fact_payment_events
+    description: "Gold fact model at payment instruction grain describing event lifecycle and fraud funnel metrics."
+    columns:
+      - name: fact_payment_event_sk
+        data_tests: [not_null, unique]
+      - name: payment_instruction_id
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('slv__payment_instruction')
+              field: payment_instruction_id
+      - name: payment_event_date
+        data_tests: [not_null]
+
+  - name: fact_daily_fraud_metrics
+    description: "Gold daily aggregate fraud metrics at metric date grain."
+    columns:
+      - name: fact_daily_fraud_metrics_sk
+        data_tests: [not_null, unique]
+      - name: metric_date
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('slv__calendar_day')
+              field: calendar_date
