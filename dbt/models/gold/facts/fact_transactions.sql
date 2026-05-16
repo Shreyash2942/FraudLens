@@ -41,7 +41,7 @@ case_rollup as (
     group by rs.payment_instruction_id
 )
 select
-    md5(concat(coalesce(tx.payment_transaction_id, ''), '|', coalesce(tx.payment_instruction_id, ''))) as fact_transaction_sk,
+    {{ fraudlens_fact_sk(['tx.payment_transaction_id', 'tx.payment_instruction_id']) }} as fact_transaction_sk,
     tx.payment_transaction_id,
     tx.payment_instruction_id,
     coalesce(tx.posted_date, tx.value_date, to_date(tx.settlement_at), pi.booking_date) as transaction_date,

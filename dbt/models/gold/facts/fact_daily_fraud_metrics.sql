@@ -75,7 +75,7 @@ calendar_spine as (
         on cal.calendar_date = md.metric_date
 )
 select
-    md5(cast(sp.metric_date as string)) as fact_daily_fraud_metrics_sk,
+    {{ fraudlens_fact_sk(['sp.metric_date']) }} as fact_daily_fraud_metrics_sk,
     sp.metric_date,
     sp.calendar_year,
     sp.calendar_quarter,

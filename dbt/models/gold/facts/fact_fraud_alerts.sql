@@ -38,7 +38,7 @@ disposition_rollup as (
     group by dr.fraud_case_id
 )
 select
-    md5(concat(coalesce(fa.fraud_alert_id, ''), '|', coalesce(rs.risk_signal_id, ''))) as fact_fraud_alert_sk,
+    {{ fraudlens_fact_sk(['fa.fraud_alert_id', 'rs.risk_signal_id']) }} as fact_fraud_alert_sk,
     fa.fraud_alert_id,
     rs.risk_signal_id,
     rs.payment_instruction_id,
