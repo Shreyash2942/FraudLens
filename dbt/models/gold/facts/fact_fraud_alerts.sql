@@ -1,8 +1,11 @@
-{{ config(alias='GOLD_FACT_FRAUD_ALERTS', tags=['gold', 'fact']) }}
+{{ config(alias='GOLD_FACT_FRAUD_ALERTS', tags=['gold', 'fact'], materialized='incremental') }}
 
 with fraud_alerts as (
     select *
     from {{ ref('slv__fraud_alert') }}
+    {% if is_incremental() %}
+    where ingested_at_utc > (select coalesce(max(ingested_at_utc), cast('1900-01-01 00:00:00' as timestamp)) from {{ this }})
+    {% endif %}
 ),
 risk_signals as (
     select *

@@ -1,8 +1,11 @@
-{{ config(alias='GOLD_FACT_PAYMENT_EVENTS', tags=['gold', 'fact']) }}
+{{ config(alias='GOLD_FACT_PAYMENT_EVENTS', tags=['gold', 'fact'], materialized='incremental') }}
 
 with payment_instructions as (
     select *
     from {{ ref('slv__payment_instruction') }}
+    {% if is_incremental() %}
+    where ingested_at_utc > (select coalesce(max(ingested_at_utc), cast('1900-01-01 00:00:00' as timestamp)) from {{ this }})
+    {% endif %}
 ),
 transaction_rollup as (
     select

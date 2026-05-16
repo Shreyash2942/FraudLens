@@ -1,8 +1,11 @@
-{{ config(alias='GOLD_FACT_TRANSACTIONS', tags=['gold', 'fact']) }}
+{{ config(alias='GOLD_FACT_TRANSACTIONS', tags=['gold', 'fact'], materialized='incremental') }}
 
 with transactions as (
     select *
     from {{ ref('slv__payment_transaction') }}
+    {% if is_incremental() %}
+    where ingested_at_utc > (select coalesce(max(ingested_at_utc), cast('1900-01-01 00:00:00' as timestamp)) from {{ this }})
+    {% endif %}
 ),
 payment_instructions as (
     select *
