@@ -3,8 +3,8 @@
 with fraud_alerts as (
     select *
     from {{ ref('slv__fraud_alert') }}
-    {% if is_incremental() %}
-    where ingested_at_utc > (select coalesce(max(ingested_at_utc), cast('1900-01-01 00:00:00' as timestamp)) from {{ this }})
+    {% if is_incremental() and var('fraudlens_batch_id', '') | length > 0 %}
+    where ingestion_batch_id = '{{ var("fraudlens_batch_id") }}'
     {% endif %}
 ),
 risk_signals as (
