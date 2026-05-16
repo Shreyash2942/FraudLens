@@ -1,0 +1,167 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Conformed calendar date dimension."
+    columns:
+      - name: dim_date_sk
+        data_tests: [not_null, unique]
+      - name: calendar_date
+        data_tests: [not_null, unique]
+
+  - name: dim_region
+    description: "Conformed region lookup dimension."
+    columns:
+      - name: dim_region_sk
+        data_tests: [not_null, unique]
+      - name: region_id
+        data_tests: [not_null, unique]
+
+  - name: dim_branch
+    description: "Conformed branch dimension with territory and region hierarchy."
+    columns:
+      - name: dim_branch_sk
+        data_tests: [not_null, unique]
+      - name: branch_id
+        data_tests: [not_null, unique]
+      - name: region_id
+        data_tests:
+          - relationships:
+              to: ref('dim_region')
+              field: region_id
+
+  - name: dim_business_unit
+    description: "Conformed business unit dimension."
+    columns:
+      - name: dim_business_unit_sk
+        data_tests: [not_null, unique]
+      - name: business_unit_id
+        data_tests: [not_null, unique]
+      - name: region_id
+        data_tests:
+          - relationships:
+              to: ref('dim_region')
+              field: region_id
+
+  - name: dim_analyst_team
+    description: "Conformed analyst team dimension."
+    columns:
+      - name: dim_analyst_team_sk
+        data_tests: [not_null, unique]
+      - name: analyst_team_id
+        data_tests: [not_null, unique]
+      - name: business_unit_id
+        data_tests:
+          - relationships:
+              to: ref('dim_business_unit')
+              field: business_unit_id
+
+  - name: dim_customer
+    description: "Conformed customer dimension."
+    columns:
+      - name: dim_customer_sk
+        data_tests: [not_null, unique]
+      - name: customer_id
+        data_tests: [not_null, unique]
+      - name: residency_region_id
+        data_tests:
+          - relationships:
+              to: ref('dim_region')
+              field: region_id
+
+  - name: dim_customer_org_assignment
+    description: "Customer organizational assignment SCD-style dimension."
+    columns:
+      - name: dim_customer_org_assignment_sk
+        data_tests: [not_null, unique]
+      - name: party_org_assignment_id
+        data_tests: [not_null, unique]
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_id
+      - name: business_unit_id
+        data_tests:
+          - relationships:
+              to: ref('dim_business_unit')
+              field: business_unit_id
+      - name: analyst_team_id
+        data_tests:
+          - relationships:
+              to: ref('dim_analyst_team')
+              field: analyst_team_id
+      - name: branch_id
+        data_tests:
+          - relationships:
+              to: ref('dim_branch')
+              field: branch_id
+
+  - name: dim_account
+    description: "Conformed account dimension."
+    columns:
+      - name: dim_account_sk
+        data_tests: [not_null, unique]
+      - name: account_id
+        data_tests: [not_null, unique]
+      - name: customer_id
+        data_tests:
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_id
+      - name: branch_id
+        data_tests:
+          - relationships:
+              to: ref('dim_branch')
+              field: branch_id
+
+  - name: dim_card
+    description: "Conformed payment card dimension."
+    columns:
+      - name: dim_card_sk
+        data_tests: [not_null, unique]
+      - name: card_id
+        data_tests: [not_null, unique]
+      - name: account_id
+        data_tests:
+          - relationships:
+              to: ref('dim_account')
+              field: account_id
+
+  - name: dim_device
+    description: "Conformed device profile dimension."
+    columns:
+      - name: dim_device_sk
+        data_tests: [not_null, unique]
+      - name: device_id
+        data_tests: [not_null, unique]
+
+  - name: dim_channel
+    description: "Conformed channel-event dimension."
+    columns:
+      - name: dim_channel_sk
+        data_tests: [not_null, unique]
+      - name: channel_event_id
+        data_tests: [not_null, unique]
+      - name: branch_id
+        data_tests:
+          - relationships:
+              to: ref('dim_branch')
+              field: branch_id
+
+  - name: dim_merchant
+    description: "Conformed merchant context dimension."
+    columns:
+      - name: dim_merchant_sk
+        data_tests: [not_null, unique]
+
+  - name: dim_reference_code
+    description: "Conformed reference code lookup dimension."
+    columns:
+      - name: dim_reference_code_sk
+        data_tests: [not_null, unique]
+      - name: code_set_name
+        data_tests: [not_null]
+      - name: code_value
+        data_tests: [not_null]
