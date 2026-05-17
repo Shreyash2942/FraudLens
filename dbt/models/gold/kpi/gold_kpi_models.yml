@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  - name: kpi_daily_fraud_operations
+    description: "Daily operational KPI model for fraud monitoring."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "fraud-operations"
+      domain: "kpi_operations"
+      criticality: "high"
+    columns:
+      - name: metric_date
+        description: "Calendar date grain for daily KPI values."
+        data_tests: [not_null, unique]
+      - name: total_transactions
+        description: "Count of transactions processed on the KPI date."
+        data_tests: [not_null]
+      - name: total_fraud_alerts
+        description: "Count of fraud alerts opened on the KPI date."
+        data_tests: [not_null]
+      - name: alert_rate_pct
+        description: "Percentage of transactions that generated alerts."
+        data_tests: [not_null]
+      - name: high_severity_alert_rate_pct
+        description: "Percentage of transactions with high-severity alerts."
+        data_tests: [not_null]
+      - name: fraud_case_open_rate_pct
+        description: "Percentage of alerts that progressed to fraud cases."
+        data_tests: [not_null]
+      - name: recovery_rate_pct
+        description: "Percentage of suspected-fraud amount recovered."
+        data_tests: [not_null]
+      - name: reversal_rate_pct
+        description: "Percentage of alerts resulting in payment reversal."
+        data_tests: [not_null]
+
+  - name: kpi_portfolio_risk_snapshot
+    description: "Portfolio-level fraud risk KPI snapshot."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "fraud-analytics"
+      domain: "kpi_portfolio"
+      criticality: "high"
+    columns:
+      - name: snapshot_at_utc
+        description: "UTC timestamp when the KPI snapshot was generated."
+        data_tests: [not_null, unique]
+      - name: total_payment_events
+        description: "Total payment events in scope at snapshot time."
+        data_tests: [not_null]
+      - name: total_fraud_alerts
+        description: "Total fraud alerts in scope at snapshot time."
+        data_tests: [not_null]
+      - name: high_risk_payment_event_rate_pct
+        description: "Percentage of payment events assessed as high risk."
+        data_tests: [not_null]
+      - name: open_alert_backlog_rate_pct
+        description: "Percentage of alerts remaining open at snapshot time."
+        data_tests: [not_null]
+      - name: open_case_backlog_rate_pct
+        description: "Percentage of fraud cases remaining open at snapshot time."
+        data_tests: [not_null]
+      - name: cross_border_transaction_rate_pct
+        description: "Percentage of transactions flagged as cross-border."
+        data_tests: [not_null]
+      - name: portfolio_recovery_rate_pct
+        description: "Portfolio-level recovered amount percentage."
+        data_tests: [not_null]

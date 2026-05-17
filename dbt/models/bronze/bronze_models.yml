@@ -1,0 +1,90 @@
+version: 2
+
+models:
+  - name: stg_bronze__reference_data_catalog
+    description: "Bronze staging view for reference data catalog."
+  - name: stg_bronze__calendar_day
+    description: "Bronze staging view for calendar day records."
+  - name: stg_bronze__region
+    description: "Bronze staging view for regions."
+  - name: stg_bronze__branch_territory
+    description: "Bronze staging view for branch territories."
+  - name: stg_bronze__branch_location
+    description: "Bronze staging view for branch locations."
+  - name: stg_bronze__business_unit
+    description: "Bronze staging view for business units."
+  - name: stg_bronze__analyst_team
+    description: "Bronze staging view for analyst teams."
+  - name: stg_bronze__party
+    description: "Bronze staging view for parties."
+  - name: stg_bronze__party_org_assignment
+    description: "Bronze staging view for party organizational assignments."
+  - name: stg_bronze__deposit_account
+    description: "Bronze staging view for deposit accounts."
+  - name: stg_bronze__payment_card
+    description: "Bronze staging view for payment cards."
+  - name: stg_bronze__device_profile
+    description: "Bronze staging view for device profiles."
+  - name: stg_bronze__channel_event
+    description: "Bronze staging view for channel events."
+  - name: stg_bronze__payment_instruction
+    description: "Bronze staging view for payment instructions."
+    columns:
+      - name: payment_instruction_id
+        data_tests: [not_null, unique]
+      - name: ingestion_batch_id
+        data_tests: [not_null]
+      - name: source_file_name
+        data_tests: [not_null]
+      - name: ingested_at_utc
+        data_tests: [not_null]
+  - name: stg_bronze__payment_transaction
+    description: "Bronze staging view for payment transactions."
+    columns:
+      - name: payment_transaction_id
+        data_tests: [not_null, unique]
+      - name: ingestion_batch_id
+        data_tests: [not_null]
+      - name: source_file_name
+        data_tests: [not_null]
+      - name: ingested_at_utc
+        data_tests: [not_null]
+  - name: stg_bronze__risk_signal
+    description: "Bronze staging view for risk signals."
+    columns:
+      - name: risk_signal_id
+        data_tests: [not_null, unique]
+      - name: ingestion_batch_id
+        data_tests: [not_null]
+      - name: source_file_name
+        data_tests: [not_null]
+      - name: ingested_at_utc
+        data_tests: [not_null]
+  - name: stg_bronze__fraud_alert
+    description: "Bronze staging view for fraud alerts."
+    columns:
+      - name: fraud_alert_id
+        data_tests: [not_null, unique]
+      - name: ingestion_batch_id
+        data_tests: [not_null]
+      - name: source_file_name
+        data_tests: [not_null]
+      - name: ingested_at_utc
+        data_tests: [not_null]
+  - name: stg_bronze__fraud_case
+    description: "Bronze staging view for fraud cases."
+    columns:
+      - name: fraud_case_id
+        data_tests: [not_null, unique]
+      - name: ingestion_batch_id
+        data_tests: [not_null]
+      - name: source_file_name
+        data_tests: [not_null]
+      - name: ingested_at_utc
+        data_tests: [not_null]
+  - name: stg_bronze__investigation_event
+    description: "Bronze staging view for investigation events."
+  - name: stg_bronze__decision_record
+    description: "Bronze staging view for decision records."
+  - name: stg_bronze__case_disposition
+    description: "Bronze staging view for case dispositions."

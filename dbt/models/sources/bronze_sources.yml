@@ -1,0 +1,75 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "FraudLens Bronze layer raw ingestion tables loaded from governed synthetic batch exports."
+    database: "{{ env_var('DBT_FRAUDLENS_DATABASE', 'FRAUDLENS') if target.type not in ['spark', 'hive'] else none }}"
+    schema: "{{ env_var('DBT_FRAUDLENS_BRONZE_SCHEMA', 'BRONZE') }}"
+    loaded_at_field: INGESTED_AT_UTC
+    freshness:
+      warn_after: {count: 48, period: hour}
+      error_after: {count: 72, period: hour}
+    tables:
+      - name: reference_data_catalog
+        identifier: BRONZE_REFERENCE_DATA_CATALOG
+        description: "Reference code tables and semantic catalog values."
+      - name: calendar_day
+        identifier: BRONZE_CALENDAR_DAY
+        description: "Calendar date dimension seed source."
+      - name: region
+        identifier: BRONZE_REGION
+        description: "Regional dimension source."
+      - name: branch_territory
+        identifier: BRONZE_BRANCH_TERRITORY
+        description: "Branch territory hierarchy source."
+      - name: branch_location
+        identifier: BRONZE_BRANCH_LOCATION
+        description: "Branch location source."
+      - name: business_unit
+        identifier: BRONZE_BUSINESS_UNIT
+        description: "Business unit source."
+      - name: analyst_team
+        identifier: BRONZE_ANALYST_TEAM
+        description: "Analyst team ownership source."
+      - name: party
+        identifier: BRONZE_PARTY
+        description: "Party entity source."
+      - name: party_org_assignment
+        identifier: BRONZE_PARTY_ORG_ASSIGNMENT
+        description: "Effective-dated party organizational assignment source."
+      - name: deposit_account
+        identifier: BRONZE_DEPOSIT_ACCOUNT
+        description: "Deposit account source."
+      - name: payment_card
+        identifier: BRONZE_PAYMENT_CARD
+        description: "Payment card source."
+      - name: device_profile
+        identifier: BRONZE_DEVICE_PROFILE
+        description: "Device and session profile source."
+      - name: channel_event
+        identifier: BRONZE_CHANNEL_EVENT
+        description: "Channel interaction and touchpoint source."
+      - name: payment_instruction
+        identifier: BRONZE_PAYMENT_INSTRUCTION
+        description: "Payment instruction source."
+      - name: payment_transaction
+        identifier: BRONZE_PAYMENT_TRANSACTION
+        description: "Payment execution transaction source."
+      - name: risk_signal
+        identifier: BRONZE_RISK_SIGNAL
+        description: "Fraud risk signal source."
+      - name: fraud_alert
+        identifier: BRONZE_FRAUD_ALERT
+        description: "Fraud alert source."
+      - name: fraud_case
+        identifier: BRONZE_FRAUD_CASE
+        description: "Fraud case source."
+      - name: investigation_event
+        identifier: BRONZE_INVESTIGATION_EVENT
+        description: "Investigation event source."
+      - name: decision_record
+        identifier: BRONZE_DECISION_RECORD
+        description: "Decision record source."
+      - name: case_disposition
+        identifier: BRONZE_CASE_DISPOSITION
+        description: "Case closure and disposition source."

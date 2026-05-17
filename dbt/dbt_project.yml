@@ -1,0 +1,53 @@
+name: fraudlens
+version: "1.0.0"
+config-version: 2
+
+profile: fraudlens_local_spark
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+vars:
+  fraudlens_database: "{{ env_var('DBT_FRAUDLENS_DATABASE', 'FRAUDLENS') }}"
+  fraudlens_bronze_schema: "{{ env_var('DBT_FRAUDLENS_BRONZE_SCHEMA', 'BRONZE') }}"
+  fraudlens_silver_schema: "{{ env_var('DBT_FRAUDLENS_SILVER_SCHEMA', 'SILVER') }}"
+  fraudlens_gold_schema: "{{ env_var('DBT_FRAUDLENS_GOLD_SCHEMA', 'GOLD') }}"
+  fraudlens_batch_id: "{{ env_var('DBT_FRAUDLENS_BATCH_ID', '') }}"
+
+models:
+  fraudlens:
+    +persist_docs:
+      relation: true
+      columns: true
+
+    bronze:
+      +materialized: view
+      +schema: "{{ env_var('DBT_FRAUDLENS_BRONZE_SCHEMA', 'BRONZE') }}"
+      +tags: ["bronze"]
+
+    silver:
+      +materialized: table
+      +schema: "{{ env_var('DBT_FRAUDLENS_SILVER_SCHEMA', 'SILVER') }}"
+      +tags: ["silver"]
+
+    gold:
+      +materialized: table
+      +schema: "{{ env_var('DBT_FRAUDLENS_GOLD_SCHEMA', 'GOLD') }}"
+      +tags: ["gold"]
+
+      facts:
+        +tags: ["gold", "fact"]
+      dimensions:
+        +tags: ["gold", "dim"]
+      kpi:
+        +tags: ["gold", "kpi"]
