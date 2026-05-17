@@ -25,6 +25,8 @@ jobs:
           python -m pip install --upgrade pip
           # Profile fraudlens_local_spark uses adapter type: hive
           pip install dbt-core==1.8.7 "dbt-hive>=1.8.0,<1.9.0"
+          python -m pip show dbt-core dbt-hive
+          python -c "import dbt.adapters.hive; print('hive adapter import ok')"
 
       - name: Validate dbt structure
         env:
@@ -37,7 +39,8 @@ jobs:
           DBT_SPARK_THREADS: "4"
           DBT_SPARK_AUTH: NOSASL
         run: |
-          bash dbt/scripts/validate_structure.sh
+          python -m dbt parse --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
+          python -m dbt ls --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
 
       - name: Validate dbt docs generation
         env:
@@ -50,4 +53,4 @@ jobs:
           DBT_SPARK_THREADS: "4"
           DBT_SPARK_AUTH: NOSASL
         run: |
-          bash dbt/scripts/validate_docs.sh
+          python -m dbt docs generate --empty-catalog --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
