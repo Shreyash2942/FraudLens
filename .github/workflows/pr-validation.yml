@@ -44,8 +44,8 @@ jobs:
           DBT_SPARK_THREADS: "4"
           DBT_SPARK_AUTH: NOSASL
         run: |
-          python -m dbt parse --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
-          python -m dbt ls --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
+          dbt parse --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
+          dbt ls --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
 
       - name: Validate dbt docs generation
         env:
@@ -58,4 +58,4 @@ jobs:
           DBT_SPARK_THREADS: "4"
           DBT_SPARK_AUTH: NOSASL
         run: |
-          python -m dbt docs generate --empty-catalog --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
+          dbt docs generate --empty-catalog --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
