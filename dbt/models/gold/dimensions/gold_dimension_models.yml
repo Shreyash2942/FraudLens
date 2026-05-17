@@ -3,28 +3,47 @@ version: 2
 models:
   - name: dim_date
     description: "Conformed calendar date dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "enterprise-analytics"
+      domain: "calendar"
     columns:
       - name: dim_date_sk
+        description: "Deterministic surrogate key for the date dimension row."
         data_tests: [not_null, unique]
       - name: calendar_date
+        description: "Natural calendar date used for date-based joins."
         data_tests: [not_null, unique]
 
   - name: dim_region
     description: "Conformed region lookup dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "enterprise-analytics"
+      domain: "geography"
     columns:
       - name: dim_region_sk
+        description: "Deterministic surrogate key for the region dimension row."
         data_tests: [not_null, unique]
       - name: region_id
+        description: "Business identifier for region."
         data_tests: [not_null, unique]
 
   - name: dim_branch
     description: "Conformed branch dimension with territory and region hierarchy."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "branch-operations"
+      domain: "geography"
     columns:
       - name: dim_branch_sk
+        description: "Deterministic surrogate key for the branch dimension row."
         data_tests: [not_null, unique]
       - name: branch_id
+        description: "Business identifier for branch."
         data_tests: [not_null, unique]
       - name: region_id
+        description: "Region business identifier for branch hierarchy rollups."
         data_tests:
           - relationships:
               to: ref('dim_region')
@@ -32,12 +51,19 @@ models:
 
   - name: dim_business_unit
     description: "Conformed business unit dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "business-control"
+      domain: "organization"
     columns:
       - name: dim_business_unit_sk
+        description: "Deterministic surrogate key for the business unit dimension row."
         data_tests: [not_null, unique]
       - name: business_unit_id
+        description: "Business identifier for business unit."
         data_tests: [not_null, unique]
       - name: region_id
+        description: "Region business identifier where the business unit operates."
         data_tests:
           - relationships:
               to: ref('dim_region')
@@ -45,12 +71,19 @@ models:
 
   - name: dim_analyst_team
     description: "Conformed analyst team dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "fraud-operations"
+      domain: "organization"
     columns:
       - name: dim_analyst_team_sk
+        description: "Deterministic surrogate key for the analyst team dimension row."
         data_tests: [not_null, unique]
       - name: analyst_team_id
+        description: "Business identifier for analyst team."
         data_tests: [not_null, unique]
       - name: business_unit_id
+        description: "Parent business unit identifier for team ownership."
         data_tests:
           - relationships:
               to: ref('dim_business_unit')
@@ -58,12 +91,20 @@ models:
 
   - name: dim_customer
     description: "Conformed customer dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "customer-risk"
+      domain: "party"
+      criticality: "high"
     columns:
       - name: dim_customer_sk
+        description: "Deterministic surrogate key for the customer dimension row."
         data_tests: [not_null, unique]
       - name: customer_id
+        description: "Business identifier for customer party."
         data_tests: [not_null, unique]
       - name: residency_region_id
+        description: "Region identifier representing customer residency."
         data_tests:
           - relationships:
               to: ref('dim_region')
@@ -71,28 +112,39 @@ models:
 
   - name: dim_customer_org_assignment
     description: "Customer organizational assignment SCD-style dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "fraud-operations"
+      domain: "organization_assignment"
+      scd_type: "type2_like"
     columns:
       - name: dim_customer_org_assignment_sk
+        description: "Deterministic surrogate key for customer assignment row."
         data_tests: [not_null, unique]
       - name: party_org_assignment_id
+        description: "Business identifier for assignment event."
         data_tests: [not_null, unique]
       - name: customer_id
+        description: "Customer business identifier linked to assignment."
         data_tests:
           - not_null
           - relationships:
               to: ref('dim_customer')
               field: customer_id
       - name: business_unit_id
+        description: "Business unit assigned to customer at effective time."
         data_tests:
           - relationships:
               to: ref('dim_business_unit')
               field: business_unit_id
       - name: analyst_team_id
+        description: "Analyst team assigned to customer at effective time."
         data_tests:
           - relationships:
               to: ref('dim_analyst_team')
               field: analyst_team_id
       - name: branch_id
+        description: "Branch assignment identifier at effective time."
         data_tests:
           - relationships:
               to: ref('dim_branch')
@@ -100,17 +152,26 @@ models:
 
   - name: dim_account
     description: "Conformed account dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "account-operations"
+      domain: "account"
+      criticality: "high"
     columns:
       - name: dim_account_sk
+        description: "Deterministic surrogate key for the account dimension row."
         data_tests: [not_null, unique]
       - name: account_id
+        description: "Business identifier for deposit account."
         data_tests: [not_null, unique]
       - name: customer_id
+        description: "Owning customer identifier for account."
         data_tests:
           - relationships:
               to: ref('dim_customer')
               field: customer_id
       - name: branch_id
+        description: "Opened or servicing branch identifier for account."
         data_tests:
           - relationships:
               to: ref('dim_branch')
@@ -118,12 +179,19 @@ models:
 
   - name: dim_card
     description: "Conformed payment card dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "cards-and-payments"
+      domain: "payment_instrument"
     columns:
       - name: dim_card_sk
+        description: "Deterministic surrogate key for the card dimension row."
         data_tests: [not_null, unique]
       - name: card_id
+        description: "Business identifier for card."
         data_tests: [not_null, unique]
       - name: account_id
+        description: "Account identifier linked to card."
         data_tests:
           - relationships:
               to: ref('dim_account')
@@ -131,20 +199,33 @@ models:
 
   - name: dim_device
     description: "Conformed device profile dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "digital-risk"
+      domain: "device"
     columns:
       - name: dim_device_sk
+        description: "Deterministic surrogate key for device dimension row."
         data_tests: [not_null, unique]
       - name: device_id
+        description: "Business identifier for device profile."
         data_tests: [not_null, unique]
 
   - name: dim_channel
     description: "Conformed channel-event dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "channel-operations"
+      domain: "channel"
     columns:
       - name: dim_channel_sk
+        description: "Deterministic surrogate key for channel dimension row."
         data_tests: [not_null, unique]
       - name: channel_event_id
+        description: "Business identifier for originating channel event."
         data_tests: [not_null, unique]
       - name: branch_id
+        description: "Branch identifier associated with channel interaction."
         data_tests:
           - relationships:
               to: ref('dim_branch')
@@ -152,16 +233,28 @@ models:
 
   - name: dim_merchant
     description: "Conformed merchant context dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "payments-risk"
+      domain: "merchant"
     columns:
       - name: dim_merchant_sk
+        description: "Deterministic surrogate key for merchant dimension row."
         data_tests: [not_null, unique]
 
   - name: dim_reference_code
     description: "Conformed reference code lookup dimension."
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "data-governance"
+      domain: "reference_data"
     columns:
       - name: dim_reference_code_sk
+        description: "Deterministic surrogate key for reference code dimension row."
         data_tests: [not_null, unique]
       - name: code_set_name
+        description: "Reference code set namespace."
         data_tests: [not_null]
       - name: code_value
+        description: "Reference code value within the set."
         data_tests: [not_null]
