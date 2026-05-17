@@ -19,3 +19,17 @@ Issue `#53` centralizes canonical fraud analytics metrics for consistent BI and 
 ## Reference Glossary
 
 See `KPI_GLOSSARY.md` for metric definitions and formula contracts.
+
+## Lineage
+
+- `kpi_daily_fraud_operations` sources from:
+  - `fact_daily_fraud_metrics`
+- `kpi_portfolio_risk_snapshot` sources from:
+  - `fact_payment_events`
+  - `fact_daily_fraud_metrics`
+
+## Consumption Guidance
+
+- use `kpi_daily_fraud_operations` for date-trended dashboard tiles and operational monitoring
+- use `kpi_portfolio_risk_snapshot` for current portfolio posture and risk committee summary tiles
+- avoid re-deriving percentage formulas in BI layers; consume KPI columns directly
