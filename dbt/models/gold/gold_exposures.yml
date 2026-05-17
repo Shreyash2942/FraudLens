@@ -1,0 +1,46 @@
+version: 2
+
+exposures:
+  - name: fraud_operations_dashboard
+    label: "Fraud Operations Dashboard"
+    type: dashboard
+    maturity: high
+    url: "https://example.internal/fraudlens/fraud-operations-dashboard"
+    description: >
+      Primary fraud operations dashboard used by analysts and operations leaders
+      to monitor alerts, cases, recovery outcomes, and regional trend movement.
+    owner:
+      name: "Fraud Ops Analytics"
+      email: "fraudlens-ops@example.com"
+    depends_on:
+      - ref('fact_fraud_alerts')
+      - ref('fact_daily_fraud_metrics')
+      - ref('kpi_daily_fraud_operations')
+      - ref('dim_date')
+      - ref('dim_analyst_team')
+      - ref('dim_business_unit')
+      - ref('dim_region')
+    tags: ["gold", "governance", "exposure", "fraud-ops"]
+
+  - name: fraud_portfolio_risk_brief
+    label: "Fraud Portfolio Risk Brief"
+    type: analysis
+    maturity: medium
+    url: "https://example.internal/fraudlens/fraud-portfolio-risk-brief"
+    description: >
+      Weekly and monthly portfolio risk briefing used by fraud strategy and
+      risk-control governance teams for KPI-driven decisioning.
+    owner:
+      name: "Fraud Strategy"
+      email: "fraudlens-strategy@example.com"
+    depends_on:
+      - ref('fact_transactions')
+      - ref('fact_payment_events')
+      - ref('kpi_portfolio_risk_snapshot')
+      - ref('dim_customer')
+      - ref('dim_account')
+      - ref('dim_card')
+      - ref('dim_device')
+      - ref('dim_channel')
+      - ref('dim_merchant')
+    tags: ["gold", "governance", "exposure", "portfolio-risk"]
