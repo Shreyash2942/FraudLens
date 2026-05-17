@@ -1,0 +1,27 @@
+{{ config(alias='GOLD_KPI_DAILY_FRAUD_OPERATIONS', tags=['gold', 'kpi']) }}
+
+select
+    fdm.metric_date,
+    fdm.calendar_year,
+    fdm.calendar_quarter,
+    fdm.calendar_month,
+    fdm.calendar_month_name,
+    fdm.total_transactions,
+    fdm.total_fraud_alerts,
+    fdm.high_severity_alert_count,
+    fdm.alerts_with_cases_count,
+    fdm.total_loss_amount,
+    fdm.total_recovered_amount,
+    fdm.reversed_transaction_count,
+    fdm.cross_border_transaction_count,
+    {{ fraudlens_pct('fdm.total_fraud_alerts', 'fdm.total_transactions') }} as alert_rate_pct,
+    {{ fraudlens_pct('fdm.high_severity_alert_count', 'fdm.total_fraud_alerts') }} as high_severity_alert_rate_pct,
+    {{ fraudlens_pct('fdm.alerts_with_cases_count', 'fdm.total_fraud_alerts') }} as fraud_case_open_rate_pct,
+    {{ fraudlens_pct('fdm.total_recovered_amount', 'fdm.total_loss_amount') }} as recovery_rate_pct,
+    {{ fraudlens_pct('fdm.reversed_transaction_count', 'fdm.total_transactions') }} as reversal_rate_pct,
+    fdm.ingestion_batch_id,
+    fdm.source_file_name,
+    fdm.ingested_at_utc,
+    fdm.pipeline_processed_at_utc,
+    fdm.lineage_run_id
+from {{ ref('fact_daily_fraud_metrics') }} as fdm
