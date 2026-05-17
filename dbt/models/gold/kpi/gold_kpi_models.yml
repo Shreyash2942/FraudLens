@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: kpi_daily_fraud_operations
+    description: "Daily operational KPI model for fraud monitoring."
+    columns:
+      - name: metric_date
+        data_tests: [not_null, unique]
+      - name: total_transactions
+        data_tests: [not_null]
+      - name: total_fraud_alerts
+        data_tests: [not_null]
+      - name: alert_rate_pct
+        data_tests: [not_null]
+      - name: high_severity_alert_rate_pct
+        data_tests: [not_null]
+      - name: fraud_case_open_rate_pct
+        data_tests: [not_null]
+      - name: recovery_rate_pct
+        data_tests: [not_null]
+      - name: reversal_rate_pct
+        data_tests: [not_null]
+
+  - name: kpi_portfolio_risk_snapshot
+    description: "Portfolio-level fraud risk KPI snapshot."
+    columns:
+      - name: snapshot_at_utc
+        data_tests: [not_null, unique]
+      - name: total_payment_events
+        data_tests: [not_null]
+      - name: total_fraud_alerts
+        data_tests: [not_null]
+      - name: high_risk_payment_event_rate_pct
+        data_tests: [not_null]
+      - name: open_alert_backlog_rate_pct
+        data_tests: [not_null]
+      - name: open_case_backlog_rate_pct
+        data_tests: [not_null]
+      - name: cross_border_transaction_rate_pct
+        data_tests: [not_null]
+      - name: portfolio_recovery_rate_pct
+        data_tests: [not_null]
