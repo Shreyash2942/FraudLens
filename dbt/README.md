@@ -84,3 +84,9 @@ Or run helper script:
 ```bash
 bash dbt/scripts/validate_structure.sh
 ```
+
+Docs-generation validation:
+
+```bash
+bash dbt/scripts/validate_docs.sh
+```

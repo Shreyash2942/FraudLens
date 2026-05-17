@@ -37,3 +37,16 @@ jobs:
           DBT_SPARK_AUTH: NOSASL
         run: |
           bash dbt/scripts/validate_structure.sh
+
+      - name: Validate dbt docs generation
+        env:
+          FRAUDLENS_DBT_PROFILE_NAME: fraudlens_local_spark
+          FRAUDLENS_DBT_TARGET_NAME: local
+          DBT_SPARK_HOST: localhost
+          DBT_SPARK_PORT: "10000"
+          DBT_SPARK_USER: ci
+          DBT_SPARK_SCHEMA: default
+          DBT_SPARK_THREADS: "4"
+          DBT_SPARK_AUTH: NOSASL
+        run: |
+          bash dbt/scripts/validate_docs.sh
