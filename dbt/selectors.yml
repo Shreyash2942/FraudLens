@@ -1,0 +1,66 @@
+selectors:
+  - name: quality_all
+    definition:
+      method: tag
+      value: quality
+
+  - name: quality_critical_gate
+    definition:
+      union:
+        - method: tag
+          value: quality_critical
+        - method: tag
+          value: governance_critical
+        - method: tag
+          value: contract_critical
+        - method: tag
+          value: audit_critical
+
+  - name: quality_high_gate
+    definition:
+      method: tag
+      value: quality_high
+
+  - name: quality_not_null
+    definition:
+      method: tag
+      value: quality_not_null
+
+  - name: quality_unique
+    definition:
+      method: tag
+      value: quality_unique
+
+  - name: quality_relationships
+    definition:
+      method: tag
+      value: quality_relationships
+
+  - name: quality_accepted_values
+    definition:
+      method: tag
+      value: quality_accepted_values
+
+  - name: quality_bronze
+    definition:
+      intersection:
+        - method: tag
+          value: quality
+        - method: tag
+          value: bronze
+
+  - name: quality_silver
+    definition:
+      intersection:
+        - method: tag
+          value: quality
+        - method: tag
+          value: silver
+
+  - name: quality_gold
+    definition:
+      intersection:
+        - method: tag
+          value: quality
+        - method: tag
+          value: gold
