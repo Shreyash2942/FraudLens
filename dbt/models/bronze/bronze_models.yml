@@ -29,59 +29,144 @@ models:
     description: "Bronze staging view for channel events."
   - name: stg_bronze__payment_instruction
     description: "Bronze staging view for payment instructions."
+    config:
+      tags: ["quality", "quality_critical", "bronze", "tier_1_critical"]
     columns:
       - name: payment_instruction_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "bronze", "tier_1_critical"]
       - name: ingestion_batch_id
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: source_file_name
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: ingested_at_utc
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
   - name: stg_bronze__payment_transaction
     description: "Bronze staging view for payment transactions."
+    config:
+      tags: ["quality", "quality_critical", "bronze", "tier_1_critical"]
     columns:
       - name: payment_transaction_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "bronze", "tier_1_critical"]
       - name: ingestion_batch_id
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: source_file_name
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: ingested_at_utc
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
   - name: stg_bronze__risk_signal
     description: "Bronze staging view for risk signals."
+    config:
+      tags: ["quality", "quality_critical", "bronze", "tier_1_critical"]
     columns:
       - name: risk_signal_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "bronze", "tier_1_critical"]
       - name: ingestion_batch_id
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: source_file_name
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: ingested_at_utc
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
   - name: stg_bronze__fraud_alert
     description: "Bronze staging view for fraud alerts."
+    config:
+      tags: ["quality", "quality_critical", "bronze", "tier_1_critical"]
     columns:
       - name: fraud_alert_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "bronze", "tier_1_critical"]
       - name: ingestion_batch_id
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: source_file_name
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: ingested_at_utc
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
   - name: stg_bronze__fraud_case
     description: "Bronze staging view for fraud cases."
+    config:
+      tags: ["quality", "quality_critical", "bronze", "tier_1_critical"]
     columns:
       - name: fraud_case_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "bronze", "tier_1_critical"]
       - name: ingestion_batch_id
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: source_file_name
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
       - name: ingested_at_utc
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "bronze", "tier_1_critical", "audit_critical"]
   - name: stg_bronze__investigation_event
     description: "Bronze staging view for investigation events."
   - name: stg_bronze__decision_record
