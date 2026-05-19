@@ -3,6 +3,8 @@ version: 2
 models:
   - name: dim_date
     description: "Conformed calendar date dimension."
+    config:
+      tags: ["quality", "quality_high", "gold", "dim", "tier_2_high"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "enterprise-analytics"
@@ -10,13 +12,27 @@ models:
     columns:
       - name: dim_date_sk
         description: "Deterministic surrogate key for the date dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: calendar_date
         description: "Natural calendar date used for date-based joins."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
 
   - name: dim_region
     description: "Conformed region lookup dimension."
+    config:
+      tags: ["quality", "quality_high", "gold", "dim", "tier_2_high"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "enterprise-analytics"
@@ -24,13 +40,27 @@ models:
     columns:
       - name: dim_region_sk
         description: "Deterministic surrogate key for the region dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: region_id
         description: "Business identifier for region."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
 
   - name: dim_branch
     description: "Conformed branch dimension with territory and region hierarchy."
+    config:
+      tags: ["quality", "quality_high", "gold", "dim", "tier_2_high"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "branch-operations"
@@ -38,19 +68,35 @@ models:
     columns:
       - name: dim_branch_sk
         description: "Deterministic surrogate key for the branch dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: branch_id
         description: "Business identifier for branch."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: region_id
         description: "Region business identifier for branch hierarchy rollups."
         data_tests:
           - relationships:
               to: ref('dim_region')
               field: region_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_high", "gold", "dim", "tier_2_high"]
 
   - name: dim_business_unit
     description: "Conformed business unit dimension."
+    config:
+      tags: ["quality", "quality_high", "gold", "dim", "tier_2_high"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "business-control"
@@ -58,19 +104,35 @@ models:
     columns:
       - name: dim_business_unit_sk
         description: "Deterministic surrogate key for the business unit dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: business_unit_id
         description: "Business identifier for business unit."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: region_id
         description: "Region business identifier where the business unit operates."
         data_tests:
           - relationships:
               to: ref('dim_region')
               field: region_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_high", "gold", "dim", "tier_2_high"]
 
   - name: dim_analyst_team
     description: "Conformed analyst team dimension."
+    config:
+      tags: ["quality", "quality_high", "gold", "dim", "tier_2_high"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-operations"
@@ -78,19 +140,35 @@ models:
     columns:
       - name: dim_analyst_team_sk
         description: "Deterministic surrogate key for the analyst team dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: analyst_team_id
         description: "Business identifier for analyst team."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: business_unit_id
         description: "Parent business unit identifier for team ownership."
         data_tests:
           - relationships:
               to: ref('dim_business_unit')
               field: business_unit_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_high", "gold", "dim", "tier_2_high"]
 
   - name: dim_customer
     description: "Conformed customer dimension."
+    config:
+      tags: ["quality", "quality_critical", "gold", "dim", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "customer-risk"
@@ -99,19 +177,35 @@ models:
     columns:
       - name: dim_customer_sk
         description: "Deterministic surrogate key for the customer dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "dim", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: customer_id
         description: "Business identifier for customer party."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "dim", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: residency_region_id
         description: "Region identifier representing customer residency."
         data_tests:
           - relationships:
               to: ref('dim_region')
               field: region_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_high", "gold", "dim", "tier_1_critical"]
 
   - name: dim_customer_org_assignment
     description: "Customer organizational assignment SCD-style dimension."
+    config:
+      tags: ["quality", "quality_critical", "gold", "dim", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-operations"
@@ -120,38 +214,62 @@ models:
     columns:
       - name: dim_customer_org_assignment_sk
         description: "Deterministic surrogate key for customer assignment row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "dim", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: party_org_assignment_id
         description: "Business identifier for assignment event."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "dim", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: customer_id
         description: "Customer business identifier linked to assignment."
         data_tests:
-          - not_null
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "dim", "tier_1_critical"]
           - relationships:
               to: ref('dim_customer')
               field: customer_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: business_unit_id
         description: "Business unit assigned to customer at effective time."
         data_tests:
           - relationships:
               to: ref('dim_business_unit')
               field: business_unit_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: analyst_team_id
         description: "Analyst team assigned to customer at effective time."
         data_tests:
           - relationships:
               to: ref('dim_analyst_team')
               field: analyst_team_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: branch_id
         description: "Branch assignment identifier at effective time."
         data_tests:
           - relationships:
               to: ref('dim_branch')
               field: branch_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "dim", "tier_1_critical"]
 
   - name: dim_account
     description: "Conformed account dimension."
+    config:
+      tags: ["quality", "quality_critical", "gold", "dim", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "account-operations"
@@ -160,25 +278,43 @@ models:
     columns:
       - name: dim_account_sk
         description: "Deterministic surrogate key for the account dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "dim", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: account_id
         description: "Business identifier for deposit account."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "dim", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: customer_id
         description: "Owning customer identifier for account."
         data_tests:
           - relationships:
               to: ref('dim_customer')
               field: customer_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: branch_id
         description: "Opened or servicing branch identifier for account."
         data_tests:
           - relationships:
               to: ref('dim_branch')
               field: branch_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "dim", "tier_1_critical"]
 
   - name: dim_card
     description: "Conformed payment card dimension."
+    config:
+      tags: ["quality", "quality_critical", "gold", "dim", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "cards-and-payments"
@@ -186,19 +322,35 @@ models:
     columns:
       - name: dim_card_sk
         description: "Deterministic surrogate key for the card dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "dim", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: card_id
         description: "Business identifier for card."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "dim", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "dim", "tier_1_critical"]
       - name: account_id
         description: "Account identifier linked to card."
         data_tests:
           - relationships:
               to: ref('dim_account')
               field: account_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "dim", "tier_1_critical"]
 
   - name: dim_device
     description: "Conformed device profile dimension."
+    config:
+      tags: ["quality", "quality_high", "gold", "dim", "tier_2_high"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "digital-risk"
@@ -206,13 +358,27 @@ models:
     columns:
       - name: dim_device_sk
         description: "Deterministic surrogate key for device dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: device_id
         description: "Business identifier for device profile."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
 
   - name: dim_channel
     description: "Conformed channel-event dimension."
+    config:
+      tags: ["quality", "quality_high", "gold", "dim", "tier_2_high"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "channel-operations"
@@ -220,19 +386,35 @@ models:
     columns:
       - name: dim_channel_sk
         description: "Deterministic surrogate key for channel dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: channel_event_id
         description: "Business identifier for originating channel event."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: branch_id
         description: "Branch identifier associated with channel interaction."
         data_tests:
           - relationships:
               to: ref('dim_branch')
               field: branch_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_high", "gold", "dim", "tier_2_high"]
 
   - name: dim_merchant
     description: "Conformed merchant context dimension."
+    config:
+      tags: ["quality", "quality_high", "gold", "dim", "tier_2_high"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "payments-risk"
@@ -240,10 +422,18 @@ models:
     columns:
       - name: dim_merchant_sk
         description: "Deterministic surrogate key for merchant dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
 
   - name: dim_reference_code
     description: "Conformed reference code lookup dimension."
+    config:
+      tags: ["quality", "quality_high", "gold", "dim", "tier_2_high"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "data-governance"
@@ -251,10 +441,22 @@ models:
     columns:
       - name: dim_reference_code_sk
         description: "Deterministic surrogate key for reference code dimension row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "gold", "dim", "tier_2_high"]
       - name: code_set_name
         description: "Reference code set namespace."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
       - name: code_value
         description: "Reference code value within the set."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "dim", "tier_2_high"]
