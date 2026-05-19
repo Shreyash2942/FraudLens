@@ -3,91 +3,248 @@ version: 2
 models:
   - name: slv__payment_instruction
     description: "Silver conformed payment instruction dataset."
+    config:
+      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
     columns:
       - name: payment_instruction_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "silver", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "silver", "tier_1_critical"]
       - name: debtor_account_id
         data_tests:
           - relationships:
               to: ref('slv__deposit_account')
               field: deposit_account_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "silver", "tier_1_critical"]
+      - name: instruction_status
+        data_tests:
+          - accepted_values:
+              values: ["PENDING", "AUTHORIZED", "RELEASED", "SETTLED", "REJECTED", "CANCELLED"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
+      - name: payment_rail_code
+        data_tests:
+          - accepted_values:
+              values: ["ACH", "SWIFT", "SEPA", "RTP", "CARD", "WIRE", "INTERNAL"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
       - name: ingestion_batch_id
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "silver", "tier_1_critical", "audit_critical"]
 
   - name: slv__payment_transaction
     description: "Silver conformed payment transaction dataset."
+    config:
+      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
     columns:
       - name: payment_transaction_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "silver", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "silver", "tier_1_critical"]
       - name: payment_instruction_id
         data_tests:
-          - not_null
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "silver", "tier_1_critical"]
           - relationships:
               to: ref('slv__payment_instruction')
               field: payment_instruction_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "silver", "tier_1_critical"]
+      - name: transaction_status
+        data_tests:
+          - accepted_values:
+              values: ["PENDING", "SETTLED", "REVERSED", "FAILED", "CANCELLED"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
+      - name: transaction_direction_code
+        data_tests:
+          - accepted_values:
+              values: ["DEBIT", "CREDIT"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
 
   - name: slv__risk_signal
     description: "Silver conformed risk signal dataset."
+    config:
+      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
     columns:
       - name: risk_signal_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "silver", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "silver", "tier_1_critical"]
       - name: payment_instruction_id
         data_tests:
           - relationships:
               to: ref('slv__payment_instruction')
               field: payment_instruction_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "silver", "tier_1_critical"]
+      - name: risk_level
+        data_tests:
+          - accepted_values:
+              values: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
 
   - name: slv__fraud_alert
     description: "Silver conformed fraud alert dataset."
+    config:
+      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
     columns:
       - name: fraud_alert_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "silver", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "silver", "tier_1_critical"]
       - name: risk_signal_id
         data_tests:
           - relationships:
               to: ref('slv__risk_signal')
               field: risk_signal_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "silver", "tier_1_critical"]
+      - name: alert_status
+        data_tests:
+          - accepted_values:
+              values: ["NEW", "OPEN", "IN_PROGRESS", "ESCALATED", "CLOSED", "DISMISSED"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
+      - name: alert_severity
+        data_tests:
+          - accepted_values:
+              values: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
 
   - name: slv__fraud_case
     description: "Silver conformed fraud case dataset."
+    config:
+      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
     columns:
       - name: fraud_case_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "silver", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "silver", "tier_1_critical"]
       - name: primary_alert_id
         data_tests:
           - relationships:
               to: ref('slv__fraud_alert')
               field: fraud_alert_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "silver", "tier_1_critical"]
+      - name: case_status
+        data_tests:
+          - accepted_values:
+              values: ["NEW", "OPEN", "IN_PROGRESS", "ESCALATED", "CLOSED"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
 
   - name: slv__investigation_event
     description: "Silver conformed investigation event dataset."
+    config:
+      tags: ["quality", "quality_high", "silver", "tier_2_high"]
     columns:
       - name: investigation_event_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "silver", "tier_2_high"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_high", "silver", "tier_2_high"]
       - name: fraud_case_id
         data_tests:
           - relationships:
               to: ref('slv__fraud_case')
               field: fraud_case_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_high", "silver", "tier_2_high"]
 
   - name: slv__decision_record
     description: "Silver conformed decision record dataset."
+    config:
+      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
     columns:
       - name: decision_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "silver", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "silver", "tier_1_critical"]
       - name: fraud_case_id
         data_tests:
           - relationships:
               to: ref('slv__fraud_case')
               field: fraud_case_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "silver", "tier_1_critical"]
+      - name: decision_status
+        data_tests:
+          - accepted_values:
+              values: ["PENDING", "APPROVED", "REJECTED", "REVIEWED", "EXECUTED"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
+      - name: decision_type
+        data_tests:
+          - accepted_values:
+              values: ["BLOCK", "ALLOW", "REVIEW", "ESCALATE", "CLOSE"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
 
   - name: slv__case_disposition
     description: "Silver conformed case disposition dataset."
+    config:
+      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
     columns:
       - name: disposition_id
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "silver", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "silver", "tier_1_critical"]
       - name: decision_id
         data_tests:
           - relationships:
               to: ref('slv__decision_record')
               field: decision_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "silver", "tier_1_critical"]
+      - name: disposition_code
+        data_tests:
+          - accepted_values:
+              values: ["CONFIRMED_FRAUD", "FALSE_POSITIVE", "CUSTOMER_ERROR", "INSUFFICIENT_EVIDENCE", "RECOVERED"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
+      - name: recovery_status_code
+        data_tests:
+          - accepted_values:
+              values: ["NONE", "PARTIAL", "FULL", "WRITE_OFF"]
+              config:
+                tags: ["quality", "quality_accepted_values", "quality_high", "silver", "tier_1_critical"]
