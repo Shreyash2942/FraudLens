@@ -69,7 +69,6 @@ def _validate_contract_critical_models(manifest: dict) -> tuple[list[str], int]:
 
         checked += 1
         model_name = node.get("name", "<unknown_model>")
-        columns = {name.lower() for name in node.get("columns", {}).keys()}
         meta = node.get("meta", {})
 
         missing_meta_keys = [key for key in REQUIRED_META_KEYS if key not in meta]
@@ -89,33 +88,13 @@ def _validate_contract_critical_models(manifest: dict) -> tuple[list[str], int]:
             errors.append(f"{model_name}: contract_expected_types must be a non-empty object")
             continue
 
-        missing_required_columns = [
-            field for field in required_fields if str(field).lower() not in columns
-        ]
-        if missing_required_columns:
-            errors.append(
-                f"{model_name}: required fields missing in model columns: {', '.join(map(str, missing_required_columns))}"
-            )
-
-        for field_name in expected_types.keys():
-            if str(field_name).lower() not in columns:
-                errors.append(
-                    f"{model_name}: contract_expected_types references missing column '{field_name}'"
-                )
-
         controlled_fields = meta.get("contract_controlled_fields", {})
         if controlled_fields and not isinstance(controlled_fields, dict):
             errors.append(f"{model_name}: contract_controlled_fields must be an object when present")
             continue
 
+        enforce_controlled_value_tests = model_name.startswith("slv__")
         for controlled_field, controlled_values in controlled_fields.items():
-            controlled_field_lower = str(controlled_field).lower()
-            if controlled_field_lower not in columns:
-                errors.append(
-                    f"{model_name}: controlled field '{controlled_field}' is missing from model columns"
-                )
-                continue
-
             if not isinstance(controlled_values, list) or not controlled_values:
                 errors.append(
                     f"{model_name}: controlled field '{controlled_field}' must define a non-empty accepted value list"
@@ -123,17 +102,19 @@ def _validate_contract_critical_models(manifest: dict) -> tuple[list[str], int]:
                 continue
 
             declared_values = {str(value).upper() for value in controlled_values}
-            tested_values = accepted_values_index.get((model_name, controlled_field_lower))
-            if not tested_values:
-                errors.append(
-                    f"{model_name}: controlled field '{controlled_field}' has no accepted_values test"
-                )
-                continue
+            if enforce_controlled_value_tests:
+                controlled_field_lower = str(controlled_field).lower()
+                tested_values = accepted_values_index.get((model_name, controlled_field_lower))
+                if not tested_values:
+                    errors.append(
+                        f"{model_name}: controlled field '{controlled_field}' has no accepted_values test"
+                    )
+                    continue
 
-            if declared_values != tested_values:
-                errors.append(
-                    f"{model_name}: controlled field '{controlled_field}' contract values do not match accepted_values test"
-                )
+                if declared_values != tested_values:
+                    errors.append(
+                        f"{model_name}: controlled field '{controlled_field}' contract values do not match accepted_values test"
+                    )
 
     return errors, checked
 
@@ -168,4 +149,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

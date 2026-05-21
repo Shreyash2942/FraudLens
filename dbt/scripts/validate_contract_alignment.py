@@ -138,8 +138,11 @@ def _models_by_name(manifest: dict) -> dict[str, dict]:
     return models
 
 
-def _model_columns(node: dict) -> set[str]:
-    return {column.lower() for column in node.get("columns", {}).keys()}
+def _contract_required_fields(node: dict) -> set[str]:
+    required_fields = node.get("meta", {}).get("contract_required_fields", [])
+    if not isinstance(required_fields, list):
+        return set()
+    return {str(column).lower() for column in required_fields}
 
 
 def _meta_expected_types(node: dict) -> dict[str, str]:
@@ -166,20 +169,27 @@ def _validate_alignment(manifest: dict) -> tuple[list[str], int]:
             errors.append(f"missing downstream model in manifest: {downstream_name}")
             continue
 
-        upstream_columns = _model_columns(upstream)
-        downstream_columns = _model_columns(downstream)
+        upstream_contract_fields = _contract_required_fields(upstream)
+        downstream_contract_fields = _contract_required_fields(downstream)
         upstream_expected_types = _meta_expected_types(upstream)
         downstream_expected_types = _meta_expected_types(downstream)
 
+        if not upstream_contract_fields:
+            errors.append(f"{upstream_name}: missing or invalid meta.contract_required_fields")
+            continue
+        if not downstream_contract_fields:
+            errors.append(f"{downstream_name}: missing or invalid meta.contract_required_fields")
+            continue
+
         for field in fields:
             field_lower = field.lower()
-            if field_lower not in upstream_columns:
+            if field_lower not in upstream_contract_fields:
                 errors.append(
-                    f"{upstream_name} -> {downstream_name}: required interface column missing upstream: {field}"
+                    f"{upstream_name} -> {downstream_name}: required interface field missing upstream contract_required_fields: {field}"
                 )
-            if field_lower not in downstream_columns:
+            if field_lower not in downstream_contract_fields:
                 errors.append(
-                    f"{upstream_name} -> {downstream_name}: required interface column missing downstream: {field}"
+                    f"{upstream_name} -> {downstream_name}: required interface field missing downstream contract_required_fields: {field}"
                 )
 
             upstream_type = upstream_expected_types.get(field_lower)
@@ -222,4 +232,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
