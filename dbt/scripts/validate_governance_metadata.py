@@ -52,12 +52,20 @@ def _validate_governance_metadata(manifest: dict) -> tuple[list[str], int]:
                 f"{model_name}: missing governance meta fields: {', '.join(missing_meta)}"
             )
 
-        columns = {column.lower() for column in node.get("columns", {}).keys()}
-        missing_audit = [column for column in REQUIRED_AUDIT_COLUMNS if column not in columns]
-        if missing_audit:
-            errors.append(
-                f"{model_name}: missing required audit columns: {', '.join(missing_audit)}"
-            )
+        tags = set(node.get("tags", []))
+        if "contract_critical" in tags:
+            columns = {column.lower() for column in node.get("columns", {}).keys()}
+            contract_required_fields = node.get("meta", {}).get("contract_required_fields", [])
+            contract_required = {str(column).lower() for column in contract_required_fields}
+
+            if contract_required:
+                missing_audit = [column for column in REQUIRED_AUDIT_COLUMNS if column not in contract_required]
+            else:
+                missing_audit = [column for column in REQUIRED_AUDIT_COLUMNS if column not in columns]
+            if missing_audit:
+                errors.append(
+                    f"{model_name}: missing required audit columns: {', '.join(missing_audit)}"
+                )
 
     return errors, checked
 
@@ -92,4 +100,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

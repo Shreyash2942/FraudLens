@@ -34,6 +34,7 @@ models:
     meta:
       owner: "fraudlens-data-platform"
       steward: "payments-operations"
+      domain: "payment_lifecycle"
       criticality: "high"
       contract_required_fields: ["payment_instruction_id", "instruction_status", "debtor_account_id", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
       contract_expected_types:
@@ -77,6 +78,7 @@ models:
     meta:
       owner: "fraudlens-data-platform"
       steward: "payments-settlement"
+      domain: "payment_lifecycle"
       criticality: "high"
       contract_required_fields: ["payment_transaction_id", "payment_instruction_id", "transaction_status", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
       contract_expected_types:
@@ -120,6 +122,7 @@ models:
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-risk"
+      domain: "risk_signals"
       criticality: "high"
       contract_required_fields: ["risk_signal_id", "payment_instruction_id", "signal_type_code", "risk_level", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
       contract_expected_types:
@@ -161,6 +164,7 @@ models:
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-operations"
+      domain: "alert_management"
       criticality: "high"
       contract_required_fields: ["fraud_alert_id", "risk_signal_id", "alert_status", "alert_severity", "created_at", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
       contract_expected_types:
@@ -203,6 +207,7 @@ models:
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-case-management"
+      domain: "case_management"
       criticality: "high"
       contract_required_fields: ["fraud_case_id", "primary_alert_id", "case_status", "opened_at", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
       contract_expected_types:
