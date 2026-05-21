@@ -4,12 +4,20 @@ models:
   - name: kpi_daily_fraud_operations
     description: "Daily operational KPI model for fraud monitoring."
     config:
-      tags: ["quality", "quality_critical", "gold", "kpi", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "kpi", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-operations"
       domain: "kpi_operations"
       criticality: "high"
+      contract_required_fields: ["metric_date", "total_transactions", "total_fraud_alerts", "alert_rate_pct", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        metric_date: "date"
+        total_transactions: "integer"
+        total_fraud_alerts: "integer"
+        alert_rate_pct: "decimal"
+        recovery_rate_pct: "decimal"
+        ingested_at_utc: "timestamp"
     columns:
       - name: metric_date
         description: "Calendar date grain for daily KPI values."
@@ -71,12 +79,20 @@ models:
   - name: kpi_portfolio_risk_snapshot
     description: "Portfolio-level fraud risk KPI snapshot."
     config:
-      tags: ["quality", "quality_critical", "gold", "kpi", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "kpi", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-analytics"
       domain: "kpi_portfolio"
       criticality: "high"
+      contract_required_fields: ["snapshot_at_utc", "total_payment_events", "total_fraud_alerts", "high_risk_payment_event_rate_pct", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        snapshot_at_utc: "timestamp"
+        total_payment_events: "integer"
+        total_fraud_alerts: "integer"
+        high_risk_payment_event_rate_pct: "decimal"
+        portfolio_recovery_rate_pct: "decimal"
+        ingested_at_utc: "timestamp"
     columns:
       - name: snapshot_at_utc
         description: "UTC timestamp when the KPI snapshot was generated."

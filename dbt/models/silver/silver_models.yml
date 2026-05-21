@@ -4,7 +4,22 @@ models:
   - name: slv__payment_instruction
     description: "Silver conformed payment instruction dataset."
     config:
-      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "silver", "tier_1_critical"]
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "payments-operations"
+      criticality: "high"
+      contract_required_fields: ["payment_instruction_id", "instruction_status", "debtor_account_id", "instructed_amount", "event_at", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        payment_instruction_id: "string"
+        instruction_status: "string"
+        debtor_account_id: "string"
+        instructed_amount: "decimal"
+        event_at: "timestamp"
+        booking_date: "date"
+      contract_controlled_fields:
+        instruction_status: ["PENDING", "AUTHORIZED", "RELEASED", "SETTLED", "REJECTED", "CANCELLED"]
+        payment_rail_code: ["ACH", "SWIFT", "SEPA", "RTP", "CARD", "WIRE", "INTERNAL"]
     columns:
       - name: payment_instruction_id
         data_tests:
@@ -42,7 +57,22 @@ models:
   - name: slv__payment_transaction
     description: "Silver conformed payment transaction dataset."
     config:
-      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "silver", "tier_1_critical"]
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "payments-settlement"
+      criticality: "high"
+      contract_required_fields: ["payment_transaction_id", "payment_instruction_id", "transaction_status", "booking_amount", "transaction_direction_code", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        payment_transaction_id: "string"
+        payment_instruction_id: "string"
+        transaction_status: "string"
+        booking_amount: "decimal"
+        settlement_at: "timestamp"
+        posted_date: "date"
+      contract_controlled_fields:
+        transaction_status: ["PENDING", "SETTLED", "REVERSED", "FAILED", "CANCELLED"]
+        transaction_direction_code: ["DEBIT", "CREDIT"]
     columns:
       - name: payment_transaction_id
         data_tests:
@@ -78,7 +108,20 @@ models:
   - name: slv__risk_signal
     description: "Silver conformed risk signal dataset."
     config:
-      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "silver", "tier_1_critical"]
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "fraud-risk"
+      criticality: "high"
+      contract_required_fields: ["risk_signal_id", "payment_instruction_id", "signal_type_code", "risk_level", "event_at", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        risk_signal_id: "string"
+        payment_instruction_id: "string"
+        signal_type_code: "string"
+        signal_score_amount: "decimal"
+        event_at: "timestamp"
+      contract_controlled_fields:
+        risk_level: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
     columns:
       - name: risk_signal_id
         data_tests:
@@ -105,7 +148,21 @@ models:
   - name: slv__fraud_alert
     description: "Silver conformed fraud alert dataset."
     config:
-      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "silver", "tier_1_critical"]
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "fraud-operations"
+      criticality: "high"
+      contract_required_fields: ["fraud_alert_id", "risk_signal_id", "alert_status", "alert_severity", "created_at", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fraud_alert_id: "string"
+        risk_signal_id: "string"
+        alert_status: "string"
+        alert_severity: "string"
+        created_at: "timestamp"
+      contract_controlled_fields:
+        alert_status: ["NEW", "OPEN", "IN_PROGRESS", "ESCALATED", "CLOSED", "DISMISSED"]
+        alert_severity: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
     columns:
       - name: fraud_alert_id
         data_tests:
@@ -138,7 +195,20 @@ models:
   - name: slv__fraud_case
     description: "Silver conformed fraud case dataset."
     config:
-      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "silver", "tier_1_critical"]
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "fraud-case-management"
+      criticality: "high"
+      contract_required_fields: ["fraud_case_id", "primary_alert_id", "case_status", "opened_at", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fraud_case_id: "string"
+        primary_alert_id: "string"
+        case_status: "string"
+        opened_at: "timestamp"
+        closed_at: "timestamp"
+      contract_controlled_fields:
+        case_status: ["NEW", "OPEN", "IN_PROGRESS", "ESCALATED", "CLOSED"]
     columns:
       - name: fraud_case_id
         data_tests:
@@ -186,7 +256,21 @@ models:
   - name: slv__decision_record
     description: "Silver conformed decision record dataset."
     config:
-      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "silver", "tier_1_critical"]
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "fraud-case-management"
+      criticality: "high"
+      contract_required_fields: ["decision_id", "fraud_case_id", "decision_status", "decision_type", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        decision_id: "string"
+        fraud_case_id: "string"
+        decision_status: "string"
+        decision_type: "string"
+        decided_at: "timestamp"
+      contract_controlled_fields:
+        decision_status: ["PENDING", "APPROVED", "REJECTED", "REVIEWED", "EXECUTED"]
+        decision_type: ["BLOCK", "ALLOW", "REVIEW", "ESCALATE", "CLOSE"]
     columns:
       - name: decision_id
         data_tests:
@@ -219,7 +303,21 @@ models:
   - name: slv__case_disposition
     description: "Silver conformed case disposition dataset."
     config:
-      tags: ["quality", "quality_critical", "silver", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "silver", "tier_1_critical"]
+    meta:
+      owner: "fraudlens-data-platform"
+      steward: "fraud-case-management"
+      criticality: "high"
+      contract_required_fields: ["disposition_id", "decision_id", "disposition_code", "recovery_status_code", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        disposition_id: "string"
+        decision_id: "string"
+        disposition_code: "string"
+        recovery_status_code: "string"
+        financial_impact_amount: "decimal"
+      contract_controlled_fields:
+        disposition_code: ["CONFIRMED_FRAUD", "FALSE_POSITIVE", "CUSTOMER_ERROR", "INSUFFICIENT_EVIDENCE", "RECOVERED"]
+        recovery_status_code: ["NONE", "PARTIAL", "FULL", "WRITE_OFF"]
     columns:
       - name: disposition_id
         data_tests:

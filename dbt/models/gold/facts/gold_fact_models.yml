@@ -4,12 +4,23 @@ models:
   - name: fact_transactions
     description: "Gold fact model at payment transaction grain with fraud exposure context."
     config:
-      tags: ["quality", "quality_critical", "gold", "fact", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "fact", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-analytics"
       domain: "payments_fraud"
       criticality: "high"
+      contract_required_fields: ["fact_transaction_sk", "payment_transaction_id", "payment_instruction_id", "transaction_date", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fact_transaction_sk: "string"
+        payment_transaction_id: "string"
+        payment_instruction_id: "string"
+        transaction_date: "date"
+        booking_amount: "decimal"
+        ingested_at_utc: "timestamp"
+      contract_controlled_fields:
+        transaction_status: ["PENDING", "SETTLED", "REVERSED", "FAILED", "CANCELLED"]
+        transaction_direction_code: ["DEBIT", "CREDIT"]
     columns:
       - name: fact_transaction_sk
         description: "Deterministic surrogate key for the fact transaction row."
@@ -55,12 +66,24 @@ models:
   - name: fact_fraud_alerts
     description: "Gold fact model at fraud alert grain with risk, case, and disposition outcomes."
     config:
-      tags: ["quality", "quality_critical", "gold", "fact", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "fact", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-operations"
       domain: "alert_case_management"
       criticality: "high"
+      contract_required_fields: ["fact_fraud_alert_sk", "fraud_alert_id", "risk_signal_id", "alert_created_date", "alert_status", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fact_fraud_alert_sk: "string"
+        fraud_alert_id: "string"
+        risk_signal_id: "string"
+        alert_created_date: "date"
+        alert_created_at: "timestamp"
+        total_loss_amount: "decimal"
+      contract_controlled_fields:
+        alert_status: ["NEW", "OPEN", "IN_PROGRESS", "ESCALATED", "CLOSED", "DISMISSED"]
+        alert_severity: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+        risk_level: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
     columns:
       - name: fact_fraud_alert_sk
         description: "Deterministic surrogate key for the fraud alert fact row."
@@ -108,12 +131,23 @@ models:
   - name: fact_payment_events
     description: "Gold fact model at payment instruction grain describing event lifecycle and fraud funnel metrics."
     config:
-      tags: ["quality", "quality_critical", "gold", "fact", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "fact", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "payments-analytics"
       domain: "payment_lifecycle"
       criticality: "high"
+      contract_required_fields: ["fact_payment_event_sk", "payment_instruction_id", "payment_event_date", "instruction_status", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fact_payment_event_sk: "string"
+        payment_instruction_id: "string"
+        payment_event_date: "date"
+        payment_event_at: "timestamp"
+        instructed_amount: "decimal"
+        total_booking_amount: "decimal"
+      contract_controlled_fields:
+        instruction_status: ["PENDING", "AUTHORIZED", "RELEASED", "SETTLED", "REJECTED", "CANCELLED"]
+        payment_rail_code: ["ACH", "SWIFT", "SEPA", "RTP", "CARD", "WIRE", "INTERNAL"]
     columns:
       - name: fact_payment_event_sk
         description: "Deterministic surrogate key for the payment event fact row."
@@ -148,12 +182,20 @@ models:
   - name: fact_daily_fraud_metrics
     description: "Gold daily aggregate fraud metrics at metric date grain."
     config:
-      tags: ["quality", "quality_critical", "gold", "fact", "tier_1_critical"]
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "fact", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-analytics"
       domain: "portfolio_monitoring"
       criticality: "high"
+      contract_required_fields: ["fact_daily_fraud_metrics_sk", "metric_date", "total_transactions", "total_fraud_alerts", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fact_daily_fraud_metrics_sk: "string"
+        metric_date: "date"
+        total_transactions: "integer"
+        total_fraud_alerts: "integer"
+        total_transaction_amount: "decimal"
+        total_loss_amount: "decimal"
     columns:
       - name: fact_daily_fraud_metrics_sk
         description: "Deterministic surrogate key for the daily fraud metrics aggregate row."
