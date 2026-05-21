@@ -9,6 +9,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "enterprise-analytics"
       domain: "calendar"
+      criticality: "medium"
+      contract_role: "supporting_dimension"
     columns:
       - name: dim_date_sk
         description: "Deterministic surrogate key for the date dimension row."
@@ -37,6 +39,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "enterprise-analytics"
       domain: "geography"
+      criticality: "medium"
+      contract_role: "supporting_dimension"
     columns:
       - name: dim_region_sk
         description: "Deterministic surrogate key for the region dimension row."
@@ -65,6 +69,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "branch-operations"
       domain: "geography"
+      criticality: "medium"
+      contract_role: "supporting_dimension"
     columns:
       - name: dim_branch_sk
         description: "Deterministic surrogate key for the branch dimension row."
@@ -101,6 +107,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "business-control"
       domain: "organization"
+      criticality: "medium"
+      contract_role: "supporting_dimension"
     columns:
       - name: dim_business_unit_sk
         description: "Deterministic surrogate key for the business unit dimension row."
@@ -137,6 +145,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "fraud-operations"
       domain: "organization"
+      criticality: "medium"
+      contract_role: "supporting_dimension"
     columns:
       - name: dim_analyst_team_sk
         description: "Deterministic surrogate key for the analyst team dimension row."
@@ -174,6 +184,7 @@ models:
       steward: "customer-risk"
       domain: "party"
       criticality: "high"
+      contract_role: "conformed_dimension"
     columns:
       - name: dim_customer_sk
         description: "Deterministic surrogate key for the customer dimension row."
@@ -210,6 +221,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "fraud-operations"
       domain: "organization_assignment"
+      criticality: "high"
+      contract_role: "conformed_dimension"
       scd_type: "type2_like"
     columns:
       - name: dim_customer_org_assignment_sk
@@ -275,6 +288,7 @@ models:
       steward: "account-operations"
       domain: "account"
       criticality: "high"
+      contract_role: "conformed_dimension"
     columns:
       - name: dim_account_sk
         description: "Deterministic surrogate key for the account dimension row."
@@ -319,6 +333,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "cards-and-payments"
       domain: "payment_instrument"
+      criticality: "high"
+      contract_role: "conformed_dimension"
     columns:
       - name: dim_card_sk
         description: "Deterministic surrogate key for the card dimension row."
@@ -355,6 +371,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "digital-risk"
       domain: "device"
+      criticality: "medium"
+      contract_role: "supporting_dimension"
     columns:
       - name: dim_device_sk
         description: "Deterministic surrogate key for device dimension row."
@@ -383,6 +401,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "channel-operations"
       domain: "channel"
+      criticality: "medium"
+      contract_role: "supporting_dimension"
     columns:
       - name: dim_channel_sk
         description: "Deterministic surrogate key for channel dimension row."
@@ -419,6 +439,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "payments-risk"
       domain: "merchant"
+      criticality: "medium"
+      contract_role: "supporting_dimension"
     columns:
       - name: dim_merchant_sk
         description: "Deterministic surrogate key for merchant dimension row."
@@ -438,6 +460,8 @@ models:
       owner: "fraudlens-data-platform"
       steward: "data-governance"
       domain: "reference_data"
+      criticality: "medium"
+      contract_role: "supporting_dimension"
     columns:
       - name: dim_reference_code_sk
         description: "Deterministic surrogate key for reference code dimension row."
