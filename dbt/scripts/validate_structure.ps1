@@ -12,6 +12,13 @@ dbt parse `
   --profile $profileName `
   --target $targetName
 
+$manifestPath = Join-Path $projectDir "target/manifest.json"
+Write-Host "[dbt] governance/naming/contract checks ($manifestPath)"
+python (Join-Path $projectDir "scripts/validate_naming_rules.py") --manifest $manifestPath
+python (Join-Path $projectDir "scripts/validate_governance_metadata.py") --manifest $manifestPath
+python (Join-Path $projectDir "scripts/validate_contracts.py") --manifest $manifestPath
+python (Join-Path $projectDir "scripts/validate_contract_alignment.py") --manifest $manifestPath
+
 Write-Host "[dbt] ls ($profileName/$targetName)"
 dbt ls `
   --project-dir $projectDir `

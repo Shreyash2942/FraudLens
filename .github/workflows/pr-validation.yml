@@ -44,8 +44,7 @@ jobs:
           DBT_SPARK_THREADS: "4"
           DBT_SPARK_AUTH: NOSASL
         run: |
-          dbt parse --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
-          dbt ls --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
+          bash dbt/scripts/validate_structure.sh
 
       - name: Validate dbt docs generation
         env:

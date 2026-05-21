@@ -13,6 +13,13 @@ dbt parse \
   --profile "${PROFILE_NAME}" \
   --target "${TARGET_NAME}"
 
+MANIFEST_PATH="${PROJECT_DIR}/target/manifest.json"
+echo "[dbt] governance/naming/contract checks (${MANIFEST_PATH})"
+python "${PROJECT_DIR}/scripts/validate_naming_rules.py" --manifest "${MANIFEST_PATH}"
+python "${PROJECT_DIR}/scripts/validate_governance_metadata.py" --manifest "${MANIFEST_PATH}"
+python "${PROJECT_DIR}/scripts/validate_contracts.py" --manifest "${MANIFEST_PATH}"
+python "${PROJECT_DIR}/scripts/validate_contract_alignment.py" --manifest "${MANIFEST_PATH}"
+
 echo "[dbt] ls (${PROFILE_NAME}/${TARGET_NAME})"
 dbt ls \
   --project-dir "${PROJECT_DIR}" \
