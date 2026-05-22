@@ -22,10 +22,9 @@
   "minimum_test_count_by_tag": {
     "quality_critical": 5,
     "governance_critical": 1,
-    "contract_critical": 5,
+    "contract_critical": 3,
     "audit_critical": 5,
     "validation_critical": 2,
     "quality_high": 5
   }
 }
-

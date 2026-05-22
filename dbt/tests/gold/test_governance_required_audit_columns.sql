@@ -1,4 +1,4 @@
-{{ config(tags=['quality', 'quality_critical', 'governance_critical', 'audit_critical', 'validation_critical']) }}
+{{ config(tags=['quality', 'quality_critical', 'governance_critical', 'contract_critical', 'audit_critical', 'validation_critical']) }}
 
 with violations as (
     select 'fact_transactions' as model_name, count(*) as violation_count

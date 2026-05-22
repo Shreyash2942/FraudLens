@@ -1,4 +1,4 @@
-{{ config(tags=['quality', 'quality_critical', 'governance_critical', 'audit_critical', 'validation_critical']) }}
+{{ config(tags=['quality', 'quality_critical', 'governance_critical', 'contract_critical', 'audit_critical', 'validation_critical']) }}
 
 with violations as (
     select
@@ -57,4 +57,3 @@ with violations as (
 select *
 from violations
 where violation_count > 0
-
