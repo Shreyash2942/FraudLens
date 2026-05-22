@@ -54,6 +54,7 @@ python "${PROJECT_DIR}/scripts/validate_naming_rules.py" --manifest "${MANIFEST_
 python "${PROJECT_DIR}/scripts/validate_governance_metadata.py" --manifest "${MANIFEST_PATH}"
 python "${PROJECT_DIR}/scripts/validate_contracts.py" --manifest "${MANIFEST_PATH}"
 python "${PROJECT_DIR}/scripts/validate_contract_alignment.py" --manifest "${MANIFEST_PATH}"
+python "${PROJECT_DIR}/scripts/validate_failure_policy.py" --manifest "${MANIFEST_PATH}" --selectors "${PROJECT_DIR}/selectors.yml" --policy "${PROJECT_DIR}/tests/validation/failure_policy_matrix.json"
 
 echo "[dbt] ls (${PROFILE_NAME}/${TARGET_NAME})"
 dbt ls \
