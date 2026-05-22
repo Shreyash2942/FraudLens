@@ -22,6 +22,10 @@ select
     fdm.ingestion_batch_id,
     fdm.source_file_name,
     fdm.ingested_at_utc,
+    fdm.created_at_utc,
+    fdm.updated_at_utc,
+    fdm.source_system,
+    fdm.pipeline_run_id,
     fdm.pipeline_processed_at_utc,
     fdm.lineage_run_id
 from {{ ref('fact_daily_fraud_metrics') }} as fdm

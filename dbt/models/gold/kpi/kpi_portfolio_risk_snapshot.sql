@@ -12,6 +12,10 @@ with payment_event_rollup as (
         max(pe.ingestion_batch_id) as ingestion_batch_id,
         max(pe.source_file_name) as source_file_name,
         max(pe.ingested_at_utc) as ingested_at_utc,
+        max(pe.created_at_utc) as created_at_utc,
+        max(pe.updated_at_utc) as updated_at_utc,
+        max(pe.source_system) as source_system,
+        max(pe.pipeline_run_id) as pipeline_run_id,
         max(pe.pipeline_processed_at_utc) as pipeline_processed_at_utc,
         max(pe.lineage_run_id) as lineage_run_id
     from {{ ref('fact_payment_events') }} as pe
@@ -45,6 +49,10 @@ select
     pe.ingestion_batch_id,
     pe.source_file_name,
     pe.ingested_at_utc,
+    pe.created_at_utc,
+    pe.updated_at_utc,
+    pe.source_system,
+    pe.pipeline_run_id,
     pe.pipeline_processed_at_utc,
     pe.lineage_run_id
 from payment_event_rollup as pe

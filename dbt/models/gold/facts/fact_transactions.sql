@@ -86,6 +86,22 @@ select
     coalesce(tx.ingestion_batch_id, pi.ingestion_batch_id) as ingestion_batch_id,
     coalesce(tx.source_file_name, pi.source_file_name) as source_file_name,
     coalesce(tx.ingested_at_utc, pi.ingested_at_utc) as ingested_at_utc,
+    coalesce(
+        tx.created_at_utc,
+        pi.created_at_utc,
+        tx.settlement_at,
+        pi.event_at,
+        tx.ingested_at_utc,
+        pi.ingested_at_utc
+    ) as created_at_utc,
+    coalesce(
+        tx.updated_at_utc,
+        pi.updated_at_utc,
+        tx.pipeline_processed_at_utc,
+        pi.pipeline_processed_at_utc
+    ) as updated_at_utc,
+    coalesce(tx.source_system, pi.source_system, 'synthetic_generator') as source_system,
+    coalesce(tx.pipeline_run_id, pi.pipeline_run_id, tx.lineage_run_id, pi.lineage_run_id) as pipeline_run_id,
     coalesce(tx.pipeline_processed_at_utc, pi.pipeline_processed_at_utc) as pipeline_processed_at_utc,
     coalesce(tx.lineage_run_id, pi.lineage_run_id) as lineage_run_id
 from transactions as tx

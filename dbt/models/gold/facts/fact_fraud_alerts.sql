@@ -90,6 +90,22 @@ select
     coalesce(fa.ingestion_batch_id, rs.ingestion_batch_id, pi.ingestion_batch_id, fc.ingestion_batch_id) as ingestion_batch_id,
     coalesce(fa.source_file_name, rs.source_file_name, pi.source_file_name, fc.source_file_name) as source_file_name,
     coalesce(fa.ingested_at_utc, rs.ingested_at_utc, pi.ingested_at_utc, fc.ingested_at_utc) as ingested_at_utc,
+    coalesce(
+        fa.created_at_utc,
+        rs.created_at_utc,
+        pi.created_at_utc,
+        fc.created_at_utc,
+        fa.created_at
+    ) as created_at_utc,
+    coalesce(
+        fc.updated_at_utc,
+        fa.updated_at_utc,
+        rs.updated_at_utc,
+        pi.updated_at_utc,
+        fa.pipeline_processed_at_utc
+    ) as updated_at_utc,
+    coalesce(fa.source_system, rs.source_system, pi.source_system, fc.source_system, 'synthetic_generator') as source_system,
+    coalesce(fa.pipeline_run_id, rs.pipeline_run_id, pi.pipeline_run_id, fc.pipeline_run_id, fa.lineage_run_id) as pipeline_run_id,
     coalesce(fa.pipeline_processed_at_utc, rs.pipeline_processed_at_utc, pi.pipeline_processed_at_utc, fc.pipeline_processed_at_utc) as pipeline_processed_at_utc,
     coalesce(fa.lineage_run_id, rs.lineage_run_id, pi.lineage_run_id, fc.lineage_run_id) as lineage_run_id
 from fraud_alerts as fa
