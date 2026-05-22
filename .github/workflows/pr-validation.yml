@@ -37,6 +37,7 @@ jobs:
         env:
           FRAUDLENS_DBT_PROFILE_NAME: fraudlens_local_spark
           FRAUDLENS_DBT_TARGET_NAME: local
+          FRAUDLENS_VALIDATION_MODE: strict
           DBT_SPARK_HOST: localhost
           DBT_SPARK_PORT: "10000"
           DBT_SPARK_USER: ci
@@ -50,6 +51,7 @@ jobs:
         env:
           FRAUDLENS_DBT_PROFILE_NAME: fraudlens_local_spark
           FRAUDLENS_DBT_TARGET_NAME: local
+          FRAUDLENS_VALIDATION_MODE: strict
           DBT_SPARK_HOST: localhost
           DBT_SPARK_PORT: "10000"
           DBT_SPARK_USER: ci
