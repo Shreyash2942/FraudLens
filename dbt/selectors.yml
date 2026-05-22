@@ -15,11 +15,63 @@ selectors:
           value: contract_critical
         - method: tag
           value: audit_critical
+        - method: tag
+          value: validation_critical
+
+  - name: governance_critical_gate
+    definition:
+      method: tag
+      value: governance_critical
+
+  - name: contract_critical_gate
+    definition:
+      method: tag
+      value: contract_critical
+
+  - name: audit_critical_gate
+    definition:
+      method: tag
+      value: audit_critical
+
+  - name: validation_critical_gate
+    definition:
+      method: tag
+      value: validation_critical
 
   - name: quality_high_gate
     definition:
       method: tag
       value: quality_high
+
+  - name: failure_blocking_gate
+    definition:
+      union:
+        - method: tag
+          value: quality_critical
+        - method: tag
+          value: governance_critical
+        - method: tag
+          value: contract_critical
+        - method: tag
+          value: audit_critical
+        - method: tag
+          value: validation_critical
+
+  - name: failure_diagnostic_gate
+    definition:
+      union:
+        - method: tag
+          value: quality_critical
+        - method: tag
+          value: governance_critical
+        - method: tag
+          value: contract_critical
+        - method: tag
+          value: audit_critical
+        - method: tag
+          value: validation_critical
+        - method: tag
+          value: quality_high
 
   - name: quality_not_null
     definition:
