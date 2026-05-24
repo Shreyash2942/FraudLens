@@ -33,6 +33,14 @@ selectors:
       method: tag
       value: audit_critical
 
+  - name: audit_traceability_gate
+    definition:
+      union:
+        - method: tag
+          value: audit_critical
+        - method: tag
+          value: validation_critical
+
   - name: validation_critical_gate
     definition:
       method: tag
@@ -72,6 +80,22 @@ selectors:
           value: validation_critical
         - method: tag
           value: quality_high
+
+  - name: phase5_readiness_bundle
+    definition:
+      union:
+        - method: tag
+          value: quality_critical
+        - method: tag
+          value: quality_high
+        - method: tag
+          value: governance_critical
+        - method: tag
+          value: contract_critical
+        - method: tag
+          value: audit_critical
+        - method: tag
+          value: validation_critical
 
   - name: quality_not_null
     definition:
