@@ -19,10 +19,6 @@ This directory contains the canonical written documentation for the project.
 - `phase-3-warehouse-setup-runbook.md` Phase 3 operator runbook for setup through baseline load benchmark
 - `phase-3-troubleshooting.md` Phase 3 issue diagnosis and recovery guide
 - `graphify-workflow.md` Graphify usage and branch portability workflow
-- `phase-5-quality-governance-standards.md` Phase 5 standards compendium for quality and governance controls
-- `phase-5-governance-operator-playbooks.md` operator execution and triage playbooks
-- `phase-5-controls-traceability-matrix.md` mapping from policy statements to executable controls
-- `phase-5-governance-maintenance-model.md` handoff and long-term maintenance expectations
-- `phase-5-governance-readiness-report.md` governance readiness signoff decision and evidence pointers
+- `data-quality-governance.md` consolidated Phase 5 document (issues #57-#64, controls, validation, readiness, and handoff)
 
 Legacy `.docx` files are retained as reference sources only. Active planning and design content should be maintained in Markdown and YAML.

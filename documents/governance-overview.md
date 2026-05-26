@@ -30,8 +30,4 @@ FraudLens adopts a SOX-aligned posture for traceability, ownership, reviewabilit
 
 ## Phase 5 Governance Operating Set
 
-- `phase-5-quality-governance-standards.md`
-- `phase-5-governance-operator-playbooks.md`
-- `phase-5-controls-traceability-matrix.md`
-- `phase-5-governance-maintenance-model.md`
-- `phase-5-governance-readiness-report.md`
+- `data-quality-governance.md`

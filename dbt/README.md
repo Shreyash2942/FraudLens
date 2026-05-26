@@ -117,11 +117,8 @@ python dbt/scripts/capture_phase5_governance_readiness.py
 ```
 
 Output:
-- `documents/validation/phase-5-governance-readiness-artifacts.json`
+- `documents/validation/data-quality-governance-readiness-artifacts.json`
 
 ### Related Governance Docs
 
-- `documents/phase-5-quality-governance-standards.md`
-- `documents/phase-5-governance-operator-playbooks.md`
-- `documents/phase-5-controls-traceability-matrix.md`
-- `documents/phase-5-governance-readiness-report.md`
+- `documents/data-quality-governance.md`

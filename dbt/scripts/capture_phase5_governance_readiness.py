@@ -55,7 +55,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--output",
-        default="documents/validation/phase-5-governance-readiness-artifacts.json",
+        default="documents/validation/data-quality-governance-readiness-artifacts.json",
         help="Output JSON artifact path",
     )
     parser.add_argument(
