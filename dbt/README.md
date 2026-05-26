@@ -90,3 +90,35 @@ Docs-generation validation:
 ```bash
 bash dbt/scripts/validate_docs.sh
 ```
+
+## Phase 5 Quality And Governance Controls
+
+### Strict Validation Bundle
+
+```bash
+bash dbt/scripts/validate_structure.sh
+```
+
+Includes:
+- selector gate coverage checks
+- naming/governance/contract/failure-policy script checks
+- fail-fast behavior for critical controls
+
+### Diagnostic Validation Bundle
+
+```bash
+FRAUDLENS_VALIDATION_MODE=diagnostic bash dbt/scripts/validate_structure.sh
+```
+
+### Governance Readiness Artifact Capture
+
+```bash
+python dbt/scripts/capture_phase5_governance_readiness.py
+```
+
+Output:
+- `documents/validation/data-quality-governance-readiness-artifacts.json`
+
+### Related Governance Docs
+
+- `documents/data-quality-governance.md`

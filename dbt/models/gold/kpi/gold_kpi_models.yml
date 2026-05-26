@@ -3,66 +3,145 @@ version: 2
 models:
   - name: kpi_daily_fraud_operations
     description: "Daily operational KPI model for fraud monitoring."
+    config:
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "kpi", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-operations"
       domain: "kpi_operations"
       criticality: "high"
+      contract_required_fields: ["metric_date", "total_transactions", "total_fraud_alerts", "alert_rate_pct", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        metric_date: "date"
+        total_transactions: "integer"
+        total_fraud_alerts: "integer"
+        alert_rate_pct: "decimal"
+        recovery_rate_pct: "decimal"
+        ingested_at_utc: "timestamp"
     columns:
       - name: metric_date
         description: "Calendar date grain for daily KPI values."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "kpi", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "kpi", "tier_1_critical"]
+          - relationships:
+              to: ref('dim_date')
+              field: calendar_date
+              config:
+                tags: ["quality", "quality_relationships", "quality_high", "gold", "kpi", "tier_1_critical"]
       - name: total_transactions
         description: "Count of transactions processed on the KPI date."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "kpi", "tier_1_critical"]
       - name: total_fraud_alerts
         description: "Count of fraud alerts opened on the KPI date."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "kpi", "tier_1_critical"]
       - name: alert_rate_pct
         description: "Percentage of transactions that generated alerts."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]
       - name: high_severity_alert_rate_pct
         description: "Percentage of transactions with high-severity alerts."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]
       - name: fraud_case_open_rate_pct
         description: "Percentage of alerts that progressed to fraud cases."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]
       - name: recovery_rate_pct
         description: "Percentage of suspected-fraud amount recovered."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]
       - name: reversal_rate_pct
         description: "Percentage of alerts resulting in payment reversal."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]
 
   - name: kpi_portfolio_risk_snapshot
     description: "Portfolio-level fraud risk KPI snapshot."
+    config:
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "kpi", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-analytics"
       domain: "kpi_portfolio"
       criticality: "high"
+      contract_required_fields: ["snapshot_at_utc", "total_payment_events", "total_fraud_alerts", "high_risk_payment_event_rate_pct", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        snapshot_at_utc: "timestamp"
+        total_payment_events: "integer"
+        total_fraud_alerts: "integer"
+        high_risk_payment_event_rate_pct: "decimal"
+        portfolio_recovery_rate_pct: "decimal"
+        ingested_at_utc: "timestamp"
     columns:
       - name: snapshot_at_utc
         description: "UTC timestamp when the KPI snapshot was generated."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "kpi", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "kpi", "tier_1_critical"]
       - name: total_payment_events
         description: "Total payment events in scope at snapshot time."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "kpi", "tier_1_critical"]
       - name: total_fraud_alerts
         description: "Total fraud alerts in scope at snapshot time."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "kpi", "tier_1_critical"]
       - name: high_risk_payment_event_rate_pct
         description: "Percentage of payment events assessed as high risk."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]
       - name: open_alert_backlog_rate_pct
         description: "Percentage of alerts remaining open at snapshot time."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]
       - name: open_case_backlog_rate_pct
         description: "Percentage of fraud cases remaining open at snapshot time."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]
       - name: cross_border_transaction_rate_pct
         description: "Percentage of transactions flagged as cross-border."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]
       - name: portfolio_recovery_rate_pct
         description: "Portfolio-level recovered amount percentage."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_high", "gold", "kpi", "tier_1_critical"]

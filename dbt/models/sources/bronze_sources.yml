@@ -52,18 +52,33 @@ sources:
       - name: payment_instruction
         identifier: BRONZE_PAYMENT_INSTRUCTION
         description: "Payment instruction source."
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 36, period: hour}
       - name: payment_transaction
         identifier: BRONZE_PAYMENT_TRANSACTION
         description: "Payment execution transaction source."
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 36, period: hour}
       - name: risk_signal
         identifier: BRONZE_RISK_SIGNAL
         description: "Fraud risk signal source."
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 36, period: hour}
       - name: fraud_alert
         identifier: BRONZE_FRAUD_ALERT
         description: "Fraud alert source."
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 36, period: hour}
       - name: fraud_case
         identifier: BRONZE_FRAUD_CASE
         description: "Fraud case source."
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 36, period: hour}
       - name: investigation_event
         identifier: BRONZE_INVESTIGATION_EVENT
         description: "Investigation event source."

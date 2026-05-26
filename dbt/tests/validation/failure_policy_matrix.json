@@ -1,0 +1,30 @@
+{
+  "required_selectors": [
+    "quality_critical_gate",
+    "quality_high_gate",
+    "governance_critical_gate",
+    "contract_critical_gate",
+    "audit_critical_gate",
+    "validation_critical_gate",
+    "failure_blocking_gate",
+    "failure_diagnostic_gate"
+  ],
+  "required_blocking_tags": [
+    "quality_critical",
+    "governance_critical",
+    "contract_critical",
+    "audit_critical",
+    "validation_critical"
+  ],
+  "required_diagnostic_tags": [
+    "quality_high"
+  ],
+  "minimum_test_count_by_tag": {
+    "quality_critical": 5,
+    "governance_critical": 1,
+    "contract_critical": 3,
+    "audit_critical": 5,
+    "validation_critical": 2,
+    "quality_high": 5
+  }
+}

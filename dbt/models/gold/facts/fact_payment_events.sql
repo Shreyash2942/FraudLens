@@ -108,6 +108,10 @@ select
     pi.ingestion_batch_id,
     pi.source_file_name,
     pi.ingested_at_utc,
+    coalesce(pi.created_at_utc, pi.event_at, pi.ingested_at_utc) as created_at_utc,
+    coalesce(pi.updated_at_utc, pi.pipeline_processed_at_utc) as updated_at_utc,
+    coalesce(pi.source_system, 'synthetic_generator') as source_system,
+    coalesce(pi.pipeline_run_id, pi.lineage_run_id) as pipeline_run_id,
     pi.pipeline_processed_at_utc,
     pi.lineage_run_id
 from payment_instructions as pi

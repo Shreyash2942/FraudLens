@@ -3,96 +3,220 @@ version: 2
 models:
   - name: fact_transactions
     description: "Gold fact model at payment transaction grain with fraud exposure context."
+    config:
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "fact", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-analytics"
       domain: "payments_fraud"
       criticality: "high"
+      contract_required_fields: ["fact_transaction_sk", "payment_transaction_id", "payment_instruction_id", "transaction_date", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fact_transaction_sk: "string"
+        payment_transaction_id: "string"
+        payment_instruction_id: "string"
+        transaction_date: "date"
+        booking_amount: "decimal"
+        ingested_at_utc: "timestamp"
+      contract_controlled_fields:
+        transaction_status: ["PENDING", "SETTLED", "REVERSED", "FAILED", "CANCELLED"]
+        transaction_direction_code: ["DEBIT", "CREDIT"]
     columns:
       - name: fact_transaction_sk
         description: "Deterministic surrogate key for the fact transaction row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "fact", "tier_1_critical"]
       - name: payment_transaction_id
         description: "Business identifier for the payment transaction execution event."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - relationships:
+              to: ref('slv__payment_transaction')
+              field: payment_transaction_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "fact", "tier_1_critical"]
       - name: payment_instruction_id
         description: "Business identifier of the payment instruction associated with this transaction."
         data_tests:
-          - not_null
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
           - relationships:
               to: ref('slv__payment_instruction')
               field: payment_instruction_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "fact", "tier_1_critical"]
       - name: transaction_date
         description: "Calendar date of transaction execution in UTC."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
 
   - name: fact_fraud_alerts
     description: "Gold fact model at fraud alert grain with risk, case, and disposition outcomes."
+    config:
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "fact", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-operations"
       domain: "alert_case_management"
       criticality: "high"
+      contract_required_fields: ["fact_fraud_alert_sk", "fraud_alert_id", "risk_signal_id", "alert_created_date", "alert_status", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fact_fraud_alert_sk: "string"
+        fraud_alert_id: "string"
+        risk_signal_id: "string"
+        alert_created_date: "date"
+        alert_created_at: "timestamp"
+        total_loss_amount: "decimal"
+      contract_controlled_fields:
+        alert_status: ["NEW", "OPEN", "IN_PROGRESS", "ESCALATED", "CLOSED", "DISMISSED"]
+        alert_severity: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+        risk_level: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
     columns:
       - name: fact_fraud_alert_sk
         description: "Deterministic surrogate key for the fraud alert fact row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "fact", "tier_1_critical"]
       - name: fraud_alert_id
         description: "Business identifier for the fraud alert."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - relationships:
+              to: ref('slv__fraud_alert')
+              field: fraud_alert_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "fact", "tier_1_critical"]
       - name: risk_signal_id
         description: "Business identifier for the upstream risk signal that triggered the alert."
         data_tests:
-          - not_null
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
           - relationships:
               to: ref('slv__risk_signal')
               field: risk_signal_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "fact", "tier_1_critical"]
       - name: payment_instruction_id
         description: "Related payment instruction business identifier, if available."
         data_tests:
           - relationships:
               to: ref('slv__payment_instruction')
               field: payment_instruction_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_high", "gold", "fact", "tier_1_critical"]
 
   - name: fact_payment_events
     description: "Gold fact model at payment instruction grain describing event lifecycle and fraud funnel metrics."
+    config:
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "fact", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "payments-analytics"
       domain: "payment_lifecycle"
       criticality: "high"
+      contract_required_fields: ["fact_payment_event_sk", "payment_instruction_id", "payment_event_date", "instruction_status", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fact_payment_event_sk: "string"
+        payment_instruction_id: "string"
+        payment_event_date: "date"
+        payment_event_at: "timestamp"
+        instructed_amount: "decimal"
+        total_booking_amount: "decimal"
+      contract_controlled_fields:
+        instruction_status: ["PENDING", "AUTHORIZED", "RELEASED", "SETTLED", "REJECTED", "CANCELLED"]
+        payment_rail_code: ["ACH", "SWIFT", "SEPA", "RTP", "CARD", "WIRE", "INTERNAL"]
     columns:
       - name: fact_payment_event_sk
         description: "Deterministic surrogate key for the payment event fact row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "fact", "tier_1_critical"]
       - name: payment_instruction_id
         description: "Business identifier for the payment instruction that defines the event grain."
         data_tests:
-          - not_null
-          - unique
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "fact", "tier_1_critical"]
           - relationships:
               to: ref('slv__payment_instruction')
               field: payment_instruction_id
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "fact", "tier_1_critical"]
       - name: payment_event_date
         description: "Calendar date associated with the payment event grain."
-        data_tests: [not_null]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
 
   - name: fact_daily_fraud_metrics
     description: "Gold daily aggregate fraud metrics at metric date grain."
+    config:
+      tags: ["quality", "quality_critical", "contract_critical", "gold", "fact", "tier_1_critical"]
     meta:
       owner: "fraudlens-data-platform"
       steward: "fraud-analytics"
       domain: "portfolio_monitoring"
       criticality: "high"
+      contract_required_fields: ["fact_daily_fraud_metrics_sk", "metric_date", "total_transactions", "total_fraud_alerts", "ingestion_batch_id", "source_file_name", "ingested_at_utc", "lineage_run_id"]
+      contract_expected_types:
+        fact_daily_fraud_metrics_sk: "string"
+        metric_date: "date"
+        total_transactions: "integer"
+        total_fraud_alerts: "integer"
+        total_transaction_amount: "decimal"
+        total_loss_amount: "decimal"
     columns:
       - name: fact_daily_fraud_metrics_sk
         description: "Deterministic surrogate key for the daily fraud metrics aggregate row."
-        data_tests: [not_null, unique]
+        data_tests:
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "fact", "tier_1_critical"]
       - name: metric_date
         description: "Calendar date grain for the daily fraud metrics aggregate."
         data_tests:
-          - not_null
-          - unique
+          - not_null:
+              config:
+                tags: ["quality", "quality_not_null", "quality_critical", "gold", "fact", "tier_1_critical"]
+          - unique:
+              config:
+                tags: ["quality", "quality_unique", "quality_critical", "gold", "fact", "tier_1_critical"]
           - relationships:
               to: ref('slv__calendar_day')
               field: calendar_date
+              config:
+                tags: ["quality", "quality_relationships", "quality_critical", "gold", "fact", "tier_1_critical"]

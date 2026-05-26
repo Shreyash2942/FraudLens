@@ -1,3 +1,5 @@
+{{ config(tags=['quality', 'quality_accepted_values', 'quality_high', 'gold', 'kpi', 'tier_1_critical']) }}
+
 with daily_violations as (
     select
         metric_date as row_key,
@@ -5,11 +7,13 @@ with daily_violations as (
         'rate_out_of_bounds' as issue
     from {{ ref('kpi_daily_fraud_operations') }}
     where alert_rate_pct < 0
+       or alert_rate_pct > 100
        or high_severity_alert_rate_pct < 0
        or high_severity_alert_rate_pct > 100
        or fraud_case_open_rate_pct < 0
        or fraud_case_open_rate_pct > 100
        or recovery_rate_pct < 0
+       or recovery_rate_pct > 100
        or reversal_rate_pct < 0
        or reversal_rate_pct > 100
 ),
@@ -28,6 +32,7 @@ snapshot_violations as (
        or cross_border_transaction_rate_pct < 0
        or cross_border_transaction_rate_pct > 100
        or portfolio_recovery_rate_pct < 0
+       or portfolio_recovery_rate_pct > 100
 )
 select * from daily_violations
 union all

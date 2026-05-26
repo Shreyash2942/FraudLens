@@ -27,3 +27,7 @@ FraudLens adopts a SOX-aligned posture for traceability, ownership, reviewabilit
 - `standards/governance-controls.md`
 - `standards/auditability-standard.md`
 - control metadata embedded directly in contract files under `specs/`
+
+## Phase 5 Governance Operating Set
+
+- `data-quality-governance.md`

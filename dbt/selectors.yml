@@ -1,0 +1,142 @@
+selectors:
+  - name: quality_all
+    definition:
+      method: tag
+      value: quality
+
+  - name: quality_critical_gate
+    definition:
+      union:
+        - method: tag
+          value: quality_critical
+        - method: tag
+          value: governance_critical
+        - method: tag
+          value: contract_critical
+        - method: tag
+          value: audit_critical
+        - method: tag
+          value: validation_critical
+
+  - name: governance_critical_gate
+    definition:
+      method: tag
+      value: governance_critical
+
+  - name: contract_critical_gate
+    definition:
+      method: tag
+      value: contract_critical
+
+  - name: audit_critical_gate
+    definition:
+      method: tag
+      value: audit_critical
+
+  - name: audit_traceability_gate
+    definition:
+      union:
+        - method: tag
+          value: audit_critical
+        - method: tag
+          value: validation_critical
+
+  - name: validation_critical_gate
+    definition:
+      method: tag
+      value: validation_critical
+
+  - name: quality_high_gate
+    definition:
+      method: tag
+      value: quality_high
+
+  - name: failure_blocking_gate
+    definition:
+      union:
+        - method: tag
+          value: quality_critical
+        - method: tag
+          value: governance_critical
+        - method: tag
+          value: contract_critical
+        - method: tag
+          value: audit_critical
+        - method: tag
+          value: validation_critical
+
+  - name: failure_diagnostic_gate
+    definition:
+      union:
+        - method: tag
+          value: quality_critical
+        - method: tag
+          value: governance_critical
+        - method: tag
+          value: contract_critical
+        - method: tag
+          value: audit_critical
+        - method: tag
+          value: validation_critical
+        - method: tag
+          value: quality_high
+
+  - name: phase5_readiness_bundle
+    definition:
+      union:
+        - method: tag
+          value: quality_critical
+        - method: tag
+          value: quality_high
+        - method: tag
+          value: governance_critical
+        - method: tag
+          value: contract_critical
+        - method: tag
+          value: audit_critical
+        - method: tag
+          value: validation_critical
+
+  - name: quality_not_null
+    definition:
+      method: tag
+      value: quality_not_null
+
+  - name: quality_unique
+    definition:
+      method: tag
+      value: quality_unique
+
+  - name: quality_relationships
+    definition:
+      method: tag
+      value: quality_relationships
+
+  - name: quality_accepted_values
+    definition:
+      method: tag
+      value: quality_accepted_values
+
+  - name: quality_bronze
+    definition:
+      intersection:
+        - method: tag
+          value: quality
+        - method: tag
+          value: bronze
+
+  - name: quality_silver
+    definition:
+      intersection:
+        - method: tag
+          value: quality
+        - method: tag
+          value: silver
+
+  - name: quality_gold
+    definition:
+      intersection:
+        - method: tag
+          value: quality
+        - method: tag
+          value: gold

@@ -37,6 +37,7 @@ jobs:
         env:
           FRAUDLENS_DBT_PROFILE_NAME: fraudlens_local_spark
           FRAUDLENS_DBT_TARGET_NAME: local
+          FRAUDLENS_VALIDATION_MODE: strict
           DBT_SPARK_HOST: localhost
           DBT_SPARK_PORT: "10000"
           DBT_SPARK_USER: ci
@@ -44,13 +45,13 @@ jobs:
           DBT_SPARK_THREADS: "4"
           DBT_SPARK_AUTH: NOSASL
         run: |
-          dbt parse --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
-          dbt ls --project-dir dbt --profiles-dir dbt/profiles --profile fraudlens_local_spark --target local
+          bash dbt/scripts/validate_structure.sh
 
       - name: Validate dbt docs generation
         env:
           FRAUDLENS_DBT_PROFILE_NAME: fraudlens_local_spark
           FRAUDLENS_DBT_TARGET_NAME: local
+          FRAUDLENS_VALIDATION_MODE: strict
           DBT_SPARK_HOST: localhost
           DBT_SPARK_PORT: "10000"
           DBT_SPARK_USER: ci

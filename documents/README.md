@@ -10,14 +10,13 @@ This directory contains the canonical written documentation for the project.
 - `governance-overview.md` governance principles, control model, and audit posture
 - `github-project-management.md` milestones, label taxonomy, and workflow conventions
 - `phase-0-readiness.md` checklist for the standards-first baseline
+- `platform-foundation.md` consolidated Phase 1 platform integration and validation document
 - `platform-foundation-guide.md` Phase 1 runtime integration guide
 - `platform-validation-runbook.md` Phase 1 validation and connectivity checks
-- `phase-2-dataset-design.md` Phase 2 dataset architecture, generator, and export design
-- `phase-2-github-issues.md` GitHub-ready epic and task issue text for the Phase 2 milestone
-- `phase-3-snowflake-warehouse-plan.md` Phase 3 implementation plan for Snowflake and Bronze ingestion
-- `phase-3-stage-checklist.md` Stage-by-stage execution checklist aligned to Phase 3 issues
-- `phase-3-warehouse-setup-runbook.md` Phase 3 operator runbook for setup through baseline load benchmark
-- `phase-3-troubleshooting.md` Phase 3 issue diagnosis and recovery guide
+- `synthetic-data-foundation.md` consolidated Phase 2 synthetic data design and delivery document
+- `warehouse-layer-foundation.md` consolidated Phase 3 warehouse planning, runbooks, and readiness document
+- `transformation-layer-dbt.md` consolidated Phase 4 dbt transformation planning, governance, and readiness document
 - `graphify-workflow.md` Graphify usage and branch portability workflow
+- `data-quality-governance.md` consolidated Phase 5 document (issues #57-#64, controls, validation, readiness, and handoff)
 
 Legacy `.docx` files are retained as reference sources only. Active planning and design content should be maintained in Markdown and YAML.

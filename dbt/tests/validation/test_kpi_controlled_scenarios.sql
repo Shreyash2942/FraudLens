@@ -1,3 +1,5 @@
+{{ config(tags=['quality', 'quality_critical', 'gold', 'kpi', 'tier_1_critical']) }}
+
 with expected_daily as (
     select
         ft.transaction_date as metric_date,

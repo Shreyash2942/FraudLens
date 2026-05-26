@@ -15,6 +15,17 @@ with standardized as (
     {{ fraudlens_clean_text('src.ingestion_batch_id') }} as ingestion_batch_id,
     {{ fraudlens_clean_text('src.source_file_name') }} as source_file_name,
     {{ fraudlens_clean_timestamp('src.ingested_at_utc') }} as ingested_at_utc,
+    coalesce(
+        {{ fraudlens_clean_timestamp('src.decided_at') }},
+        {{ fraudlens_clean_timestamp('src.created_at_utc') }},
+        {{ fraudlens_clean_timestamp('src.ingested_at_utc') }}
+    ) as created_at_utc,
+    coalesce(
+        {{ fraudlens_clean_timestamp('src.updated_at_utc') }},
+        {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }}
+    ) as updated_at_utc,
+    {{ fraudlens_clean_text('src.source_system') }} as source_system,
+    {{ fraudlens_clean_text('src.pipeline_run_id') }} as pipeline_run_id,
     {{ fraudlens_clean_timestamp('src.pipeline_processed_at_utc') }} as pipeline_processed_at_utc,
     {{ fraudlens_clean_text('src.lineage_run_id') }} as lineage_run_id
     from {{ ref('stg_bronze__decision_record') }} as src
@@ -43,6 +54,10 @@ select
     ranked.ingestion_batch_id,
     ranked.source_file_name,
     ranked.ingested_at_utc,
+    ranked.created_at_utc,
+    ranked.updated_at_utc,
+    ranked.source_system,
+    ranked.pipeline_run_id,
     ranked.pipeline_processed_at_utc,
     ranked.lineage_run_id
 from ranked

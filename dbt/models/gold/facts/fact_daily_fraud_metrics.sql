@@ -10,6 +10,10 @@ with transaction_daily as (
         max(ft.ingestion_batch_id) as ingestion_batch_id,
         max(ft.source_file_name) as source_file_name,
         max(ft.ingested_at_utc) as ingested_at_utc,
+        max(ft.created_at_utc) as created_at_utc,
+        max(ft.updated_at_utc) as updated_at_utc,
+        max(ft.source_system) as source_system,
+        max(ft.pipeline_run_id) as pipeline_run_id,
         max(ft.pipeline_processed_at_utc) as pipeline_processed_at_utc,
         max(ft.lineage_run_id) as lineage_run_id
     from {{ ref('fact_transactions') }} as ft
@@ -28,6 +32,10 @@ alert_daily as (
         max(fa.ingestion_batch_id) as ingestion_batch_id,
         max(fa.source_file_name) as source_file_name,
         max(fa.ingested_at_utc) as ingested_at_utc,
+        max(fa.created_at_utc) as created_at_utc,
+        max(fa.updated_at_utc) as updated_at_utc,
+        max(fa.source_system) as source_system,
+        max(fa.pipeline_run_id) as pipeline_run_id,
         max(fa.pipeline_processed_at_utc) as pipeline_processed_at_utc,
         max(fa.lineage_run_id) as lineage_run_id
     from {{ ref('fact_fraud_alerts') }} as fa
@@ -45,6 +53,10 @@ payment_event_daily as (
         max(fpe.ingestion_batch_id) as ingestion_batch_id,
         max(fpe.source_file_name) as source_file_name,
         max(fpe.ingested_at_utc) as ingested_at_utc,
+        max(fpe.created_at_utc) as created_at_utc,
+        max(fpe.updated_at_utc) as updated_at_utc,
+        max(fpe.source_system) as source_system,
+        max(fpe.pipeline_run_id) as pipeline_run_id,
         max(fpe.pipeline_processed_at_utc) as pipeline_processed_at_utc,
         max(fpe.lineage_run_id) as lineage_run_id
     from {{ ref('fact_payment_events') }} as fpe
@@ -104,6 +116,10 @@ select
     coalesce(td.ingestion_batch_id, ad.ingestion_batch_id, ped.ingestion_batch_id) as ingestion_batch_id,
     coalesce(td.source_file_name, ad.source_file_name, ped.source_file_name) as source_file_name,
     coalesce(td.ingested_at_utc, ad.ingested_at_utc, ped.ingested_at_utc) as ingested_at_utc,
+    coalesce(td.created_at_utc, ad.created_at_utc, ped.created_at_utc) as created_at_utc,
+    coalesce(td.updated_at_utc, ad.updated_at_utc, ped.updated_at_utc) as updated_at_utc,
+    coalesce(td.source_system, ad.source_system, ped.source_system, 'synthetic_generator') as source_system,
+    coalesce(td.pipeline_run_id, ad.pipeline_run_id, ped.pipeline_run_id) as pipeline_run_id,
     coalesce(td.pipeline_processed_at_utc, ad.pipeline_processed_at_utc, ped.pipeline_processed_at_utc) as pipeline_processed_at_utc,
     coalesce(td.lineage_run_id, ad.lineage_run_id, ped.lineage_run_id) as lineage_run_id
 from calendar_spine as sp
