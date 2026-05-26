@@ -12,12 +12,9 @@ This directory contains the canonical written documentation for the project.
 - `phase-0-readiness.md` checklist for the standards-first baseline
 - `platform-foundation-guide.md` Phase 1 runtime integration guide
 - `platform-validation-runbook.md` Phase 1 validation and connectivity checks
-- `phase-2-dataset-design.md` Phase 2 dataset architecture, generator, and export design
-- `phase-2-github-issues.md` GitHub-ready epic and task issue text for the Phase 2 milestone
-- `phase-3-snowflake-warehouse-plan.md` Phase 3 implementation plan for Snowflake and Bronze ingestion
-- `phase-3-stage-checklist.md` Stage-by-stage execution checklist aligned to Phase 3 issues
-- `phase-3-warehouse-setup-runbook.md` Phase 3 operator runbook for setup through baseline load benchmark
-- `phase-3-troubleshooting.md` Phase 3 issue diagnosis and recovery guide
+- `phase-2-synthetic-data-foundation.md` consolidated Phase 2 synthetic data design and delivery document
+- `phase-3-warehouse-layer-foundation.md` consolidated Phase 3 warehouse planning, runbooks, and readiness document
+- `phase-4-transformation-layer-dbt.md` consolidated Phase 4 dbt transformation planning, governance, and readiness document
 - `graphify-workflow.md` Graphify usage and branch portability workflow
 - `data-quality-governance.md` consolidated Phase 5 document (issues #57-#64, controls, validation, readiness, and handoff)
 
