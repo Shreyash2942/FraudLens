@@ -10,6 +10,7 @@ This directory contains the canonical written documentation for the project.
 - `governance-overview.md` governance principles, control model, and audit posture
 - `github-project-management.md` milestones, label taxonomy, and workflow conventions
 - `phase-0-readiness.md` checklist for the standards-first baseline
+- `platform-foundation.md` consolidated Phase 1 platform integration and validation document
 - `platform-foundation-guide.md` Phase 1 runtime integration guide
 - `platform-validation-runbook.md` Phase 1 validation and connectivity checks
 - `synthetic-data-foundation.md` consolidated Phase 2 synthetic data design and delivery document
