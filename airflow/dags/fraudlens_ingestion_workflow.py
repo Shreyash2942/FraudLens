@@ -121,13 +121,23 @@ batch_root = Path(r'REPO_ROOT_PLACEHOLDER') / "data" / "batches" / batch_id
 manifest_file = batch_root / "control" / "manifest.json"
 landing_csv_root = batch_root / "landing" / "csv"
 missing: list[str] = []
+manifest_datasets: dict = {}
 
 if not manifest_file.exists():
     missing.append(str(manifest_file))
+else:
+    manifest_payload = json.loads(manifest_file.read_text(encoding="utf-8"))
+    manifest_datasets = manifest_payload.get("datasets", {}) if isinstance(manifest_payload, dict) else {}
+    if not isinstance(manifest_datasets, dict):
+        manifest_datasets = {}
+
 for dataset in datasets:
     candidate = landing_csv_root / f"{dataset}.csv"
     if not candidate.exists():
         missing.append(str(candidate))
+    dataset_meta = manifest_datasets.get(dataset)
+    if strict_mode and not isinstance(dataset_meta, dict):
+        missing.append(f"manifest:datasets.{dataset}")
 
 summary = {
     "status": "ok" if not missing else "missing_assets",
