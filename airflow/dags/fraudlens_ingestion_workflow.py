@@ -178,11 +178,26 @@ command_profile = str(ctx.get("command_profile", "local")).lower()
 spark_submit_cmd = str(ctx.get("spark_submit_cmd", "python"))
 
 if execution_mode == "dry_run":
+    preview_cmd = [
+        "python",
+        str(Path(r'REPO_ROOT_PLACEHOLDER') / "warehouse" / "snowflake-warehouse-setup" / "scripts" / "run_dataset_spark_job.py"),
+        "--layer",
+        "bronze",
+        "--dataset",
+        dataset,
+        "--batch-id",
+        batch_id,
+        "--profile",
+        command_profile,
+        "--spark-submit-cmd",
+        spark_submit_cmd,
+    ]
     payload = {
         "dataset": dataset,
         "status": "dry_run",
         "batch_id": batch_id,
         "command_profile": command_profile,
+        "load_command": preview_cmd,
     }
     status_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload))
@@ -209,6 +224,7 @@ payload = {
     "status": "success" if completed.returncode == 0 else "failed",
     "exit_code": int(completed.returncode),
     "command_profile": command_profile,
+    "load_command": cmd,
 }
 status_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 print(json.dumps(payload))
