@@ -9,6 +9,15 @@ Current Phase 3 DAGs:
 - `phase3_bronze_local_hive_validation.py`
   - local Bronze validation with Spark contract jobs and Hive DDL/DML checks
 
+Phase 6 DAGs:
+
+- `fraudlens_pipeline_orchestration.py`
+  - master orchestration scaffold for runtime prep, stage gates, and run artifact publication
+- `fraudlens_ingestion_workflow.py`
+  - ingestion workflow with context preparation, asset checks, dataset fan-out, validation, and summary publishing
+- `_fraudlens_orchestration_common.py`
+  - shared helper module for profile/batch/dataset runtime behaviors
+
 If these DAGs do not appear in UI, run:
 
 ```powershell
