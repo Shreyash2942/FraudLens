@@ -322,7 +322,11 @@ summary = {
     "selected_datasets": ctx.get("selected_datasets", []),
     "dataset_status": statuses,
     "validation": validation,
+    "overall_status": "success",
 }
+failed = [row for row in statuses if row.get("status") == "failed"]
+if failed:
+    summary["overall_status"] = "failed"
 target = context_path.parent / "ingestion_summary.json"
 target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
 print(json.dumps({"status": "published", "summary_file": str(target)}))
@@ -380,6 +384,8 @@ with DAG(
             cwd=REPO_ROOT.as_posix(),
         )
 
+    ingestion_completion_gate = EmptyOperator(task_id="ingestion_completion_gate")
+
     with TaskGroup(group_id="publish_ingestion_metadata") as publish_ingestion_metadata:
         publish_summary = BashOperator(
             task_id="publish_ingestion_summary",
@@ -387,4 +393,12 @@ with DAG(
             cwd=REPO_ROOT.as_posix(),
         )
 
-    start >> prepare_context >> load_bronze_datasets >> validate_ingestion_results >> publish_ingestion_metadata >> end
+    (
+        start
+        >> prepare_context
+        >> load_bronze_datasets
+        >> validate_ingestion_results
+        >> ingestion_completion_gate
+        >> publish_ingestion_metadata
+        >> end
+    )
