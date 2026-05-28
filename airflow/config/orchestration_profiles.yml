@@ -1,0 +1,34 @@
+defaults:
+  profile: local
+  strict_mode: true
+  allow_empty: false
+  max_parallel_datasets: 4
+  schedule: null
+
+profiles:
+  local:
+    description: Local Spark/Hive execution for development validation.
+    ingestion:
+      execution_mode: spark_job
+      command_profile: local
+      spark_submit_cmd: python
+      strict_mode: true
+      max_parallel_datasets: 4
+
+  ci:
+    description: CI contract mode without dataset load execution.
+    ingestion:
+      execution_mode: dry_run
+      command_profile: local
+      spark_submit_cmd: python
+      strict_mode: true
+      max_parallel_datasets: 2
+
+  snowflake:
+    description: Future Snowflake COPY INTO mode (scaffold only).
+    ingestion:
+      execution_mode: dry_run
+      command_profile: cloud
+      spark_submit_cmd: spark-submit
+      strict_mode: true
+      max_parallel_datasets: 4
