@@ -6,6 +6,7 @@ from pathlib import Path
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.utils.task_group import TaskGroup
 
 from _fraudlens_orchestration_common import REPO_ROOT
@@ -103,12 +104,22 @@ with DAG(
     ingestion_complete_gate = EmptyOperator(task_id="ingestion_complete_gate")
 
     with TaskGroup(group_id="transformation_layer") as transformation_layer:
-        transformation_entry = EmptyOperator(task_id="transformation_entrypoint")
+        transformation_entry = TriggerDagRunOperator(
+            task_id="run_transformation_workflow",
+            trigger_dag_id="fraudlens_transformation_workflow",
+            wait_for_completion=True,
+            poke_interval=30,
+        )
 
     transformation_complete_gate = EmptyOperator(task_id="transformation_complete_gate")
 
     with TaskGroup(group_id="validation_layer") as validation_layer:
-        validation_entry = EmptyOperator(task_id="validation_entrypoint")
+        validation_entry = TriggerDagRunOperator(
+            task_id="run_validation_workflow",
+            trigger_dag_id="fraudlens_validation_workflow",
+            wait_for_completion=True,
+            poke_interval=30,
+        )
 
     with TaskGroup(group_id="publish_run_artifacts") as publish_run_artifacts:
         publish_summary = BashOperator(

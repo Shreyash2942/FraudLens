@@ -46,6 +46,78 @@ def _dbt_parse_command() -> str:
     )
 
 
+def _validation_status_file(check_name: str) -> str:
+    return str((REPO_ROOT / "airflow" / "artifacts" / "orchestration" / "validation" / "{{ ts_nodash }}" / "checks" / f"{check_name}.json").as_posix())
+
+
+def _command_with_status(check_name: str, base_command: str) -> str:
+    return f"""
+set +e
+{base_command}
+RC=$?
+export RC
+python - <<'PY'
+import json
+import os
+from pathlib import Path
+
+target = Path(r'VALIDATION_STATUS_FILE_PLACEHOLDER')
+target.parent.mkdir(parents=True, exist_ok=True)
+exit_code = int(os.environ.get("RC", "1"))
+payload = {{
+    "check_name": "{check_name}",
+    "exit_code": exit_code,
+    "status": "success" if exit_code == 0 else "failed",
+}}
+target.write_text(json.dumps(payload, indent=2) + "\\n", encoding="utf-8")
+print(json.dumps(payload))
+PY
+exit $RC
+""".replace(
+        "VALIDATION_STATUS_FILE_PLACEHOLDER", _validation_status_file(check_name).replace("\\", "\\\\")
+    ).strip()
+
+
+def _publish_validation_evidence_command() -> str:
+    return r"""
+python - <<'PY'
+import json
+from pathlib import Path
+
+artifact_root = Path(r'VALIDATION_ARTIFACT_ROOT_PLACEHOLDER')
+status_dir = artifact_root / "checks"
+status_rows = []
+if status_dir.exists():
+    for entry in sorted(status_dir.glob("*.json")):
+        status_rows.append(json.loads(entry.read_text(encoding="utf-8")))
+
+overall_status = "success"
+if any(row.get("status") != "success" for row in status_rows):
+    overall_status = "failed"
+
+summary = {
+    "dag_id": "fraudlens_validation_workflow",
+    "run_id": "{{ run_id }}",
+    "run_stamp": "{{ ts_nodash }}",
+    "profile": "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+    "target": "{{ (dag_run.conf if dag_run else {}).get('target', params.target) }}",
+    "batch_id": "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
+    "check_status": status_rows,
+    "overall_status": overall_status,
+}
+target = artifact_root / "validation_summary.json"
+target.parent.mkdir(parents=True, exist_ok=True)
+target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+print(json.dumps({"status": "published", "summary_file": str(target), "overall_status": overall_status}))
+PY
+""".replace(
+        "VALIDATION_ARTIFACT_ROOT_PLACEHOLDER",
+        str((REPO_ROOT / "airflow" / "artifacts" / "orchestration" / "validation" / "{{ ts_nodash }}").as_posix()).replace(
+            "\\", "\\\\"
+        ),
+    ).strip()
+
+
 with DAG(
     dag_id="fraudlens_validation_workflow",
     description="Validation workflow scaffold for quality, governance, and checkpoint controls.",
@@ -65,74 +137,74 @@ with DAG(
     with TaskGroup(group_id="validate_preflight") as validate_preflight:
         preflight_parse = BashOperator(
             task_id="preflight_parse",
-            bash_command=_dbt_parse_command(),
+            bash_command=_command_with_status("preflight_parse", _dbt_parse_command()),
             cwd=REPO_ROOT.as_posix(),
         )
 
     with TaskGroup(group_id="validate_bronze_gate") as validate_bronze_gate:
         bronze_tag_test = BashOperator(
             task_id="bronze_tag_test",
-            bash_command=_dbt_test_command("tag:bronze"),
+            bash_command=_command_with_status("bronze_tag_test", _dbt_test_command("tag:bronze")),
             cwd=REPO_ROOT.as_posix(),
         )
 
     with TaskGroup(group_id="validate_silver_gate") as validate_silver_gate:
         silver_tag_test = BashOperator(
             task_id="silver_tag_test",
-            bash_command=_dbt_test_command("tag:silver"),
+            bash_command=_command_with_status("silver_tag_test", _dbt_test_command("tag:silver")),
             cwd=REPO_ROOT.as_posix(),
         )
 
     with TaskGroup(group_id="validate_gold_gate") as validate_gold_gate:
         gold_tag_test = BashOperator(
             task_id="gold_tag_test",
-            bash_command=_dbt_test_command("tag:gold"),
+            bash_command=_command_with_status("gold_tag_test", _dbt_test_command("tag:gold")),
             cwd=REPO_ROOT.as_posix(),
         )
 
     with TaskGroup(group_id="validate_kpi_gate") as validate_kpi_gate:
         kpi_tag_test = BashOperator(
             task_id="kpi_tag_test",
-            bash_command=_dbt_test_command("tag:kpi"),
+            bash_command=_command_with_status("kpi_tag_test", _dbt_test_command("tag:kpi")),
             cwd=REPO_ROOT.as_posix(),
         )
 
     with TaskGroup(group_id="validate_governance_gate") as validate_governance_gate:
         quality_critical_gate_test = BashOperator(
             task_id="quality_critical_gate_test",
-            bash_command=_dbt_test_command("quality_critical_gate"),
+            bash_command=_command_with_status("quality_critical_gate_test", _dbt_test_command("quality_critical_gate")),
             cwd=REPO_ROOT.as_posix(),
         )
         governance_critical_gate_test = BashOperator(
             task_id="governance_critical_gate_test",
-            bash_command=_dbt_test_command("governance_critical_gate"),
+            bash_command=_command_with_status("governance_critical_gate_test", _dbt_test_command("governance_critical_gate")),
             cwd=REPO_ROOT.as_posix(),
         )
         contract_critical_gate_test = BashOperator(
             task_id="contract_critical_gate_test",
-            bash_command=_dbt_test_command("contract_critical_gate"),
+            bash_command=_command_with_status("contract_critical_gate_test", _dbt_test_command("contract_critical_gate")),
             cwd=REPO_ROOT.as_posix(),
         )
         audit_traceability_gate_test = BashOperator(
             task_id="audit_traceability_gate_test",
-            bash_command=_dbt_test_command("audit_traceability_gate"),
+            bash_command=_command_with_status("audit_traceability_gate_test", _dbt_test_command("audit_traceability_gate")),
             cwd=REPO_ROOT.as_posix(),
         )
         contract_metadata_validator = BashOperator(
             task_id="contract_metadata_validator",
-            bash_command="python dbt/scripts/validate_contracts.py",
+            bash_command=_command_with_status("contract_metadata_validator", "python dbt/scripts/validate_contracts.py"),
             cwd=REPO_ROOT.as_posix(),
             retries=0,
         )
         contract_alignment_validator = BashOperator(
             task_id="contract_alignment_validator",
-            bash_command="python dbt/scripts/validate_contract_alignment.py",
+            bash_command=_command_with_status("contract_alignment_validator", "python dbt/scripts/validate_contract_alignment.py"),
             cwd=REPO_ROOT.as_posix(),
             retries=0,
         )
         failure_policy_validator = BashOperator(
             task_id="failure_policy_validator",
-            bash_command="python dbt/scripts/validate_failure_policy.py",
+            bash_command=_command_with_status("failure_policy_validator", "python dbt/scripts/validate_failure_policy.py"),
             cwd=REPO_ROOT.as_posix(),
             retries=0,
         )
@@ -147,7 +219,12 @@ with DAG(
         )
 
     with TaskGroup(group_id="validate_publish_artifacts") as validate_publish_artifacts:
-        publish_entry = EmptyOperator(task_id="publish_entry")
+        publish_validation_evidence = BashOperator(
+            task_id="publish_validation_evidence",
+            bash_command=_publish_validation_evidence_command(),
+            cwd=REPO_ROOT.as_posix(),
+            trigger_rule="all_done",
+        )
 
     checkpoint_bronze_to_silver = EmptyOperator(task_id="checkpoint_bronze_to_silver")
     checkpoint_silver_to_gold = EmptyOperator(task_id="checkpoint_silver_to_gold")
