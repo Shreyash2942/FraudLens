@@ -198,7 +198,6 @@ PY
 """.replace(
         "CONTEXT_FILE_PLACEHOLDER", _context_file().replace("\\", "\\\\")
     ).strip()
-""".strip()
 
 
 with DAG(
