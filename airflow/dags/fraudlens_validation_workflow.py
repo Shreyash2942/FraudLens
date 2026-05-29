@@ -108,9 +108,64 @@ with DAG(
             bash_command=_dbt_test_command("governance_critical_gate"),
             cwd=REPO_ROOT.as_posix(),
         )
-        quality_critical_gate_test >> governance_critical_gate_test
+        contract_critical_gate_test = BashOperator(
+            task_id="contract_critical_gate_test",
+            bash_command=_dbt_test_command("contract_critical_gate"),
+            cwd=REPO_ROOT.as_posix(),
+        )
+        audit_traceability_gate_test = BashOperator(
+            task_id="audit_traceability_gate_test",
+            bash_command=_dbt_test_command("audit_traceability_gate"),
+            cwd=REPO_ROOT.as_posix(),
+        )
+        contract_metadata_validator = BashOperator(
+            task_id="contract_metadata_validator",
+            bash_command="python dbt/scripts/validate_contracts.py",
+            cwd=REPO_ROOT.as_posix(),
+            retries=0,
+        )
+        contract_alignment_validator = BashOperator(
+            task_id="contract_alignment_validator",
+            bash_command="python dbt/scripts/validate_contract_alignment.py",
+            cwd=REPO_ROOT.as_posix(),
+            retries=0,
+        )
+        failure_policy_validator = BashOperator(
+            task_id="failure_policy_validator",
+            bash_command="python dbt/scripts/validate_failure_policy.py",
+            cwd=REPO_ROOT.as_posix(),
+            retries=0,
+        )
+        (
+            quality_critical_gate_test
+            >> governance_critical_gate_test
+            >> contract_critical_gate_test
+            >> audit_traceability_gate_test
+            >> contract_metadata_validator
+            >> contract_alignment_validator
+            >> failure_policy_validator
+        )
 
     with TaskGroup(group_id="validate_publish_artifacts") as validate_publish_artifacts:
         publish_entry = EmptyOperator(task_id="publish_entry")
 
-    start >> validate_preflight >> validate_bronze_gate >> validate_silver_gate >> validate_gold_gate >> validate_kpi_gate >> validate_governance_gate >> validate_publish_artifacts >> end
+    checkpoint_bronze_to_silver = EmptyOperator(task_id="checkpoint_bronze_to_silver")
+    checkpoint_silver_to_gold = EmptyOperator(task_id="checkpoint_silver_to_gold")
+    checkpoint_gold_to_kpi = EmptyOperator(task_id="checkpoint_gold_to_kpi")
+    checkpoint_kpi_to_publish = EmptyOperator(task_id="checkpoint_kpi_to_publish")
+
+    (
+        start
+        >> validate_preflight
+        >> validate_bronze_gate
+        >> checkpoint_bronze_to_silver
+        >> validate_silver_gate
+        >> checkpoint_silver_to_gold
+        >> validate_gold_gate
+        >> checkpoint_gold_to_kpi
+        >> validate_kpi_gate
+        >> checkpoint_kpi_to_publish
+        >> validate_governance_gate
+        >> validate_publish_artifacts
+        >> end
+    )
