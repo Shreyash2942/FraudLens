@@ -14,6 +14,11 @@ profiles:
       spark_submit_cmd: python
       strict_mode: true
       max_parallel_datasets: 4
+    transformation:
+      execution_mode: dbt_build
+      dbt_profile: fraudlens_local_spark
+      dbt_target: local
+      threads: 4
 
   ci:
     description: CI contract mode without dataset load execution.
@@ -23,6 +28,11 @@ profiles:
       spark_submit_cmd: python
       strict_mode: true
       max_parallel_datasets: 2
+    transformation:
+      execution_mode: dbt_build
+      dbt_profile: fraudlens_local_spark
+      dbt_target: local
+      threads: 2
 
   snowflake:
     description: Future Snowflake COPY INTO mode (scaffold only).
@@ -32,3 +42,8 @@ profiles:
       spark_submit_cmd: spark-submit
       strict_mode: true
       max_parallel_datasets: 4
+    transformation:
+      execution_mode: dbt_build
+      dbt_profile: fraudlens_snowflake
+      dbt_target: dev
+      threads: 4
