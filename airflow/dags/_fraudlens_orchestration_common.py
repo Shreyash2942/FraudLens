@@ -34,6 +34,21 @@ if str(REPO_ROOT) not in sys.path:
 from synthetic_generator.contracts import DATASET_ORDER
 
 ORCHESTRATION_PROFILE_PATH = REPO_ROOT / "airflow" / "config" / "orchestration_profiles.yml"
+RUN_METADATA_SCHEMA_VERSION = "1.0"
+RUN_METADATA_FIELDS: tuple[str, ...] = (
+    "pipeline_run_id",
+    "batch_id",
+    "dag_id",
+    "task_id",
+    "task_group",
+    "run_profile",
+    "run_target",
+    "execution_date_utc",
+    "started_at_utc",
+    "ended_at_utc",
+    "run_status",
+    "failure_category",
+)
 
 
 def load_orchestration_profile_contract() -> dict[str, Any]:
@@ -220,6 +235,39 @@ def runtime_failure_callback(context: dict[str, Any]) -> None:
     target = artifact_dir / f"{task_id}.json"
     target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"event": "task_failure_classified", **payload}))
+
+
+def canonical_run_metadata(
+    *,
+    pipeline_run_id: str,
+    batch_id: str,
+    dag_id: str,
+    task_id: str,
+    task_group: str,
+    run_profile: str,
+    run_target: str,
+    execution_date_utc: str,
+    started_at_utc: str,
+    ended_at_utc: str,
+    run_status: str,
+    failure_category: str | None = None,
+) -> dict[str, Any]:
+    payload = {
+        "schema_version": RUN_METADATA_SCHEMA_VERSION,
+        "pipeline_run_id": pipeline_run_id,
+        "batch_id": batch_id,
+        "dag_id": dag_id,
+        "task_id": task_id,
+        "task_group": task_group,
+        "run_profile": run_profile,
+        "run_target": run_target,
+        "execution_date_utc": execution_date_utc,
+        "started_at_utc": started_at_utc,
+        "ended_at_utc": ended_at_utc,
+        "run_status": run_status,
+        "failure_category": failure_category,
+    }
+    return payload
 
 
 def latest_batch_id(data_root: Path | None = None) -> str:
