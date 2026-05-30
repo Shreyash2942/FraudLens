@@ -9,7 +9,7 @@ from airflow.operators.empty import EmptyOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.utils.task_group import TaskGroup
 
-from _fraudlens_orchestration_common import REPO_ROOT
+from _fraudlens_orchestration_common import REPO_ROOT, max_active_runs_for_profile, schedule_for_profile
 
 
 def _runtime_context_command() -> str:
@@ -80,8 +80,9 @@ with DAG(
     dag_id="fraudlens_pipeline_orchestration",
     description="Phase 6 master DAG skeleton for ingestion, transformation, and validation control gates.",
     start_date=datetime(2026, 1, 1),
-    schedule=None,
+    schedule=schedule_for_profile(),
     catchup=False,
+    max_active_runs=max_active_runs_for_profile(),
     tags=["fraudlens", "orchestration", "airflow"],
     params={
         "profile": "local",

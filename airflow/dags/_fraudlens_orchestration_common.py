@@ -80,6 +80,50 @@ def orchestration_defaults() -> dict[str, Any]:
     return defaults
 
 
+def dag_profile_from_env() -> str:
+    env_profile = os.getenv("ORCHESTRATION_PROFILE", "").strip().lower()
+    if env_profile:
+        return resolve_orchestration_profile(env_profile)
+    return resolve_orchestration_profile(None)
+
+
+def profile_runtime_settings(profile: str | None = None) -> dict[str, Any]:
+    selected = resolve_orchestration_profile(profile) if profile else dag_profile_from_env()
+    settings = orchestration_profile_settings(selected)
+    runtime = settings.get("runtime", {})
+    if not isinstance(runtime, dict):
+        return {}
+    return runtime
+
+
+def schedule_for_profile(profile: str | None = None) -> str | None:
+    runtime = profile_runtime_settings(profile)
+    schedule_mode = str(runtime.get("schedule_mode", "manual")).strip().lower()
+    if schedule_mode in {"manual", "ci_triggered"}:
+        return None
+    if schedule_mode == "daily":
+        cron_expr = str(runtime.get("schedule_cron", "0 2 * * *")).strip()
+        return cron_expr or "0 2 * * *"
+    return None
+
+
+def max_active_runs_for_profile(profile: str | None = None) -> int:
+    runtime = profile_runtime_settings(profile)
+    raw_value = runtime.get("max_active_runs", 1)
+    try:
+        value = int(raw_value)
+    except (TypeError, ValueError):
+        value = 1
+    return max(value, 1)
+
+
+def run_window_for_profile(profile: str | None = None) -> tuple[str, str]:
+    runtime = profile_runtime_settings(profile)
+    start = str(runtime.get("run_window_start_utc", "00:00")).strip() or "00:00"
+    end = str(runtime.get("run_window_end_utc", "23:59")).strip() or "23:59"
+    return start, end
+
+
 def latest_batch_id(data_root: Path | None = None) -> str:
     root = data_root or (REPO_ROOT / "data" / "batches")
     if not root.exists():

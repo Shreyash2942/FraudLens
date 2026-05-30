@@ -4,10 +4,17 @@ defaults:
   allow_empty: false
   max_parallel_datasets: 4
   schedule: null
+  schedule_mode: manual
 
 profiles:
   local:
     description: Local Spark/Hive execution for development validation.
+    runtime:
+      schedule_mode: manual
+      schedule_cron: null
+      run_window_start_utc: "00:00"
+      run_window_end_utc: "23:59"
+      max_active_runs: 1
     ingestion:
       execution_mode: spark_job
       command_profile: local
@@ -27,6 +34,12 @@ profiles:
 
   ci:
     description: CI contract mode without dataset load execution.
+    runtime:
+      schedule_mode: ci_triggered
+      schedule_cron: null
+      run_window_start_utc: "00:00"
+      run_window_end_utc: "23:59"
+      max_active_runs: 1
     ingestion:
       execution_mode: dry_run
       command_profile: local
@@ -46,6 +59,12 @@ profiles:
 
   snowflake:
     description: Future Snowflake COPY INTO mode (scaffold only).
+    runtime:
+      schedule_mode: daily
+      schedule_cron: "0 2 * * *"
+      run_window_start_utc: "01:00"
+      run_window_end_utc: "05:00"
+      max_active_runs: 1
     ingestion:
       execution_mode: dry_run
       command_profile: cloud

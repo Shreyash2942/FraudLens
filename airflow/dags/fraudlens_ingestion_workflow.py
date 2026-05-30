@@ -7,7 +7,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
-from _fraudlens_orchestration_common import REPO_ROOT, bronze_dataset_order
+from _fraudlens_orchestration_common import REPO_ROOT, bronze_dataset_order, max_active_runs_for_profile, schedule_for_profile
 
 
 def _context_file() -> str:
@@ -340,9 +340,10 @@ with DAG(
     dag_id="fraudlens_ingestion_workflow",
     description="Phase 6 ingestion workflow for Bronze dataset loading with governed runtime controls.",
     start_date=datetime(2026, 1, 1),
-    schedule=None,
+    schedule=schedule_for_profile(),
     catchup=False,
     max_active_tasks=8,
+    max_active_runs=max_active_runs_for_profile(),
     tags=["fraudlens", "orchestration", "ingestion", "bronze"],
     params={
         "profile": "local",

@@ -7,7 +7,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
-from _fraudlens_orchestration_common import REPO_ROOT
+from _fraudlens_orchestration_common import REPO_ROOT, max_active_runs_for_profile, schedule_for_profile
 
 
 def _dbt_test_command(selector: str) -> str:
@@ -122,8 +122,9 @@ with DAG(
     dag_id="fraudlens_validation_workflow",
     description="Validation workflow scaffold for quality, governance, and checkpoint controls.",
     start_date=datetime(2026, 1, 1),
-    schedule=None,
+    schedule=schedule_for_profile(),
     catchup=False,
+    max_active_runs=max_active_runs_for_profile(),
     tags=["fraudlens", "orchestration", "validation", "dbt"],
     params={
         "profile": "local",
