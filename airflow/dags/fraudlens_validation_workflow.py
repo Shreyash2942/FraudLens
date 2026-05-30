@@ -7,7 +7,13 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
-from _fraudlens_orchestration_common import REPO_ROOT, max_active_runs_for_profile, schedule_for_profile
+from _fraudlens_orchestration_common import (
+    REPO_ROOT,
+    dagrun_timeout_for_profile,
+    max_active_runs_for_profile,
+    schedule_for_profile,
+    task_policy_kwargs,
+)
 
 
 def _dbt_test_command(selector: str) -> str:
@@ -125,6 +131,7 @@ with DAG(
     schedule=schedule_for_profile(),
     catchup=False,
     max_active_runs=max_active_runs_for_profile(),
+    dagrun_timeout=dagrun_timeout_for_profile(),
     tags=["fraudlens", "orchestration", "validation", "dbt"],
     params={
         "profile": "local",
@@ -140,6 +147,7 @@ with DAG(
             task_id="preflight_parse",
             bash_command=_command_with_status("preflight_parse", _dbt_parse_command()),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("deterministic_contract"),
         )
 
     with TaskGroup(group_id="validate_bronze_gate") as validate_bronze_gate:
@@ -147,6 +155,7 @@ with DAG(
             task_id="bronze_tag_test",
             bash_command=_command_with_status("bronze_tag_test", _dbt_test_command("tag:bronze")),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("validation_gate"),
         )
 
     with TaskGroup(group_id="validate_silver_gate") as validate_silver_gate:
@@ -154,6 +163,7 @@ with DAG(
             task_id="silver_tag_test",
             bash_command=_command_with_status("silver_tag_test", _dbt_test_command("tag:silver")),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("validation_gate"),
         )
 
     with TaskGroup(group_id="validate_gold_gate") as validate_gold_gate:
@@ -161,6 +171,7 @@ with DAG(
             task_id="gold_tag_test",
             bash_command=_command_with_status("gold_tag_test", _dbt_test_command("tag:gold")),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("validation_gate"),
         )
 
     with TaskGroup(group_id="validate_kpi_gate") as validate_kpi_gate:
@@ -168,6 +179,7 @@ with DAG(
             task_id="kpi_tag_test",
             bash_command=_command_with_status("kpi_tag_test", _dbt_test_command("tag:kpi")),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("validation_gate"),
         )
 
     with TaskGroup(group_id="validate_governance_gate") as validate_governance_gate:
@@ -175,39 +187,43 @@ with DAG(
             task_id="quality_critical_gate_test",
             bash_command=_command_with_status("quality_critical_gate_test", _dbt_test_command("quality_critical_gate")),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("validation_gate"),
         )
         governance_critical_gate_test = BashOperator(
             task_id="governance_critical_gate_test",
             bash_command=_command_with_status("governance_critical_gate_test", _dbt_test_command("governance_critical_gate")),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("validation_gate"),
         )
         contract_critical_gate_test = BashOperator(
             task_id="contract_critical_gate_test",
             bash_command=_command_with_status("contract_critical_gate_test", _dbt_test_command("contract_critical_gate")),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("validation_gate"),
         )
         audit_traceability_gate_test = BashOperator(
             task_id="audit_traceability_gate_test",
             bash_command=_command_with_status("audit_traceability_gate_test", _dbt_test_command("audit_traceability_gate")),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("validation_gate"),
         )
         contract_metadata_validator = BashOperator(
             task_id="contract_metadata_validator",
             bash_command=_command_with_status("contract_metadata_validator", "python dbt/scripts/validate_contracts.py"),
             cwd=REPO_ROOT.as_posix(),
-            retries=0,
+            **task_policy_kwargs("deterministic_contract"),
         )
         contract_alignment_validator = BashOperator(
             task_id="contract_alignment_validator",
             bash_command=_command_with_status("contract_alignment_validator", "python dbt/scripts/validate_contract_alignment.py"),
             cwd=REPO_ROOT.as_posix(),
-            retries=0,
+            **task_policy_kwargs("deterministic_contract"),
         )
         failure_policy_validator = BashOperator(
             task_id="failure_policy_validator",
             bash_command=_command_with_status("failure_policy_validator", "python dbt/scripts/validate_failure_policy.py"),
             cwd=REPO_ROOT.as_posix(),
-            retries=0,
+            **task_policy_kwargs("deterministic_contract"),
         )
         (
             quality_critical_gate_test
@@ -225,6 +241,7 @@ with DAG(
             bash_command=_publish_validation_evidence_command(),
             cwd=REPO_ROOT.as_posix(),
             trigger_rule="all_done",
+            **task_policy_kwargs("artifact_publish"),
         )
 
     checkpoint_bronze_to_silver = EmptyOperator(task_id="checkpoint_bronze_to_silver")

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
@@ -122,6 +123,62 @@ def run_window_for_profile(profile: str | None = None) -> tuple[str, str]:
     start = str(runtime.get("run_window_start_utc", "00:00")).strip() or "00:00"
     end = str(runtime.get("run_window_end_utc", "23:59")).strip() or "23:59"
     return start, end
+
+
+def dagrun_timeout_for_profile(profile: str | None = None) -> timedelta | None:
+    runtime = profile_runtime_settings(profile)
+    raw_value = runtime.get("dagrun_timeout_minutes", None)
+    if raw_value in {None, "", 0, "0"}:
+        return None
+    try:
+        minutes = int(raw_value)
+    except (TypeError, ValueError):
+        return None
+    if minutes <= 0:
+        return None
+    return timedelta(minutes=minutes)
+
+
+def runtime_policy_map(profile: str | None = None) -> dict[str, dict[str, Any]]:
+    defaults = orchestration_defaults()
+    default_map = defaults.get("runtime_policies", {})
+    if not isinstance(default_map, dict):
+        default_map = {}
+    selected = resolve_orchestration_profile(profile) if profile else dag_profile_from_env()
+    profile_settings = orchestration_profile_settings(selected)
+    runtime = profile_settings.get("runtime", {})
+    profile_map = runtime.get("runtime_policies", {}) if isinstance(runtime, dict) else {}
+    if not isinstance(profile_map, dict):
+        profile_map = {}
+
+    merged: dict[str, dict[str, Any]] = {}
+    for key, value in default_map.items():
+        if isinstance(value, dict):
+            merged[str(key)] = dict(value)
+    for key, value in profile_map.items():
+        if isinstance(value, dict):
+            base = merged.get(str(key), {})
+            base.update(value)
+            merged[str(key)] = base
+    return merged
+
+
+def task_policy_kwargs(task_category: str, profile: str | None = None) -> dict[str, Any]:
+    policy = runtime_policy_map(profile).get(task_category, {})
+
+    retries = int(policy.get("retries", 0))
+    retry_delay_minutes = int(policy.get("retry_delay_minutes", 1))
+    max_retry_delay_minutes = int(policy.get("max_retry_delay_minutes", max(retry_delay_minutes, 1)))
+    timeout_minutes = int(policy.get("execution_timeout_minutes", 30))
+    retry_backoff = bool(policy.get("retry_exponential_backoff", False))
+
+    return {
+        "retries": max(retries, 0),
+        "retry_delay": timedelta(minutes=max(retry_delay_minutes, 1)),
+        "max_retry_delay": timedelta(minutes=max(max_retry_delay_minutes, 1)),
+        "retry_exponential_backoff": retry_backoff,
+        "execution_timeout": timedelta(minutes=max(timeout_minutes, 1)),
+    }
 
 
 def latest_batch_id(data_root: Path | None = None) -> str:

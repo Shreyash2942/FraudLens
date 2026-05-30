@@ -5,6 +5,43 @@ defaults:
   max_parallel_datasets: 4
   schedule: null
   schedule_mode: manual
+  runtime_policies:
+    infra_transient:
+      retries: 2
+      retry_delay_minutes: 5
+      max_retry_delay_minutes: 20
+      retry_exponential_backoff: true
+      execution_timeout_minutes: 15
+    ingestion_dataset:
+      retries: 1
+      retry_delay_minutes: 5
+      max_retry_delay_minutes: 20
+      retry_exponential_backoff: true
+      execution_timeout_minutes: 30
+    dbt_transform:
+      retries: 1
+      retry_delay_minutes: 5
+      max_retry_delay_minutes: 20
+      retry_exponential_backoff: true
+      execution_timeout_minutes: 45
+    validation_gate:
+      retries: 0
+      retry_delay_minutes: 1
+      max_retry_delay_minutes: 5
+      retry_exponential_backoff: false
+      execution_timeout_minutes: 20
+    deterministic_contract:
+      retries: 0
+      retry_delay_minutes: 1
+      max_retry_delay_minutes: 5
+      retry_exponential_backoff: false
+      execution_timeout_minutes: 10
+    artifact_publish:
+      retries: 1
+      retry_delay_minutes: 2
+      max_retry_delay_minutes: 10
+      retry_exponential_backoff: true
+      execution_timeout_minutes: 10
 
 profiles:
   local:
@@ -15,6 +52,7 @@ profiles:
       run_window_start_utc: "00:00"
       run_window_end_utc: "23:59"
       max_active_runs: 1
+      dagrun_timeout_minutes: 240
     ingestion:
       execution_mode: spark_job
       command_profile: local
@@ -40,6 +78,7 @@ profiles:
       run_window_start_utc: "00:00"
       run_window_end_utc: "23:59"
       max_active_runs: 1
+      dagrun_timeout_minutes: 120
     ingestion:
       execution_mode: dry_run
       command_profile: local
@@ -65,6 +104,7 @@ profiles:
       run_window_start_utc: "01:00"
       run_window_end_utc: "05:00"
       max_active_runs: 1
+      dagrun_timeout_minutes: 180
     ingestion:
       execution_mode: dry_run
       command_profile: cloud

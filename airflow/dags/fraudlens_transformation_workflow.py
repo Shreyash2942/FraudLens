@@ -7,7 +7,13 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
-from _fraudlens_orchestration_common import REPO_ROOT, max_active_runs_for_profile, schedule_for_profile
+from _fraudlens_orchestration_common import (
+    REPO_ROOT,
+    dagrun_timeout_for_profile,
+    max_active_runs_for_profile,
+    schedule_for_profile,
+    task_policy_kwargs,
+)
 
 
 def _context_file() -> str:
@@ -207,6 +213,7 @@ with DAG(
     schedule=schedule_for_profile(),
     catchup=False,
     max_active_runs=max_active_runs_for_profile(),
+    dagrun_timeout=dagrun_timeout_for_profile(),
     tags=["fraudlens", "orchestration", "transformation", "dbt"],
     params={
         "profile": "local",
@@ -227,11 +234,13 @@ with DAG(
             task_id="resolve_runtime_context",
             bash_command=_runtime_context_command(),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("infra_transient"),
         )
         preflight_parse = BashOperator(
             task_id="preflight_parse",
             bash_command=_dbt_parse_with_status_command(),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("deterministic_contract"),
         )
         resolve_runtime_context >> preflight_parse
 
@@ -240,6 +249,7 @@ with DAG(
             task_id="build_bronze_models",
             bash_command=_stage_build_command("bronze", "tag:bronze"),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("dbt_transform"),
         )
     bronze_success_gate = EmptyOperator(task_id="bronze_success_gate")
 
@@ -248,6 +258,7 @@ with DAG(
             task_id="build_silver_models",
             bash_command=_stage_build_command("silver", "tag:silver"),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("dbt_transform"),
         )
     silver_success_gate = EmptyOperator(task_id="silver_success_gate")
 
@@ -256,6 +267,7 @@ with DAG(
             task_id="build_gold_models",
             bash_command=_stage_build_command("gold", "tag:gold"),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("dbt_transform"),
         )
     gold_success_gate = EmptyOperator(task_id="gold_success_gate")
 
@@ -264,6 +276,7 @@ with DAG(
             task_id="build_kpi_models",
             bash_command=_stage_build_command("kpi", "tag:kpi"),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("dbt_transform"),
         )
     kpi_success_gate = EmptyOperator(task_id="kpi_success_gate")
 
@@ -272,6 +285,7 @@ with DAG(
             task_id="publish_transformation_summary",
             bash_command=_publish_transformation_metadata_command(),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("artifact_publish"),
         )
 
     (

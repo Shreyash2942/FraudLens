@@ -9,7 +9,13 @@ from airflow.operators.empty import EmptyOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.utils.task_group import TaskGroup
 
-from _fraudlens_orchestration_common import REPO_ROOT, max_active_runs_for_profile, schedule_for_profile
+from _fraudlens_orchestration_common import (
+    REPO_ROOT,
+    dagrun_timeout_for_profile,
+    max_active_runs_for_profile,
+    schedule_for_profile,
+    task_policy_kwargs,
+)
 
 
 def _runtime_context_command() -> str:
@@ -83,6 +89,7 @@ with DAG(
     schedule=schedule_for_profile(),
     catchup=False,
     max_active_runs=max_active_runs_for_profile(),
+    dagrun_timeout=dagrun_timeout_for_profile(),
     tags=["fraudlens", "orchestration", "airflow"],
     params={
         "profile": "local",
@@ -97,6 +104,7 @@ with DAG(
             task_id="resolve_runtime_context",
             bash_command=_runtime_context_command(),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("infra_transient"),
         )
 
     with TaskGroup(group_id="ingestion_layer") as ingestion_layer:
@@ -110,6 +118,7 @@ with DAG(
             trigger_dag_id="fraudlens_transformation_workflow",
             wait_for_completion=True,
             poke_interval=30,
+            **task_policy_kwargs("infra_transient"),
         )
 
     transformation_complete_gate = EmptyOperator(task_id="transformation_complete_gate")
@@ -120,6 +129,7 @@ with DAG(
             trigger_dag_id="fraudlens_validation_workflow",
             wait_for_completion=True,
             poke_interval=30,
+            **task_policy_kwargs("infra_transient"),
         )
 
     with TaskGroup(group_id="publish_run_artifacts") as publish_run_artifacts:
@@ -127,6 +137,7 @@ with DAG(
             task_id="publish_pipeline_summary",
             bash_command=_publish_summary_command(),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("artifact_publish"),
         )
 
     (

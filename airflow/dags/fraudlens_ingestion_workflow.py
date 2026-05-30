@@ -7,7 +7,14 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
-from _fraudlens_orchestration_common import REPO_ROOT, bronze_dataset_order, max_active_runs_for_profile, schedule_for_profile
+from _fraudlens_orchestration_common import (
+    REPO_ROOT,
+    bronze_dataset_order,
+    dagrun_timeout_for_profile,
+    max_active_runs_for_profile,
+    schedule_for_profile,
+    task_policy_kwargs,
+)
 
 
 def _context_file() -> str:
@@ -344,6 +351,7 @@ with DAG(
     catchup=False,
     max_active_tasks=8,
     max_active_runs=max_active_runs_for_profile(),
+    dagrun_timeout=dagrun_timeout_for_profile(),
     tags=["fraudlens", "orchestration", "ingestion", "bronze"],
     params={
         "profile": "local",
@@ -362,11 +370,13 @@ with DAG(
             task_id="resolve_runtime_context",
             bash_command=_prepare_context_command(),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("infra_transient"),
         )
         check_input_assets = BashOperator(
             task_id="check_input_assets",
             bash_command=_check_input_assets_command(),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("deterministic_contract"),
         )
         resolve_runtime_context >> check_input_assets
 
@@ -376,6 +386,7 @@ with DAG(
                 task_id=f"load_bronze__{dataset_name}",
                 bash_command=_dataset_load_command(dataset_name),
                 cwd=REPO_ROOT.as_posix(),
+                **task_policy_kwargs("ingestion_dataset"),
             )
 
     with TaskGroup(group_id="validate_ingestion_results") as validate_ingestion_results:
@@ -383,6 +394,7 @@ with DAG(
             task_id="validate_dataset_statuses",
             bash_command=_validate_ingestion_results_command(),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("deterministic_contract"),
         )
 
     ingestion_completion_gate = EmptyOperator(task_id="ingestion_completion_gate")
@@ -392,6 +404,7 @@ with DAG(
             task_id="publish_ingestion_summary",
             bash_command=_publish_ingestion_metadata_command(),
             cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("artifact_publish"),
         )
 
     (
