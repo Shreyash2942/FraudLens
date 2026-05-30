@@ -181,6 +181,47 @@ def task_policy_kwargs(task_category: str, profile: str | None = None) -> dict[s
     }
 
 
+def classify_failure_category(task_id: str, error_text: str) -> str:
+    task = task_id.lower()
+    text = error_text.lower()
+    if any(marker in task for marker in ["input_assets", "trigger", "runtime_context"]):
+        return "infra_transient"
+    if any(marker in task for marker in ["contract", "alignment", "failure_policy"]):
+        return "config_contract"
+    if any(marker in task for marker in ["quality", "validation", "tag_test"]):
+        return "data_quality"
+    if any(marker in task for marker in ["governance", "traceability"]):
+        return "governance_block"
+    if "traceback" in text and "connection" in text:
+        return "infra_transient"
+    return "unknown"
+
+
+def runtime_failure_callback(context: dict[str, Any]) -> None:
+    dag_id = str(getattr(context.get("dag"), "dag_id", context.get("dag_id", "unknown_dag")))
+    task_id = str(getattr(context.get("task"), "task_id", context.get("task_id", "unknown_task")))
+    run_id = str(context.get("run_id", "unknown_run"))
+    run_stamp = str(context.get("ts_nodash", "unknown_ts"))
+    error = context.get("exception")
+    error_text = repr(error) if error is not None else "unknown_exception"
+    category = classify_failure_category(task_id, error_text)
+
+    artifact_dir = REPO_ROOT / "airflow" / "artifacts" / "orchestration" / "failures" / dag_id / run_stamp
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "dag_id": dag_id,
+        "task_id": task_id,
+        "run_id": run_id,
+        "run_stamp": run_stamp,
+        "failure_category": category,
+        "error": error_text,
+        "status": "FAILED",
+    }
+    target = artifact_dir / f"{task_id}.json"
+    target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"event": "task_failure_classified", **payload}))
+
+
 def latest_batch_id(data_root: Path | None = None) -> str:
     root = data_root or (REPO_ROOT / "data" / "batches")
     if not root.exists():

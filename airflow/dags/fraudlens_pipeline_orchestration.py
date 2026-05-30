@@ -13,6 +13,7 @@ from _fraudlens_orchestration_common import (
     REPO_ROOT,
     dagrun_timeout_for_profile,
     max_active_runs_for_profile,
+    runtime_failure_callback,
     schedule_for_profile,
     task_policy_kwargs,
 )
@@ -90,6 +91,9 @@ with DAG(
     catchup=False,
     max_active_runs=max_active_runs_for_profile(),
     dagrun_timeout=dagrun_timeout_for_profile(),
+    default_args={
+        "on_failure_callback": runtime_failure_callback,
+    },
     tags=["fraudlens", "orchestration", "airflow"],
     params={
         "profile": "local",

@@ -12,6 +12,7 @@ from _fraudlens_orchestration_common import (
     bronze_dataset_order,
     dagrun_timeout_for_profile,
     max_active_runs_for_profile,
+    runtime_failure_callback,
     schedule_for_profile,
     task_policy_kwargs,
 )
@@ -352,6 +353,9 @@ with DAG(
     max_active_tasks=8,
     max_active_runs=max_active_runs_for_profile(),
     dagrun_timeout=dagrun_timeout_for_profile(),
+    default_args={
+        "on_failure_callback": runtime_failure_callback,
+    },
     tags=["fraudlens", "orchestration", "ingestion", "bronze"],
     params={
         "profile": "local",
