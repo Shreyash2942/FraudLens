@@ -207,6 +207,7 @@ if str(dags_dir) not in sys.path:
     sys.path.insert(0, str(dags_dir))
 
 from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
+from _fraudlens_orchestration_common import canonical_run_metadata, infer_task_group
 
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
 ctx = json.loads(context_path.read_text(encoding="utf-8")) if context_path.exists() else {}
@@ -223,16 +224,33 @@ if any(item.get("status") != "success" for item in stage_status):
 summary = {
     "dag_id": "fraudlens_transformation_workflow",
     "run_id": ctx.get("run_id"),
+    "pipeline_run_id": ctx.get("run_id"),
     "run_stamp": ctx.get("run_stamp"),
-    "profile": ctx.get("profile"),
+    "run_profile": ctx.get("profile"),
     "batch_id": ctx.get("batch_id"),
+    "run_target": ctx.get("dbt_target"),
     "dbt_profile": ctx.get("dbt_profile"),
-    "dbt_target": ctx.get("dbt_target"),
     "threads": ctx.get("threads"),
+    "execution_date_utc": "{{ ts }}",
     "stage_status": stage_status,
-    "overall_status": overall_status,
+    "run_status": "SUCCESS" if overall_status == "success" else "FAILED",
+    "failure_category": None if overall_status == "success" else "data_quality",
     "ended_at_utc": utc_now_iso(),
 }
+summary["run_metadata"] = canonical_run_metadata(
+    pipeline_run_id=str(ctx.get("run_id", "")),
+    batch_id=str(ctx.get("batch_id", "")),
+    dag_id="fraudlens_transformation_workflow",
+    task_id="publish_transformation_summary",
+    task_group=infer_task_group("publish_transformation_metadata.publish_transformation_summary"),
+    run_profile=str(ctx.get("profile", "local")),
+    run_target=str(ctx.get("dbt_target", "local")),
+    execution_date_utc="{{ ts }}",
+    started_at_utc=str((ctx.get("run_metadata", {}) or {}).get("started_at_utc", "")),
+    ended_at_utc=str(summary.get("ended_at_utc", "")),
+    run_status=str(summary.get("run_status", "UNKNOWN")),
+    failure_category=summary.get("failure_category"),
+)
 target = context_path.parent / "transformation_summary.json"
 target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
 log_orchestration_event("INFO", "transformation_summary_published", dag_id="fraudlens_transformation_workflow", run_id=ctx.get("run_id"), summary_file=str(target))

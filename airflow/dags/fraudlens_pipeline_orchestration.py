@@ -97,17 +97,47 @@ if str(dags_dir) not in sys.path:
     sys.path.insert(0, str(dags_dir))
 
 from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
+from _fraudlens_orchestration_common import canonical_run_metadata, infer_task_group
 
 target = Path(r'REPO_ROOT_PLACEHOLDER') / "airflow" / "artifacts" / "orchestration" / "pipeline" / "{{ ts_nodash }}" / "pipeline_summary.json"
 target.parent.mkdir(parents=True, exist_ok=True)
 ended_at_utc = utc_now_iso()
+workflow_root = Path(r'REPO_ROOT_PLACEHOLDER') / "airflow" / "artifacts" / "orchestration"
+ingestion_summary = workflow_root / "ingestion" / "{{ ts_nodash }}" / "ingestion_summary.json"
+transformation_summary = workflow_root / "transformation" / "{{ ts_nodash }}" / "transformation_summary.json"
+validation_summary = workflow_root / "validation" / "{{ ts_nodash }}" / "validation_summary.json"
+
+workflow_artifacts = {
+    "ingestion_summary_file": str(ingestion_summary),
+    "transformation_summary_file": str(transformation_summary),
+    "validation_summary_file": str(validation_summary),
+}
 payload = {
     "dag_id": "fraudlens_pipeline_orchestration",
     "run_id": "{{ run_id }}",
+    "pipeline_run_id": "{{ run_id }}",
     "batch_id": "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
-    "profile": "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+    "run_profile": "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+    "run_target": "local",
     "status": "success",
+    "run_status": "SUCCESS",
+    "failure_category": None,
+    "execution_date_utc": "{{ ts }}",
     "ended_at_utc": ended_at_utc,
+    "workflow_artifacts": workflow_artifacts,
+    "run_metadata": canonical_run_metadata(
+        pipeline_run_id="{{ run_id }}",
+        batch_id="{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
+        dag_id="fraudlens_pipeline_orchestration",
+        task_id="publish_pipeline_summary",
+        task_group=infer_task_group("publish_run_artifacts.publish_pipeline_summary"),
+        run_profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+        run_target="local",
+        execution_date_utc="{{ ts }}",
+        started_at_utc=ended_at_utc,
+        ended_at_utc=ended_at_utc,
+        run_status="SUCCESS",
+    ),
     "note": "Issue #66 skeleton: transformation and validation DAG triggers are added in issues #68/#69.",
 }
 target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")

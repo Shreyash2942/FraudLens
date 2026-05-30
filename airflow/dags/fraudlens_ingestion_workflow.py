@@ -291,6 +291,7 @@ if str(dags_dir) not in sys.path:
     sys.path.insert(0, str(dags_dir))
 
 from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
+from _fraudlens_orchestration_common import canonical_run_metadata, infer_task_group
 
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
 ctx = json.loads(context_path.read_text(encoding="utf-8"))
@@ -352,19 +353,39 @@ if status_dir.exists():
 summary = {
     "dag_id": "fraudlens_ingestion_workflow",
     "run_id": ctx.get("run_id"),
+    "pipeline_run_id": ctx.get("run_id"),
     "run_stamp": ctx.get("run_stamp"),
-    "profile": ctx.get("profile"),
+    "run_profile": ctx.get("profile"),
+    "run_target": ctx.get("command_profile"),
     "execution_mode": ctx.get("execution_mode"),
     "batch_id": ctx.get("batch_id"),
+    "execution_date_utc": "{{ ts }}",
     "selected_datasets": ctx.get("selected_datasets", []),
     "dataset_status": statuses,
     "validation": validation,
-    "overall_status": "success",
+    "run_status": "SUCCESS",
+    "failure_category": None,
     "ended_at_utc": utc_now_iso(),
 }
 failed = [row for row in statuses if row.get("status") == "failed"]
 if failed:
-    summary["overall_status"] = "failed"
+    summary["run_status"] = "FAILED"
+    summary["failure_category"] = "data_quality"
+
+summary["run_metadata"] = canonical_run_metadata(
+    pipeline_run_id=str(ctx.get("run_id", "")),
+    batch_id=str(ctx.get("batch_id", "")),
+    dag_id="fraudlens_ingestion_workflow",
+    task_id="publish_ingestion_summary",
+    task_group=infer_task_group("publish_ingestion_metadata.publish_ingestion_summary"),
+    run_profile=str(ctx.get("profile", "local")),
+    run_target=str(ctx.get("command_profile", "local")),
+    execution_date_utc="{{ ts }}",
+    started_at_utc=str((ctx.get("run_metadata", {}) or {}).get("started_at_utc", "")),
+    ended_at_utc=str(summary.get("ended_at_utc", "")),
+    run_status=str(summary["run_status"]),
+    failure_category=summary.get("failure_category"),
+)
 target = context_path.parent / "ingestion_summary.json"
 target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
 log_orchestration_event("INFO", "ingestion_summary_published", dag_id="fraudlens_ingestion_workflow", run_id=ctx.get("run_id"), summary_file=str(target))

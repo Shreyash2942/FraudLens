@@ -100,6 +100,7 @@ if str(dags_dir) not in sys.path:
     sys.path.insert(0, str(dags_dir))
 
 from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
+from _fraudlens_orchestration_common import canonical_run_metadata, infer_task_group
 
 artifact_root = Path(r'VALIDATION_ARTIFACT_ROOT_PLACEHOLDER')
 status_dir = artifact_root / "checks"
@@ -115,14 +116,31 @@ if any(row.get("status") != "success" for row in status_rows):
 summary = {
     "dag_id": "fraudlens_validation_workflow",
     "run_id": "{{ run_id }}",
+    "pipeline_run_id": "{{ run_id }}",
     "run_stamp": "{{ ts_nodash }}",
-    "profile": "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
-    "target": "{{ (dag_run.conf if dag_run else {}).get('target', params.target) }}",
+    "run_profile": "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+    "run_target": "{{ (dag_run.conf if dag_run else {}).get('target', params.target) }}",
     "batch_id": "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
+    "execution_date_utc": "{{ ts }}",
     "check_status": status_rows,
-    "overall_status": overall_status,
+    "run_status": "SUCCESS" if overall_status == "success" else "FAILED",
+    "failure_category": None if overall_status == "success" else "governance_block",
     "ended_at_utc": utc_now_iso(),
 }
+summary["run_metadata"] = canonical_run_metadata(
+    pipeline_run_id="{{ run_id }}",
+    batch_id="{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
+    dag_id="fraudlens_validation_workflow",
+    task_id="publish_validation_evidence",
+    task_group=infer_task_group("validate_publish_artifacts.publish_validation_evidence"),
+    run_profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+    run_target="{{ (dag_run.conf if dag_run else {}).get('target', params.target) }}",
+    execution_date_utc="{{ ts }}",
+    started_at_utc=str(summary.get("ended_at_utc", "")),
+    ended_at_utc=str(summary.get("ended_at_utc", "")),
+    run_status=str(summary.get("run_status", "UNKNOWN")),
+    failure_category=summary.get("failure_category"),
+)
 target = artifact_root / "validation_summary.json"
 target.parent.mkdir(parents=True, exist_ok=True)
 target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
