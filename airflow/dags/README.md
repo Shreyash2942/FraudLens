@@ -18,6 +18,11 @@ Phase 6 DAGs:
 - `_fraudlens_orchestration_common.py`
   - shared helper module for profile/batch/dataset runtime behaviors
 
+Runtime policy reference:
+
+- `../runtime_failure_handling_policy.md`
+  - schedule modes, retry/timeouts by task class, and fail-fast escalation behavior
+
 If these DAGs do not appear in UI, run:
 
 ```powershell

@@ -27,6 +27,8 @@ Phase 6 scaffolding adds:
     `prepare_context -> load_bronze_datasets -> validate_ingestion_results -> publish_ingestion_metadata`
 - `tests/test_ingestion_dag.py`
   - profile contract and DAG scaffold syntax/topology checks
+- `runtime_failure_handling_policy.md`
+  - runtime schedule/retry/timeout/fail-fast and escalation policy reference
 
 ## Syncing DAGs Into Data-Lab Container
 
