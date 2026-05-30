@@ -35,7 +35,16 @@ dags_dir = repo_root / "airflow" / "dags"
 if str(dags_dir) not in sys.path:
     sys.path.insert(0, str(dags_dir))
 
-from _fraudlens_orchestration_common import latest_batch_id, orchestration_artifact_dir, orchestration_profile_settings, resolve_orchestration_profile
+from _fraudlens_orchestration_common import (
+    canonical_run_metadata,
+    infer_task_group,
+    latest_batch_id,
+    log_orchestration_event,
+    orchestration_artifact_dir,
+    orchestration_profile_settings,
+    resolve_orchestration_profile,
+    utc_now_iso,
+)
 
 profile = resolve_orchestration_profile("{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}")
 profile_settings = orchestration_profile_settings(profile)
@@ -48,6 +57,7 @@ artifact_dir = orchestration_artifact_dir("transformation", "{{ ts_nodash }}")
 artifact_dir.mkdir(parents=True, exist_ok=True)
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
 context_path.parent.mkdir(parents=True, exist_ok=True)
+started_at_utc = utc_now_iso()
 payload = {
     "dag_id": "fraudlens_transformation_workflow",
     "run_id": "{{ run_id }}",
@@ -57,8 +67,22 @@ payload = {
     "dbt_profile": str(transform_settings.get("dbt_profile", "fraudlens_local_spark")),
     "dbt_target": str(transform_settings.get("dbt_target", "local")),
     "threads": int("{{ (dag_run.conf if dag_run else {}).get('threads', params.threads) }}"),
+    "run_metadata": canonical_run_metadata(
+        pipeline_run_id="{{ run_id }}",
+        batch_id=batch_id,
+        dag_id="fraudlens_transformation_workflow",
+        task_id="resolve_runtime_context",
+        task_group=infer_task_group("prepare_dbt_context.resolve_runtime_context"),
+        run_profile=profile,
+        run_target=str(transform_settings.get("dbt_target", "local")),
+        execution_date_utc="{{ ts }}",
+        started_at_utc=started_at_utc,
+        ended_at_utc=started_at_utc,
+        run_status="SUCCESS",
+    ),
 }
 context_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+log_orchestration_event("INFO", "transformation_runtime_context_prepared", dag_id="fraudlens_transformation_workflow", run_id="{{ run_id }}", batch_id=batch_id)
 print(json.dumps(payload))
 PY
 """.replace(
@@ -173,6 +197,16 @@ def _publish_transformation_metadata_command() -> str:
 python - <<'PY'
 import json
 from pathlib import Path
+import sys
+
+repo_root = Path(r'REPO_ROOT_PLACEHOLDER')
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+dags_dir = repo_root / "airflow" / "dags"
+if str(dags_dir) not in sys.path:
+    sys.path.insert(0, str(dags_dir))
+
+from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
 
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
 ctx = json.loads(context_path.read_text(encoding="utf-8")) if context_path.exists() else {}
@@ -197,12 +231,16 @@ summary = {
     "threads": ctx.get("threads"),
     "stage_status": stage_status,
     "overall_status": overall_status,
+    "ended_at_utc": utc_now_iso(),
 }
 target = context_path.parent / "transformation_summary.json"
 target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+log_orchestration_event("INFO", "transformation_summary_published", dag_id="fraudlens_transformation_workflow", run_id=ctx.get("run_id"), summary_file=str(target))
 print(json.dumps({"status": "published", "summary_file": str(target), "overall_status": overall_status}))
 PY
 """.replace(
+        "REPO_ROOT_PLACEHOLDER", REPO_ROOT.as_posix()
+    ).replace(
         "CONTEXT_FILE_PLACEHOLDER", _context_file().replace("\\", "\\\\")
     ).strip()
 

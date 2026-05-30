@@ -90,6 +90,16 @@ def _publish_validation_evidence_command() -> str:
 python - <<'PY'
 import json
 from pathlib import Path
+import sys
+
+repo_root = Path(r'REPO_ROOT_PLACEHOLDER')
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+dags_dir = repo_root / "airflow" / "dags"
+if str(dags_dir) not in sys.path:
+    sys.path.insert(0, str(dags_dir))
+
+from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
 
 artifact_root = Path(r'VALIDATION_ARTIFACT_ROOT_PLACEHOLDER')
 status_dir = artifact_root / "checks"
@@ -111,13 +121,17 @@ summary = {
     "batch_id": "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
     "check_status": status_rows,
     "overall_status": overall_status,
+    "ended_at_utc": utc_now_iso(),
 }
 target = artifact_root / "validation_summary.json"
 target.parent.mkdir(parents=True, exist_ok=True)
 target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+log_orchestration_event("INFO", "validation_summary_published", dag_id="fraudlens_validation_workflow", run_id="{{ run_id }}", summary_file=str(target))
 print(json.dumps({"status": "published", "summary_file": str(target), "overall_status": overall_status}))
 PY
 """.replace(
+        "REPO_ROOT_PLACEHOLDER", REPO_ROOT.as_posix()
+    ).replace(
         "VALIDATION_ARTIFACT_ROOT_PLACEHOLDER",
         str((REPO_ROOT / "airflow" / "artifacts" / "orchestration" / "validation" / "{{ ts_nodash }}").as_posix()).replace(
             "\\", "\\\\"

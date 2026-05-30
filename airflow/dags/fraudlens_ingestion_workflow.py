@@ -38,13 +38,17 @@ if str(dags_dir) not in sys.path:
 
 from _fraudlens_orchestration_common import (
     bronze_dataset_order,
+    canonical_run_metadata,
+    infer_task_group,
     latest_batch_id,
+    log_orchestration_event,
     orchestration_artifact_dir,
     orchestration_defaults,
     orchestration_profile_settings,
     parse_bool,
     parse_dataset_override,
     resolve_orchestration_profile,
+    utc_now_iso,
     validate_dataset_subset,
 )
 
@@ -85,6 +89,7 @@ artifact_dir = orchestration_artifact_dir("ingestion", "{{ ts_nodash }}")
 artifact_dir.mkdir(parents=True, exist_ok=True)
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
 context_path.parent.mkdir(parents=True, exist_ok=True)
+started_at_utc = utc_now_iso()
 payload = {
     "dag_id": "fraudlens_ingestion_workflow",
     "run_id": "{{ run_id }}",
@@ -98,8 +103,22 @@ payload = {
     "allow_empty": allow_empty,
     "max_parallel_datasets": max_parallel,
     "selected_datasets": selected_datasets,
+    "run_metadata": canonical_run_metadata(
+        pipeline_run_id="{{ run_id }}",
+        batch_id=batch_id,
+        dag_id="fraudlens_ingestion_workflow",
+        task_id="resolve_runtime_context",
+        task_group=infer_task_group("prepare_context.resolve_runtime_context"),
+        run_profile=profile,
+        run_target=command_profile,
+        execution_date_utc="{{ ts }}",
+        started_at_utc=started_at_utc,
+        ended_at_utc=started_at_utc,
+        run_status="SUCCESS",
+    ),
 }
 context_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+log_orchestration_event("INFO", "ingestion_runtime_context_prepared", dag_id="fraudlens_ingestion_workflow", run_id="{{ run_id }}", batch_id=batch_id)
 print(json.dumps(payload))
 PY
 """.replace(
@@ -262,6 +281,16 @@ def _validate_ingestion_results_command() -> str:
 python - <<'PY'
 import json
 from pathlib import Path
+import sys
+
+repo_root = Path(r'REPO_ROOT_PLACEHOLDER')
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+dags_dir = repo_root / "airflow" / "dags"
+if str(dags_dir) not in sys.path:
+    sys.path.insert(0, str(dags_dir))
+
+from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
 
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
 ctx = json.loads(context_path.read_text(encoding="utf-8"))
@@ -331,15 +360,19 @@ summary = {
     "dataset_status": statuses,
     "validation": validation,
     "overall_status": "success",
+    "ended_at_utc": utc_now_iso(),
 }
 failed = [row for row in statuses if row.get("status") == "failed"]
 if failed:
     summary["overall_status"] = "failed"
 target = context_path.parent / "ingestion_summary.json"
 target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+log_orchestration_event("INFO", "ingestion_summary_published", dag_id="fraudlens_ingestion_workflow", run_id=ctx.get("run_id"), summary_file=str(target))
 print(json.dumps({"status": "published", "summary_file": str(target)}))
 PY
 """.replace(
+        "REPO_ROOT_PLACEHOLDER", REPO_ROOT.as_posix()
+    ).replace(
         "CONTEXT_FILE_PLACEHOLDER", _context_file().replace("\\", "\\\\")
     ).strip()
 

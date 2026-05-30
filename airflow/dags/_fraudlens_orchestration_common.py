@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -268,6 +268,28 @@ def canonical_run_metadata(
         "failure_category": failure_category,
     }
     return payload
+
+
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def log_orchestration_event(level: str, event: str, **fields: Any) -> None:
+    payload = {
+        "level": level.upper(),
+        "event": event,
+        "timestamp_utc": utc_now_iso(),
+        **fields,
+    }
+    print(json.dumps(payload))
+
+
+def infer_task_group(task_id: str) -> str:
+    if "." in task_id:
+        return task_id.split(".", 1)[0]
+    if "__" in task_id:
+        return task_id.split("__", 1)[0]
+    return "root"
 
 
 def latest_batch_id(data_root: Path | None = None) -> str:
