@@ -50,6 +50,8 @@ Operational docs:
 - `../documents/airflow-orchestration-cicd-handoff-checklist.md`
 - `../documents/airflow-e2e-validation-runbook.md`
 - `../documents/airflow-orchestration-readiness-report.md`
+- `../documents/airflow-observability-lineage-design.md`
+- `../documents/airflow-observability-operations-runbook.md`
 
 ## Syncing DAGs Into Data-Lab Container
 

@@ -25,6 +25,8 @@ This directory contains the canonical written documentation for the project.
 - `airflow-orchestration-cicd-handoff-checklist.md` CI integration checklist and handoff contract
 - `airflow-e2e-validation-runbook.md` end-to-end validation execution runbook
 - `airflow-orchestration-readiness-report.md` readiness status and closure conditions for runtime validation
+- `airflow-observability-lineage-design.md` observability and lineage architecture contract for orchestration
+- `airflow-observability-operations-runbook.md` observability artifact operations and troubleshooting guide
 - `phase-6-plan/` detailed per-sub-issue planning workspace for Phase 6 implementation
 
 Legacy `.docx` files are retained as reference sources only. Active planning and design content should be maintained in Markdown and YAML.
