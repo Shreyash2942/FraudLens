@@ -15,6 +15,11 @@ Phase 6 DAGs:
   - master orchestration scaffold for runtime prep, stage gates, and run artifact publication
 - `fraudlens_ingestion_workflow.py`
   - ingestion workflow with context preparation, asset checks, dataset fan-out, validation, and summary publishing
+- `fraudlens_transformation_workflow.py`
+  - transformation workflow with dbt stage progression:
+    `bronze -> silver -> gold -> kpi`
+- `fraudlens_validation_workflow.py`
+  - validation workflow with quality/governance checks and readiness summary publishing
 - `_fraudlens_orchestration_common.py`
   - shared helper module for profile/batch/dataset runtime behaviors
 
@@ -28,3 +33,9 @@ If these DAGs do not appear in UI, run:
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/sync_airflow_dags_to_fraudlens_container.ps1
 ```
+
+For operator procedures and dependency documentation, see:
+
+- `../../documents/airflow-orchestration-design-reference.md`
+- `../../documents/airflow-orchestration-dependency-matrix.md`
+- `../../documents/airflow-orchestration-operations-runbook.md`

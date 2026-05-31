@@ -13,7 +13,7 @@ Phase 3 adds:
   - runs per-dataset Spark contract checks
   - runs per-dataset local Hive DDL/DML checks through Beeline
 
-Phase 6 scaffolding adds:
+Current orchestration DAG set includes:
 
 - `config/orchestration_profiles.yml`
   - profile contract for `local`, `ci`, and future `snowflake` modes
@@ -25,10 +25,31 @@ Phase 6 scaffolding adds:
 - `dags/fraudlens_ingestion_workflow.py`
   - ingestion workflow task groups:
     `prepare_context -> load_bronze_datasets -> validate_ingestion_results -> publish_ingestion_metadata`
+- `dags/fraudlens_transformation_workflow.py`
+  - transformation workflow task groups:
+    `prepare_runtime_context -> bronze_layer -> silver_layer -> gold_layer -> kpi_layer -> publish_transformation_metadata`
+- `dags/fraudlens_validation_workflow.py`
+  - validation workflow task groups:
+    `quality_checks -> governance_checks -> readiness_bundle`
 - `tests/test_ingestion_dag.py`
   - profile contract and DAG scaffold syntax/topology checks
+- `tests/test_transformation_dag.py`
+  - transformation DAG syntax, topology, and command contract checks
+- `tests/test_validation_dag.py`
+  - validation DAG syntax and gate command checks
+- `tests/test_logging_metadata.py`
+  - canonical metadata schema and failure-artifact hook checks
 - `runtime_failure_handling_policy.md`
   - runtime schedule/retry/timeout/fail-fast and escalation policy reference
+
+Operational docs:
+
+- `../documents/airflow-orchestration-design-reference.md`
+- `../documents/airflow-orchestration-dependency-matrix.md`
+- `../documents/airflow-orchestration-operations-runbook.md`
+- `../documents/airflow-orchestration-cicd-handoff-checklist.md`
+- `../documents/airflow-e2e-validation-runbook.md`
+- `../documents/airflow-orchestration-readiness-report.md`
 
 ## Syncing DAGs Into Data-Lab Container
 
