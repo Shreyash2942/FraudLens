@@ -1,0 +1,53 @@
+{
+  "issue": 72,
+  "artifact_version": "1.0.0",
+  "captured_at": "2026-05-30T21:20:41.8615150-04:00",
+  "environment": {
+    "repo_root": "d:/GitHub/FraudLens",
+    "container": "fraudlens",
+    "container_image": "shreyash42/data-lab:latest",
+    "profile": "local"
+  },
+  "test_batch_candidates": [
+    "phase2_mixed_small_fast_20260423T012415Z_seed11",
+    "phase2_mixed_small_fast_20260423T012444Z_seed11",
+    "phase2_mixed_small_fast_20260428T214444Z_seed42",
+    "phase2_mixed_small_fast_20260428T214956Z_seed42",
+    "phase2_small_fast_20260422T034851Z_seed11"
+  ],
+  "automation_checks": {
+    "pytest_airflow_tests": {
+      "command": "py -m pytest airflow/tests -q",
+      "status": "passed",
+      "summary": "15 passed in 0.16s"
+    },
+    "dag_sync": {
+      "command": "powershell -ExecutionPolicy Bypass -File scripts/sync_airflow_dags_to_fraudlens_container.ps1",
+      "status": "completed_with_runtime_errors",
+      "summary": "DAG files copied; Airflow CLI import/list checks failed due metadata DB connection refusal"
+    },
+    "dag_list": {
+      "command": "docker exec fraudlens sh -lc \"export FRAUDLENS_REPO_ROOT=/home/datalab/fraudlens; airflow dags list\"",
+      "status": "blocked",
+      "error_type": "infra_dependency",
+      "error": "psycopg2.OperationalError connection refused at localhost:5432"
+    },
+    "dag_import_errors": {
+      "command": "docker exec fraudlens sh -lc \"export FRAUDLENS_REPO_ROOT=/home/datalab/fraudlens; airflow dags list-import-errors || true\"",
+      "status": "blocked",
+      "error_type": "infra_dependency",
+      "error": "psycopg2.OperationalError connection refused at localhost:5432"
+    }
+  },
+  "e2e_execution": {
+    "pipeline_dag": "fraudlens_pipeline_orchestration",
+    "trigger_attempted": false,
+    "blocked_reason": "Airflow metadata database unavailable; DAG runtime commands cannot initialize"
+  },
+  "artifact_completeness": {
+    "runtime_artifacts_present": false,
+    "expected_root": "airflow/artifacts/orchestration",
+    "notes": "No runtime artifacts can be generated until Airflow metadata DB is reachable"
+  },
+  "result": "partially_validated_static_only"
+}
