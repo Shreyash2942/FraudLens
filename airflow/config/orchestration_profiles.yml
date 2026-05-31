@@ -69,6 +69,12 @@ profiles:
       dbt_profile: fraudlens_local_spark
       dbt_target: local
       strict_mode: true
+    observability:
+      enabled: true
+      emit_metrics: true
+      emit_lineage: true
+      metrics_namespace: fraudlens.orchestration.local
+      lineage_namespace: fraudlens.orchestration.local
 
   ci:
     description: CI contract mode without dataset load execution.
@@ -95,6 +101,12 @@ profiles:
       dbt_profile: fraudlens_local_spark
       dbt_target: local
       strict_mode: true
+    observability:
+      enabled: true
+      emit_metrics: true
+      emit_lineage: true
+      metrics_namespace: fraudlens.orchestration.ci
+      lineage_namespace: fraudlens.orchestration.ci
 
   snowflake:
     description: Future Snowflake COPY INTO mode (scaffold only).
@@ -121,3 +133,9 @@ profiles:
       dbt_profile: fraudlens_snowflake
       dbt_target: dev
       strict_mode: true
+    observability:
+      enabled: true
+      emit_metrics: true
+      emit_lineage: true
+      metrics_namespace: fraudlens.orchestration.snowflake
+      lineage_namespace: fraudlens.orchestration.snowflake
