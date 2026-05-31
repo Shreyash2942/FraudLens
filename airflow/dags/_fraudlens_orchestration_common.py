@@ -349,3 +349,74 @@ def validate_dataset_subset(requested: list[str] | None, valid_order: list[str])
 
 def orchestration_artifact_dir(workflow: str, run_stamp: str) -> Path:
     return REPO_ROOT / "airflow" / "artifacts" / "orchestration" / workflow / run_stamp
+
+
+def observability_settings(profile: str | None) -> dict[str, Any]:
+    settings = orchestration_profile_settings(profile)
+    section = settings.get("observability", {})
+    if not isinstance(section, dict):
+        return {}
+    return section
+
+
+def observability_enabled(profile: str | None) -> bool:
+    section = observability_settings(profile)
+    return parse_bool(section.get("enabled"), default=True)
+
+
+def observability_artifact_dir(signal_type: str, workflow: str, run_stamp: str) -> Path:
+    return REPO_ROOT / "airflow" / "artifacts" / "observability" / signal_type / workflow / run_stamp
+
+
+def emit_metric_event(
+    *,
+    workflow: str,
+    run_stamp: str,
+    metric_name: str,
+    metric_value: float,
+    metric_type: str,
+    run_profile: str,
+    payload: dict[str, Any],
+) -> Path:
+    section = observability_settings(run_profile)
+    namespace = str(section.get("metrics_namespace", f"fraudlens.orchestration.{run_profile}")).strip()
+    target_dir = observability_artifact_dir("metrics", workflow, run_stamp)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target = target_dir / "metric_events.jsonl"
+    event = {
+        "metric_name": metric_name,
+        "metric_value": metric_value,
+        "metric_type": metric_type,
+        "namespace": namespace,
+        "emitted_at_utc": utc_now_iso(),
+        **payload,
+    }
+    with target.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(event) + "\n")
+    log_orchestration_event("INFO", "metric_event_emitted", metric_name=metric_name, target_file=str(target))
+    return target
+
+
+def emit_lineage_event(
+    *,
+    workflow: str,
+    run_stamp: str,
+    event_type: str,
+    run_profile: str,
+    payload: dict[str, Any],
+) -> Path:
+    section = observability_settings(run_profile)
+    namespace = str(section.get("lineage_namespace", f"fraudlens.orchestration.{run_profile}")).strip()
+    target_dir = observability_artifact_dir("lineage", workflow, run_stamp)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target = target_dir / "lineage_events.jsonl"
+    event = {
+        "event_type": event_type,
+        "event_time_utc": utc_now_iso(),
+        "namespace": namespace,
+        **payload,
+    }
+    with target.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(event) + "\n")
+    log_orchestration_event("INFO", "lineage_event_emitted", event_type=event_type, target_file=str(target))
+    return target
