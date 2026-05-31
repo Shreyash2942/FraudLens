@@ -96,8 +96,16 @@ dags_dir = repo_root / "airflow" / "dags"
 if str(dags_dir) not in sys.path:
     sys.path.insert(0, str(dags_dir))
 
-from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
-from _fraudlens_orchestration_common import canonical_run_metadata, infer_task_group
+from _fraudlens_orchestration_common import (
+    canonical_run_metadata,
+    emit_lineage_event,
+    emit_metric_event,
+    infer_task_group,
+    log_orchestration_event,
+    observability_settings,
+    parse_bool,
+    utc_now_iso,
+)
 
 target = Path(r'REPO_ROOT_PLACEHOLDER') / "airflow" / "artifacts" / "orchestration" / "pipeline" / "{{ ts_nodash }}" / "pipeline_summary.json"
 target.parent.mkdir(parents=True, exist_ok=True)
@@ -139,6 +147,80 @@ payload = {
         run_status="SUCCESS",
     ),
     "note": "Issue #66 skeleton: transformation and validation DAG triggers are added in issues #68/#69.",
+}
+target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+completed_stage_artifacts = sum(
+    1 for path in [ingestion_summary, transformation_summary, validation_summary] if path.exists()
+)
+artifact_completeness = completed_stage_artifacts / 3
+run_profile = str(payload.get("run_profile", "local")).strip().lower() or "local"
+obs_settings = observability_settings(run_profile)
+obs_enabled = parse_bool(obs_settings.get("enabled"), default=True)
+metrics_file = None
+lineage_file = None
+if obs_enabled and parse_bool(obs_settings.get("emit_metrics"), default=True):
+    metrics_file = emit_metric_event(
+        workflow="pipeline",
+        run_stamp="{{ ts_nodash }}",
+        metric_name="pipeline_run_status",
+        metric_value=1.0,
+        metric_type="gauge",
+        run_profile=run_profile,
+        payload={
+            "dag_id": "fraudlens_pipeline_orchestration",
+            "run_id": "{{ run_id }}",
+            "batch_id": "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
+            "run_profile": run_profile,
+            "run_target": "local",
+            "workflow": "pipeline",
+            "run_status": "SUCCESS",
+        },
+    )
+    emit_metric_event(
+        workflow="pipeline",
+        run_stamp="{{ ts_nodash }}",
+        metric_name="pipeline_artifact_completeness",
+        metric_value=float(artifact_completeness),
+        metric_type="gauge",
+        run_profile=run_profile,
+        payload={
+            "dag_id": "fraudlens_pipeline_orchestration",
+            "run_id": "{{ run_id }}",
+            "batch_id": "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
+            "run_profile": run_profile,
+            "run_target": "local",
+            "workflow": "pipeline",
+            "completed_stage_artifacts": completed_stage_artifacts,
+            "expected_stage_artifacts": 3,
+        },
+    )
+if obs_enabled and parse_bool(obs_settings.get("emit_lineage"), default=True):
+    lineage_file = emit_lineage_event(
+        workflow="pipeline",
+        run_stamp="{{ ts_nodash }}",
+        event_type="pipeline_run_completed",
+        run_profile=run_profile,
+        payload={
+            "job_name": "fraudlens_pipeline_orchestration",
+            "run_id": "{{ run_id }}",
+            "batch_id": "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
+            "run_profile": run_profile,
+            "status": "SUCCESS",
+            "inputs": [
+                "data/batches/{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}"
+            ],
+            "outputs": [
+                str(target),
+                str(ingestion_summary),
+                str(transformation_summary),
+                str(validation_summary),
+            ],
+        },
+    )
+payload["observability_artifacts"] = {
+    "metrics_file": str(metrics_file) if metrics_file else None,
+    "lineage_file": str(lineage_file) if lineage_file else None,
 }
 target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 log_orchestration_event("INFO", "pipeline_summary_published", dag_id="fraudlens_pipeline_orchestration", run_id="{{ run_id }}", summary_file=str(target))
