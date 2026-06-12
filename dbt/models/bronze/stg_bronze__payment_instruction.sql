@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_PAYMENT_INSTRUCTION', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_payment_instruction', tags=['bronze', 'staging_raw']) }}
 
 select
     src.PAYMENT_INSTRUCTION_ID as payment_instruction_id,

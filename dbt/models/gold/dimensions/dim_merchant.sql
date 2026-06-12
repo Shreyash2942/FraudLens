@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_MERCHANT', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_merchant', tags=['gold', 'dim']) }}
 
 with merchant_base as (
     select

@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_CHANNEL', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_channel', tags=['gold', 'dim']) }}
 
 select
     {{ fraudlens_fact_sk(['ce.channel_event_id']) }} as dim_channel_sk,

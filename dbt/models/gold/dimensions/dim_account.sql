@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_ACCOUNT', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_account', tags=['gold', 'dim']) }}
 
 select
     {{ fraudlens_fact_sk(['da.deposit_account_id']) }} as dim_account_sk,

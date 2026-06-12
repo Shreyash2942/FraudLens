@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_BRANCH_TERRITORY', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_branch_territory', tags=['bronze', 'staging_raw']) }}
 
 select
     src.BRANCH_TERRITORY_ID as branch_territory_id,

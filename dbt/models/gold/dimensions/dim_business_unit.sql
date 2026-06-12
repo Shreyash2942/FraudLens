@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_BUSINESS_UNIT', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_business_unit', tags=['gold', 'dim']) }}
 
 select
     {{ fraudlens_fact_sk(['bu.business_unit_id']) }} as dim_business_unit_sk,

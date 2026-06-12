@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_FACT_DAILY_FRAUD_METRICS', tags=['gold', 'fact']) }}
+{{ config(alias='gold_fact_daily_fraud_metrics', tags=['gold', 'fact']) }}
 
 with transaction_daily as (
     select

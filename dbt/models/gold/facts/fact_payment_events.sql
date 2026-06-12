@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_FACT_PAYMENT_EVENTS', tags=['gold', 'fact'], materialized='incremental') }}
+{{ config(alias='gold_fact_payment_events', tags=['gold', 'fact'], materialized='incremental') }}
 
 with payment_instructions as (
     select *

@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_BUSINESS_UNIT', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_business_unit', tags=['bronze', 'staging_raw']) }}
 
 select
     src.BUSINESS_UNIT_ID as business_unit_id,

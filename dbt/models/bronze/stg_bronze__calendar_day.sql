@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_CALENDAR_DAY', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_calendar_day', tags=['bronze', 'staging_raw']) }}
 
 select
     src.CALENDAR_DATE as calendar_date,

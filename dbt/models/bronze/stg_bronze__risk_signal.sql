@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_RISK_SIGNAL', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_risk_signal', tags=['bronze', 'staging_raw']) }}
 
 select
     src.RISK_SIGNAL_ID as risk_signal_id,

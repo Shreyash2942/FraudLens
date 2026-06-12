@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_REGION', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_region', tags=['gold', 'dim']) }}
 
 select
     {{ fraudlens_fact_sk(['r.region_id']) }} as dim_region_sk,

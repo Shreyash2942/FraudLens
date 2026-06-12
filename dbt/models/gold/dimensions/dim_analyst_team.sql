@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_ANALYST_TEAM', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_analyst_team', tags=['gold', 'dim']) }}
 
 select
     {{ fraudlens_fact_sk(['at.analyst_team_id']) }} as dim_analyst_team_sk,

@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_CUSTOMER_ORG_ASSIGNMENT', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_customer_org_assignment', tags=['gold', 'dim']) }}
 
 with base as (
     select

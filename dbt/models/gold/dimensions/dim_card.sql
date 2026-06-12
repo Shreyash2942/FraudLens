@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_CARD', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_card', tags=['gold', 'dim']) }}
 
 select
     {{ fraudlens_fact_sk(['pc.card_id']) }} as dim_card_sk,

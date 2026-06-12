@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_REFERENCE_DATA_CATALOG', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_reference_data_catalog', tags=['bronze', 'staging_raw']) }}
 
 select
     src.CODE_SET_NAME as code_set_name,

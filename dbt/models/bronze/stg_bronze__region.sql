@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_REGION', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_region', tags=['bronze', 'staging_raw']) }}
 
 select
     src.REGION_ID as region_id,

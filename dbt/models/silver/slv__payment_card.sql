@@ -1,4 +1,4 @@
-{{ config(alias='SILVER_PAYMENT_CARD', tags=['silver', 'conformed']) }}
+{{ config(alias='silver_payment_card', tags=['silver', 'conformed']) }}
 
 with standardized as (
     select

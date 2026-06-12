@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_INVESTIGATION_EVENT', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_investigation_event', tags=['bronze', 'staging_raw']) }}
 
 select
     src.INVESTIGATION_EVENT_ID as investigation_event_id,

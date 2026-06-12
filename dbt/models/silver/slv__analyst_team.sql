@@ -1,4 +1,4 @@
-{{ config(alias='SILVER_ANALYST_TEAM', tags=['silver', 'conformed']) }}
+{{ config(alias='silver_analyst_team', tags=['silver', 'conformed']) }}
 
 with standardized as (
     select

@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_FRAUD_ALERT', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_fraud_alert', tags=['bronze', 'staging_raw']) }}
 
 select
     src.FRAUD_ALERT_ID as fraud_alert_id,

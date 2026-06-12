@@ -1,4 +1,4 @@
-{{ config(alias='SILVER_FRAUD_CASE', tags=['silver', 'conformed']) }}
+{{ config(alias='silver_fraud_case', tags=['silver', 'conformed']) }}
 
 with standardized as (
     select
