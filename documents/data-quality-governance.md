@@ -10,6 +10,10 @@ This document consolidates all Phase 5 planning, implementation, validation, rea
 
 Use this as the one-stop Phase 5 handoff and review file for downstream branches.
 
+## Primary Phase File
+
+Use this as the primary Phase 5 review and handoff file in `documents/`.
+
 ## Scope Consolidated
 
 Phase 5 sub-issues:
@@ -45,9 +49,7 @@ Phase 5 established a governed quality layer for FraudLens with:
 
 Key artifacts:
 
-- `documents/phase-5-quality-framework.md`
-- `documents/phase-5-quality-rule-matrix.md`
-- `documents/phase-5-quality-framework-runbook.md`
+- quality framework narrative, rule mapping, and runbook guidance are consolidated into this document
 - `dbt/selectors.yml`
 - `dbt/macros/quality_framework.sql`
 
@@ -59,7 +61,7 @@ Key artifacts:
 
 Key artifacts:
 
-- `documents/phase-5-test-coverage-map.md`
+- test coverage mapping is consolidated into this document
 - model YAML test expansions under `dbt/models/**`
 - validation tests under `dbt/tests/**`
 
@@ -71,8 +73,7 @@ Key artifacts:
 
 Key artifacts:
 
-- `documents/phase-5-data-contract-requirements.md`
-- `documents/phase-5-data-contract-enforcement-guide.md`
+- contract requirements and enforcement guidance are consolidated into this document
 - `dbt/scripts/validate_contracts.py`
 - `dbt/scripts/validate_contract_alignment.py`
 
@@ -84,7 +85,7 @@ Key artifacts:
 
 Key artifacts:
 
-- `documents/phase-5-governance-naming-standard.md`
+- governance naming standard guidance is consolidated into this document
 - `dbt/scripts/validate_naming_rules.py`
 - `dbt/scripts/validate_governance_metadata.py`
 - `.github/workflows/pr-validation.yml`
@@ -109,7 +110,7 @@ Canonical fields:
 
 Key artifacts:
 
-- `documents/phase-5-audit-traceability-guide.md`
+- auditability and traceability guidance is consolidated into this document
 - `dbt/macros/audit.sql`
 - `dbt/tests/validation/test_audit_trace_lineage_continuity.sql`
 - `dbt/tests/validation/test_lifecycle_traceability_chronology.sql`
@@ -122,7 +123,7 @@ Key artifacts:
 
 Key artifacts:
 
-- `documents/phase-5-failure-handling-runbook.md`
+- failure-handling runbook guidance is consolidated into this document
 - `dbt/tests/validation/failure_policy_matrix.json`
 - `dbt/scripts/validate_failure_policy.py`
 - `dbt/scripts/validate_structure.sh`
@@ -137,11 +138,11 @@ Key artifacts:
 
 Key artifacts:
 
-- `documents/phase-5-governance-readiness-checklist.md`
 - `documents/validation/phase-5-governance-readiness-artifacts.json`
 - `documents/validation/phase-5-governance-readiness-evidence.md`
 - `documents/validation/phase-5-governance-integrated-controls.md`
-- `documents/phase-5-governance-readiness-report.md`
+
+Readiness checklist and report guidance are consolidated into this document.
 
 ### 8) Standards Documentation (`#64`)
 
@@ -152,10 +153,7 @@ Key artifacts:
 
 Key artifacts:
 
-- `documents/phase-5-quality-governance-standards.md`
-- `documents/phase-5-governance-operator-playbooks.md`
-- `documents/phase-5-controls-traceability-matrix.md`
-- `documents/phase-5-governance-maintenance-model.md`
+- standards, operator playbooks, controls traceability, and maintenance guidance are consolidated into this document
 
 ## Validation And Readiness Snapshot
 
@@ -190,39 +188,12 @@ Consolidated Phase 5 execution commits:
   - `130f838` (governance metadata/audit tuning)
   - `d5dda6e` (failure-policy gate/tag alignment)
 
-## Consolidation Source Set
+## Consolidation Note
 
-Planning docs:
+Earlier Phase 5 planning and implementation working documents were consolidated into this file and
+are not retained separately in the root `documents/` directory.
 
-- `documents/phase-5-data-quality-governance-plan.md`
-- `documents/phase-5-issue-57-quality-framework-plan.md`
-- `documents/phase-5-issue-58-dbt-test-coverage-plan.md`
-- `documents/phase-5-issue-59-data-contracts-plan.md`
-- `documents/phase-5-issue-60-governance-naming-plan.md`
-- `documents/phase-5-issue-61-audit-traceability-plan.md`
-- `documents/phase-5-issue-62-failure-handling-plan.md`
-- `documents/phase-5-issue-63-governance-readiness-plan.md`
-- `documents/phase-5-issue-64-standards-documentation-plan.md`
-
-Implementation/docs:
-
-- `documents/phase-5-quality-framework.md`
-- `documents/phase-5-quality-rule-matrix.md`
-- `documents/phase-5-quality-framework-runbook.md`
-- `documents/phase-5-test-coverage-map.md`
-- `documents/phase-5-data-contract-requirements.md`
-- `documents/phase-5-data-contract-enforcement-guide.md`
-- `documents/phase-5-governance-naming-standard.md`
-- `documents/phase-5-audit-traceability-guide.md`
-- `documents/phase-5-failure-handling-runbook.md`
-- `documents/phase-5-governance-readiness-checklist.md`
-- `documents/phase-5-governance-readiness-report.md`
-- `documents/phase-5-quality-governance-standards.md`
-- `documents/phase-5-governance-operator-playbooks.md`
-- `documents/phase-5-controls-traceability-matrix.md`
-- `documents/phase-5-governance-maintenance-model.md`
-
-Validation evidence:
+Retained supporting validation evidence:
 
 - `documents/validation/phase-5-governance-readiness-artifacts.json`
 - `documents/validation/phase-5-governance-readiness-evidence.md`

@@ -7,6 +7,10 @@ Milestone scope: `#47` with sub-issues `#48`-`#55`
 
 This document consolidates Phase 4 planning, implementation structure, governance controls, and readiness validation for the dbt transformation layer.
 
+## Primary Phase File
+
+Use this as the primary Phase 4 review and handoff file in `documents/`.
+
 ## Scope Consolidated
 
 - `#48` Setup dbt project and warehouse profiles
@@ -116,12 +120,10 @@ dbt docs generate --empty-catalog --project-dir dbt --profiles-dir dbt/profiles 
 
 Final readiness requires rerun of full local validation bundle with active Hive thrift endpoint and attachment of passing evidence artifacts.
 
-## Consolidation Source Set
+## Consolidation Note
 
-- `documents/phase-4-dbt-transformation-plan.md`
-- `documents/phase-4-governance-model-standards-checklist.md`
-- `documents/phase-4-validation-runbook.md`
-- `documents/phase-4-readiness-report.md`
+Earlier Phase 4 working documents were consolidated into this file and are not retained separately
+in the root `documents/` directory.
 
 ## Reviewer Notes
 

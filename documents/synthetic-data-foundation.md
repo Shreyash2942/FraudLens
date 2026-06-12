@@ -7,6 +7,10 @@ Milestone scope: `#29` with sub-issues `#30`-`#37`
 
 This document consolidates Phase 2 design and delivery planning into one implementation and review artifact.
 
+## Primary Phase File
+
+Use this as the primary Phase 2 review and handoff file in `documents/`.
+
 ## Scope Consolidated
 
 - `#30` Define dataset architecture and relationships
@@ -75,10 +79,10 @@ Phase 2 established a deterministic synthetic data foundation aligned to FraudLe
 
 The GitHub issue pack for Phase 2 maps the milestone into one epic with eight sub-issues and reusable issue bodies, including acceptance criteria and references for each workstream.
 
-## Consolidation Source Set
+## Consolidation Note
 
-- `documents/phase-2-dataset-design.md`
-- `documents/phase-2-github-issues.md`
+Earlier Phase 2 working documents were consolidated into this file and are not retained separately
+in the root `documents/` directory.
 
 ## Reviewer Notes
 
