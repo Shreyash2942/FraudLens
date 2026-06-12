@@ -42,6 +42,13 @@ Current orchestration DAG set includes:
 - `runtime_failure_handling_policy.md`
   - runtime schedule/retry/timeout/fail-fast and escalation policy reference
 
+Artifact persistence:
+
+- orchestration run artifacts now persist to MongoDB for `local`, `ci`, and `snowflake` profiles
+- local filesystem artifact folders under `airflow/artifacts/` are generated legacy leftovers and can be cleaned with:
+  - `python scripts/cleanup_airflow_artifacts.py --dry-run`
+  - `python scripts/cleanup_airflow_artifacts.py`
+
 Operational docs:
 
 - `../documents/airflow-orchestration-design-reference.md`

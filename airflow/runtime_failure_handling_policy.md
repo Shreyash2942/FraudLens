@@ -58,13 +58,16 @@ On task failure, shared callback logic classifies failures into:
 - `governance_block`
 - `unknown`
 
-Failure artifacts are emitted to:
+Failure artifacts are emitted to MongoDB collection:
 
-- `airflow/artifacts/orchestration/failures/<dag_id>/<run_stamp>/<task_id>.json`
+- `datalab.orchestration_artifacts`
+- artifact type: `failure_artifact`
+- artifact path key pattern:
+  `airflow/artifacts/orchestration/failures/<dag_id>/<run_stamp>/<task_id>.json`
 
 ## Escalation Workflow
 
 1. Inspect task logs in Airflow UI.
-2. Inspect failure artifact JSON for category and error payload.
+2. Inspect the failure artifact document in MongoDB for category and error payload.
 3. If `infra_transient`, retry run in allowed window.
 4. If `config_contract`, `data_quality`, or `governance_block`, fix root cause before rerun.
