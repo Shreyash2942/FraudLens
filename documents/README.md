@@ -17,16 +17,24 @@ This directory contains the canonical written documentation for the project.
 - `warehouse-layer-foundation.md` consolidated Phase 3 warehouse planning, runbooks, and readiness document
 - `transformation-layer-dbt.md` consolidated Phase 4 dbt transformation planning, governance, and readiness document
 - `graphify-workflow.md` Graphify usage and branch portability workflow
-- `data-quality-governance.md` consolidated Phase 5 document (issues #57-#64, controls, validation, readiness, and handoff)
-- `orchestration-airflow.md` orchestration delivery ledger and issue closure summary
-- `airflow-orchestration-design-reference.md` DAG architecture, runtime contract, and artifact model
-- `airflow-orchestration-dependency-matrix.md` stage/layer dependency map and failure propagation semantics
-- `airflow-orchestration-operations-runbook.md` operator runbook, troubleshooting, and recovery flow
-- `airflow-orchestration-cicd-handoff-checklist.md` CI integration checklist and handoff contract
-- `airflow-e2e-validation-runbook.md` end-to-end validation execution runbook
-- `airflow-orchestration-readiness-report.md` readiness status and closure conditions for runtime validation
-- `airflow-observability-lineage-design.md` observability and lineage architecture contract for orchestration
-- `airflow-observability-operations-runbook.md` observability artifact operations and troubleshooting guide
+- `data-quality-governance.md` consolidated Phase 5 document (issues `#57`-`#64`, controls, validation, readiness, and handoff)
+- `orchestration-airflow.md` consolidated Phase 6 branch handoff for `orchestration-airflow`, including architecture, operations, MongoDB artifact persistence, validation status, and commit ledger
+
+## Supporting Airflow Reference Set
+
+These remain available as detailed supporting references behind `orchestration-airflow.md`:
+
+- `airflow-orchestration-design-reference.md`
+- `airflow-orchestration-dependency-matrix.md`
+- `airflow-orchestration-operations-runbook.md`
+- `airflow-orchestration-cicd-handoff-checklist.md`
+- `airflow-e2e-validation-runbook.md`
+- `airflow-orchestration-readiness-report.md`
+- `airflow-observability-lineage-design.md`
+- `airflow-observability-operations-runbook.md`
+
+## Planning Workspace
+
 - `phase-6-plan/` detailed per-sub-issue planning workspace for Phase 6 implementation
 
 Legacy `.docx` files are retained as reference sources only. Active planning and design content should be maintained in Markdown and YAML.
