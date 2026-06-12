@@ -48,16 +48,14 @@ from _fraudlens_orchestration_common import (
     orchestration_artifact_dir,
     resolve_orchestration_profile,
     utc_now_iso,
+    write_orchestration_artifact,
 )
 
 profile = resolve_orchestration_profile("{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}")
 batch_id_input = "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}"
 batch_id = latest_batch_id() if str(batch_id_input).strip().lower() in {"", "latest"} else str(batch_id_input).strip()
 run_stamp = "{{ ts_nodash }}"
-
-target_dir = orchestration_artifact_dir("pipeline", run_stamp)
-target_dir.mkdir(parents=True, exist_ok=True)
-target_file = target_dir / "runtime_context.json"
+target_file = orchestration_artifact_dir("pipeline", run_stamp) / "runtime_context.json"
 started_at_utc = utc_now_iso()
 payload = {
     "dag_id": "fraudlens_pipeline_orchestration",
@@ -80,7 +78,7 @@ payload = {
         run_status="SUCCESS",
     ),
 }
-target_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(target_file, payload, profile=profile, artifact_type="pipeline_runtime_context")
 log_orchestration_event("INFO", "runtime_context_prepared", dag_id="fraudlens_pipeline_orchestration", batch_id=batch_id, run_id="{{ run_id }}")
 print(json.dumps(payload))
 PY
@@ -111,11 +109,12 @@ from _fraudlens_orchestration_common import (
     log_orchestration_event,
     observability_settings,
     parse_bool,
+    read_orchestration_artifact,
     utc_now_iso,
+    write_orchestration_artifact,
 )
 
 target = Path(r'REPO_ROOT_PLACEHOLDER') / "airflow" / "artifacts" / "orchestration" / "pipeline" / "{{ ts_nodash }}" / "pipeline_summary.json"
-target.parent.mkdir(parents=True, exist_ok=True)
 ended_at_utc = utc_now_iso()
 workflow_root = Path(r'REPO_ROOT_PLACEHOLDER') / "airflow" / "artifacts" / "orchestration"
 ingestion_summary = workflow_root / "ingestion" / "{{ ts_nodash }}" / "ingestion_summary.json"
@@ -155,10 +154,20 @@ payload = {
     ),
     "note": "Issue #66 skeleton: transformation and validation DAG triggers are added in issues #68/#69.",
 }
-target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(
+    target,
+    payload,
+    profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+    artifact_type="pipeline_summary",
+)
 
 completed_stage_artifacts = sum(
-    1 for path in [ingestion_summary, transformation_summary, validation_summary] if path.exists()
+    1
+    for path in [ingestion_summary, transformation_summary, validation_summary]
+    if read_orchestration_artifact(
+        path,
+        profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+    )
 )
 artifact_completeness = completed_stage_artifacts / 3
 run_profile = str(payload.get("run_profile", "local")).strip().lower() or "local"
@@ -229,7 +238,12 @@ payload["observability_artifacts"] = {
     "metrics_file": str(metrics_file) if metrics_file else None,
     "lineage_file": str(lineage_file) if lineage_file else None,
 }
-target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(
+    target,
+    payload,
+    profile=run_profile,
+    artifact_type="pipeline_summary",
+)
 log_orchestration_event("INFO", "pipeline_summary_published", dag_id="fraudlens_pipeline_orchestration", run_id="{{ run_id }}", summary_file=str(target))
 print(json.dumps(payload))
 PY

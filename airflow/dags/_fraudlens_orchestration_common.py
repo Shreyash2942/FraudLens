@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -222,7 +224,6 @@ def runtime_failure_callback(context: dict[str, Any]) -> None:
     category = classify_failure_category(task_id, error_text)
 
     artifact_dir = REPO_ROOT / "airflow" / "artifacts" / "orchestration" / "failures" / dag_id / run_stamp
-    artifact_dir.mkdir(parents=True, exist_ok=True)
     payload = {
         "dag_id": dag_id,
         "task_id": task_id,
@@ -233,7 +234,12 @@ def runtime_failure_callback(context: dict[str, Any]) -> None:
         "status": "FAILED",
     }
     target = artifact_dir / f"{task_id}.json"
-    target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    profile = None
+    dag_run = context.get("dag_run")
+    conf = getattr(dag_run, "conf", None)
+    if isinstance(conf, dict):
+        profile = conf.get("profile")
+    write_orchestration_artifact(target, payload, profile=profile, artifact_type="failure_artifact")
     print(json.dumps({"event": "task_failure_classified", **payload}))
 
 
@@ -282,6 +288,242 @@ def log_orchestration_event(level: str, event: str, **fields: Any) -> None:
         **fields,
     }
     print(json.dumps(payload))
+
+
+def artifact_backend_settings(profile: str | None) -> dict[str, str]:
+    section = observability_settings(profile)
+    backend = str(section.get("artifact_backend", "filesystem")).strip().lower() or "filesystem"
+    return {
+        "backend": backend,
+        "mongodb_uri_env": str(section.get("mongodb_uri_env", "FRAUDLENS_MONGODB_URI")).strip() or "FRAUDLENS_MONGODB_URI",
+        "mongodb_default_uri": str(
+            section.get(
+                "mongodb_default_uri",
+                "mongodb://admin:admin@localhost:27017/datalab?authSource=admin",
+            )
+        ).strip(),
+        "mongodb_database": str(section.get("mongodb_database", "datalab")).strip() or "datalab",
+        "mongodb_collection": str(section.get("mongodb_collection", "orchestration_artifacts")).strip()
+        or "orchestration_artifacts",
+    }
+
+
+def _repo_relative_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def _artifact_document(target: Path, payload: dict[str, Any], *, profile: str | None, artifact_type: str) -> dict[str, Any]:
+    selected_profile = resolve_orchestration_profile(profile) if profile else dag_profile_from_env()
+    document: dict[str, Any] = {
+        "artifact_path": _repo_relative_path(target),
+        "artifact_name": target.name,
+        "artifact_type": artifact_type,
+        "run_profile": selected_profile,
+        "persisted_at_utc": utc_now_iso(),
+        "payload": payload,
+    }
+    if isinstance(payload, dict):
+        for key in (
+            "dag_id",
+            "task_id",
+            "run_id",
+            "run_stamp",
+            "pipeline_run_id",
+            "batch_id",
+            "status",
+            "run_status",
+            "failure_category",
+            "stage",
+            "check_name",
+        ):
+            if key in payload:
+                document[key] = payload[key]
+    return document
+
+
+def _write_artifact_to_mongodb(target: Path, payload: dict[str, Any], *, profile: str | None, artifact_type: str) -> None:
+    settings = artifact_backend_settings(profile)
+    uri = os.getenv(settings["mongodb_uri_env"], "").strip() or settings["mongodb_default_uri"]
+    database = settings["mongodb_database"]
+    collection = settings["mongodb_collection"]
+    if not uri:
+        raise RuntimeError("MongoDB artifact backend selected but no connection URI is configured.")
+
+    if not shutil.which("mongosh"):
+        raise RuntimeError("MongoDB artifact backend requires 'mongosh' to be installed in the runtime container.")
+
+    document = _artifact_document(target, payload, profile=profile, artifact_type=artifact_type)
+    js = (
+        f"db = db.getSiblingDB({json.dumps(database)});"
+        f"db.getCollection({json.dumps(collection)}).updateOne("
+        f"{{artifact_path: {json.dumps(document['artifact_path'])}}}, "
+        f"{{$set: {json.dumps(document)}}}, "
+        "{upsert: true}"
+        ");"
+    )
+    subprocess.run(
+        ["mongosh", "--quiet", uri, "--eval", js],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+def _insert_artifact_event_to_mongodb(target: Path, payload: dict[str, Any], *, profile: str | None, artifact_type: str) -> None:
+    settings = artifact_backend_settings(profile)
+    uri = os.getenv(settings["mongodb_uri_env"], "").strip() or settings["mongodb_default_uri"]
+    database = settings["mongodb_database"]
+    collection = settings["mongodb_collection"]
+    if not uri:
+        raise RuntimeError("MongoDB artifact backend selected but no connection URI is configured.")
+    if not shutil.which("mongosh"):
+        raise RuntimeError("MongoDB artifact backend requires 'mongosh' to be installed in the runtime container.")
+
+    document = _artifact_document(target, payload, profile=profile, artifact_type=artifact_type)
+    js = (
+        f"db = db.getSiblingDB({json.dumps(database)});"
+        f"db.getCollection({json.dumps(collection)}).insertOne({json.dumps(document)});"
+    )
+    subprocess.run(
+        ["mongosh", "--quiet", uri, "--eval", js],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+def _read_mongodb_json(profile: str | None, js: str) -> Any:
+    settings = artifact_backend_settings(profile)
+    uri = os.getenv(settings["mongodb_uri_env"], "").strip() or settings["mongodb_default_uri"]
+    if not uri:
+        raise RuntimeError("MongoDB artifact backend selected but no connection URI is configured.")
+    if not shutil.which("mongosh"):
+        raise RuntimeError("MongoDB artifact backend requires 'mongosh' to be installed in the runtime container.")
+
+    completed = subprocess.run(
+        ["mongosh", "--quiet", uri, "--eval", js],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+    if not lines:
+        return None
+    return json.loads(lines[-1])
+
+
+def _read_artifact_from_mongodb(target: Path, *, profile: str | None = None) -> dict[str, Any] | None:
+    settings = artifact_backend_settings(profile)
+    artifact_path = _repo_relative_path(target)
+    js = (
+        f"db = db.getSiblingDB({json.dumps(settings['mongodb_database'])});"
+        f"const doc = db.getCollection({json.dumps(settings['mongodb_collection'])}).findOne("
+        f"{{artifact_path: {json.dumps(artifact_path)}}}"
+        ");"
+        "print(EJSON.stringify(doc));"
+    )
+    payload = _read_mongodb_json(profile, js)
+    return payload if isinstance(payload, dict) else None
+
+
+def _list_artifacts_from_mongodb(
+    target_dir: Path,
+    *,
+    profile: str | None = None,
+    artifact_type: str | None = None,
+) -> list[dict[str, Any]]:
+    settings = artifact_backend_settings(profile)
+    prefix = _repo_relative_path(target_dir).rstrip("/") + "/"
+    query: dict[str, Any] = {
+        "artifact_path": {
+            "$regex": f"^{prefix}",
+        }
+    }
+    if artifact_type:
+        query["artifact_type"] = artifact_type
+    js = (
+        f"db = db.getSiblingDB({json.dumps(settings['mongodb_database'])});"
+        f"const docs = db.getCollection({json.dumps(settings['mongodb_collection'])})"
+        f".find({json.dumps(query)}).sort({json.dumps({'artifact_path': 1})}).toArray();"
+        "print(EJSON.stringify(docs));"
+    )
+    payload = _read_mongodb_json(profile, js)
+    if not isinstance(payload, list):
+        return []
+    return [item for item in payload if isinstance(item, dict)]
+
+
+def write_orchestration_artifact(
+    target: Path,
+    payload: dict[str, Any],
+    *,
+    profile: str | None = None,
+    artifact_type: str = "json_artifact",
+) -> Path:
+    settings = artifact_backend_settings(profile)
+    backend = settings["backend"]
+
+    if backend not in {"filesystem", "mongodb", "dual"}:
+        raise ValueError(f"Unsupported artifact backend '{backend}'. Allowed: filesystem, mongodb, dual.")
+
+    if backend in {"filesystem", "dual"}:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+    if backend in {"mongodb", "dual"}:
+        try:
+            _write_artifact_to_mongodb(target, payload, profile=profile, artifact_type=artifact_type)
+        except Exception as exc:
+            if backend == "mongodb":
+                raise
+            log_orchestration_event(
+                "WARNING",
+                "mongodb_artifact_write_failed",
+                artifact_path=_repo_relative_path(target),
+                error=repr(exc),
+            )
+
+    return target
+
+
+def read_orchestration_artifact(target: Path, *, profile: str | None = None) -> dict[str, Any] | None:
+    settings = artifact_backend_settings(profile)
+    backend = settings["backend"]
+    if backend in {"filesystem", "dual"} and target.exists():
+        return json.loads(target.read_text(encoding="utf-8"))
+    if backend in {"mongodb", "dual"}:
+        document = _read_artifact_from_mongodb(target, profile=profile)
+        payload = document.get("payload") if isinstance(document, dict) else None
+        return payload if isinstance(payload, dict) else None
+    return None
+
+
+def list_orchestration_artifacts(
+    target_dir: Path,
+    *,
+    profile: str | None = None,
+    artifact_type: str | None = None,
+) -> list[dict[str, Any]]:
+    settings = artifact_backend_settings(profile)
+    backend = settings["backend"]
+    if backend in {"filesystem", "dual"} and target_dir.exists():
+        artifacts = [
+            json.loads(entry.read_text(encoding="utf-8"))
+            for entry in sorted(target_dir.glob("*.json"))
+            if entry.is_file()
+        ]
+        if artifacts or backend == "filesystem":
+            return artifacts
+    if backend in {"mongodb", "dual"}:
+        return [
+            document["payload"]
+            for document in _list_artifacts_from_mongodb(target_dir, profile=profile, artifact_type=artifact_type)
+            if isinstance(document.get("payload"), dict)
+        ]
+    return []
 
 
 def infer_task_group(task_id: str) -> str:
@@ -381,7 +623,6 @@ def emit_metric_event(
     section = observability_settings(run_profile)
     namespace = str(section.get("metrics_namespace", f"fraudlens.orchestration.{run_profile}")).strip()
     target_dir = observability_artifact_dir("metrics", workflow, run_stamp)
-    target_dir.mkdir(parents=True, exist_ok=True)
     target = target_dir / "metric_events.jsonl"
     event = {
         "metric_name": metric_name,
@@ -391,8 +632,18 @@ def emit_metric_event(
         "emitted_at_utc": utc_now_iso(),
         **payload,
     }
-    with target.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(event) + "\n")
+    backend = artifact_backend_settings(run_profile)["backend"]
+    if backend == "filesystem":
+        target_dir.mkdir(parents=True, exist_ok=True)
+        with target.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(event) + "\n")
+    else:
+        _insert_artifact_event_to_mongodb(
+            target,
+            event,
+            profile=run_profile,
+            artifact_type="observability_metric_event",
+        )
     log_orchestration_event("INFO", "metric_event_emitted", metric_name=metric_name, target_file=str(target))
     return target
 
@@ -408,7 +659,6 @@ def emit_lineage_event(
     section = observability_settings(run_profile)
     namespace = str(section.get("lineage_namespace", f"fraudlens.orchestration.{run_profile}")).strip()
     target_dir = observability_artifact_dir("lineage", workflow, run_stamp)
-    target_dir.mkdir(parents=True, exist_ok=True)
     target = target_dir / "lineage_events.jsonl"
     event = {
         "event_type": event_type,
@@ -416,7 +666,17 @@ def emit_lineage_event(
         "namespace": namespace,
         **payload,
     }
-    with target.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(event) + "\n")
+    backend = artifact_backend_settings(run_profile)["backend"]
+    if backend == "filesystem":
+        target_dir.mkdir(parents=True, exist_ok=True)
+        with target.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(event) + "\n")
+    else:
+        _insert_artifact_event_to_mongodb(
+            target,
+            event,
+            profile=run_profile,
+            artifact_type="observability_lineage_event",
+        )
     log_orchestration_event("INFO", "lineage_event_emitted", event_type=event_type, target_file=str(target))
     return target

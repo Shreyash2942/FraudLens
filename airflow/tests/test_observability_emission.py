@@ -41,6 +41,8 @@ class ObservabilityEmitterCoverageTest(unittest.TestCase):
         for profile in ["local", "ci", "snowflake"]:
             self.assertIn(f"{profile}:", source)
         self.assertIn("observability:", source)
+        self.assertIn("artifact_backend: mongodb", source)
+        self.assertIn("mongodb_collection: orchestration_artifacts", source)
         self.assertIn("emit_metrics", source)
         self.assertIn("emit_lineage", source)
 

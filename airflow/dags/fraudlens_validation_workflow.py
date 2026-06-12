@@ -89,20 +89,38 @@ python - <<'PY'
 import json
 import os
 from pathlib import Path
+import sys
+
+repo_root = Path(r'REPO_ROOT_PLACEHOLDER')
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+dags_dir = repo_root / "airflow" / "dags"
+if str(dags_dir) not in sys.path:
+    sys.path.insert(0, str(dags_dir))
+
+from _fraudlens_orchestration_common import write_orchestration_artifact
 
 target = Path(r'VALIDATION_STATUS_FILE_PLACEHOLDER')
-target.parent.mkdir(parents=True, exist_ok=True)
 exit_code = int(os.environ.get("RC", "1"))
 payload = {{
     "check_name": "{check_name}",
     "exit_code": exit_code,
     "status": "success" if exit_code == 0 else "failed",
 }}
-target.write_text(json.dumps(payload, indent=2) + "\\n", encoding="utf-8")
+write_orchestration_artifact(
+    target,
+    payload,
+    profile="PROFILE_PLACEHOLDER",
+    artifact_type="validation_check_status",
+)
 print(json.dumps(payload))
 PY
 exit $RC
 """.replace(
+        "REPO_ROOT_PLACEHOLDER", REPO_ROOT.as_posix()
+    ).replace(
+        "PROFILE_PLACEHOLDER", "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}"
+    ).replace(
         "VALIDATION_STATUS_FILE_PLACEHOLDER", _validation_status_file(check_name).replace("\\", "\\\\")
     ).strip()
 
@@ -121,15 +139,22 @@ dags_dir = repo_root / "airflow" / "dags"
 if str(dags_dir) not in sys.path:
     sys.path.insert(0, str(dags_dir))
 
-from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
-from _fraudlens_orchestration_common import canonical_run_metadata, infer_task_group
+from _fraudlens_orchestration_common import (
+    canonical_run_metadata,
+    infer_task_group,
+    list_orchestration_artifacts,
+    log_orchestration_event,
+    utc_now_iso,
+    write_orchestration_artifact,
+)
 
 artifact_root = Path(r'VALIDATION_ARTIFACT_ROOT_PLACEHOLDER')
 status_dir = artifact_root / "checks"
-status_rows = []
-if status_dir.exists():
-    for entry in sorted(status_dir.glob("*.json")):
-        status_rows.append(json.loads(entry.read_text(encoding="utf-8")))
+status_rows = list_orchestration_artifacts(
+    status_dir,
+    profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+    artifact_type="validation_check_status",
+)
 
 overall_status = "success"
 if any(row.get("status") != "success" for row in status_rows):
@@ -164,8 +189,12 @@ summary["run_metadata"] = canonical_run_metadata(
     failure_category=summary.get("failure_category"),
 )
 target = artifact_root / "validation_summary.json"
-target.parent.mkdir(parents=True, exist_ok=True)
-target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(
+    target,
+    summary,
+    profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+    artifact_type="validation_summary",
+)
 log_orchestration_event("INFO", "validation_summary_published", dag_id="fraudlens_validation_workflow", run_id="{{ run_id }}", summary_file=str(target))
 print(json.dumps({"status": "published", "summary_file": str(target), "overall_status": overall_status}))
 if overall_status != "success":

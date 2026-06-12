@@ -73,6 +73,11 @@ profiles:
       enabled: true
       emit_metrics: true
       emit_lineage: true
+      artifact_backend: mongodb
+      mongodb_uri_env: FRAUDLENS_MONGODB_URI
+      mongodb_default_uri: mongodb://admin:admin@localhost:27017/datalab?authSource=admin
+      mongodb_database: datalab
+      mongodb_collection: orchestration_artifacts
       metrics_namespace: fraudlens.orchestration.local
       lineage_namespace: fraudlens.orchestration.local
 
@@ -105,6 +110,11 @@ profiles:
       enabled: true
       emit_metrics: true
       emit_lineage: true
+      artifact_backend: mongodb
+      mongodb_uri_env: FRAUDLENS_MONGODB_URI
+      mongodb_default_uri: ""
+      mongodb_database: datalab
+      mongodb_collection: orchestration_artifacts
       metrics_namespace: fraudlens.orchestration.ci
       lineage_namespace: fraudlens.orchestration.ci
 
@@ -137,5 +147,10 @@ profiles:
       enabled: true
       emit_metrics: true
       emit_lineage: true
+      artifact_backend: mongodb
+      mongodb_uri_env: FRAUDLENS_MONGODB_URI
+      mongodb_default_uri: ""
+      mongodb_database: datalab
+      mongodb_collection: orchestration_artifacts
       metrics_namespace: fraudlens.orchestration.snowflake
       lineage_namespace: fraudlens.orchestration.snowflake

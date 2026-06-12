@@ -32,6 +32,10 @@ class LoggingMetadataCompletenessTest(unittest.TestCase):
             "canonical_run_metadata",
             "log_orchestration_event",
             "runtime_failure_callback",
+            "artifact_backend_settings",
+            "write_orchestration_artifact",
+            "read_orchestration_artifact",
+            "list_orchestration_artifacts",
         ]
         for token in expected_fields:
             self.assertIn(token, source)
@@ -54,6 +58,7 @@ class LoggingMetadataCompletenessTest(unittest.TestCase):
         self.assertIn("task_policy_kwargs", source)
         self.assertIn("classify_failure_category", source)
         self.assertIn('"orchestration" / "failures"', source)
+        self.assertIn("artifact_backend", source)
 
 
 if __name__ == "__main__":

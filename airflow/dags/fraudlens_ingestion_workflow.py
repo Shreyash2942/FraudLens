@@ -42,7 +42,6 @@ from _fraudlens_orchestration_common import (
     infer_task_group,
     latest_batch_id,
     log_orchestration_event,
-    orchestration_artifact_dir,
     orchestration_defaults,
     orchestration_profile_settings,
     parse_bool,
@@ -50,6 +49,7 @@ from _fraudlens_orchestration_common import (
     resolve_orchestration_profile,
     utc_now_iso,
     validate_dataset_subset,
+    write_orchestration_artifact,
 )
 
 defaults = orchestration_defaults()
@@ -84,11 +84,7 @@ max_parallel = int(
 command_profile = str(ingestion_profile.get("command_profile", "local")).strip().lower()
 execution_mode = str(ingestion_profile.get("execution_mode", "spark_job")).strip().lower()
 spark_submit_cmd = str(ingestion_profile.get("spark_submit_cmd", "python")).strip()
-
-artifact_dir = orchestration_artifact_dir("ingestion", "{{ ts_nodash }}")
-artifact_dir.mkdir(parents=True, exist_ok=True)
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
-context_path.parent.mkdir(parents=True, exist_ok=True)
 started_at_utc = utc_now_iso()
 payload = {
     "dag_id": "fraudlens_ingestion_workflow",
@@ -117,7 +113,7 @@ payload = {
         run_status="SUCCESS",
     ),
 }
-context_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(context_path, payload, profile=profile, artifact_type="ingestion_runtime_context")
 log_orchestration_event("INFO", "ingestion_runtime_context_prepared", dag_id="fraudlens_ingestion_workflow", run_id="{{ run_id }}", batch_id=batch_id)
 print(json.dumps(payload))
 PY
@@ -134,12 +130,24 @@ python - <<'PY'
 import json
 import sys
 from pathlib import Path
+import sys
+
+repo_root = Path(r'REPO_ROOT_PLACEHOLDER')
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+dags_dir = repo_root / "airflow" / "dags"
+if str(dags_dir) not in sys.path:
+    sys.path.insert(0, str(dags_dir))
+
+from _fraudlens_orchestration_common import read_orchestration_artifact, write_orchestration_artifact
 
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
-if not context_path.exists():
+ctx = read_orchestration_artifact(
+    context_path,
+    profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+)
+if not ctx:
     raise FileNotFoundError(f"Runtime context file not found: {context_path}")
-
-ctx = json.loads(context_path.read_text(encoding="utf-8"))
 batch_id = ctx["batch_id"]
 strict_mode = bool(ctx.get("strict_mode", True))
 datasets = ctx.get("selected_datasets", [])
@@ -174,7 +182,12 @@ summary = {
     "missing": missing,
 }
 summary_path = context_path.parent / "input_asset_check.json"
-summary_path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(
+    summary_path,
+    summary,
+    profile=str(ctx.get("profile", "local")),
+    artifact_type="ingestion_input_asset_check",
+)
 print(json.dumps(summary))
 
 if missing and strict_mode:
@@ -195,17 +208,35 @@ import subprocess
 import sys
 from pathlib import Path
 
+repo_root = Path(r'REPO_ROOT_PLACEHOLDER')
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+dags_dir = repo_root / "airflow" / "dags"
+if str(dags_dir) not in sys.path:
+    sys.path.insert(0, str(dags_dir))
+
+from _fraudlens_orchestration_common import read_orchestration_artifact, write_orchestration_artifact
+
 dataset = "DATASET_PLACEHOLDER"
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
-ctx = json.loads(context_path.read_text(encoding="utf-8"))
+ctx = read_orchestration_artifact(
+    context_path,
+    profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+)
+if not ctx:
+    raise FileNotFoundError(f"Runtime context file not found: {context_path}")
 selected = set(ctx.get("selected_datasets", []))
 status_dir = context_path.parent / "datasets"
-status_dir.mkdir(parents=True, exist_ok=True)
 status_file = status_dir / f"{dataset}.json"
 
 if dataset not in selected:
     payload = {"dataset": dataset, "status": "skipped", "reason": "not_selected"}
-    status_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    write_orchestration_artifact(
+        status_file,
+        payload,
+        profile=str(ctx.get("profile", "local")),
+        artifact_type="ingestion_dataset_status",
+    )
     print(json.dumps(payload))
     raise SystemExit(0)
 
@@ -236,7 +267,12 @@ if execution_mode == "dry_run":
         "command_profile": command_profile,
         "load_command": preview_cmd,
     }
-    status_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    write_orchestration_artifact(
+        status_file,
+        payload,
+        profile=str(ctx.get("profile", "local")),
+        artifact_type="ingestion_dataset_status",
+    )
     print(json.dumps(payload))
     raise SystemExit(0)
 
@@ -263,7 +299,12 @@ payload = {
     "command_profile": command_profile,
     "load_command": cmd,
 }
-status_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(
+    status_file,
+    payload,
+    profile=str(ctx.get("profile", "local")),
+    artifact_type="ingestion_dataset_status",
+)
 print(json.dumps(payload))
 raise SystemExit(completed.returncode)
 PY
@@ -290,24 +331,43 @@ dags_dir = repo_root / "airflow" / "dags"
 if str(dags_dir) not in sys.path:
     sys.path.insert(0, str(dags_dir))
 
-from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
-from _fraudlens_orchestration_common import canonical_run_metadata, infer_task_group
+from _fraudlens_orchestration_common import (
+    canonical_run_metadata,
+    infer_task_group,
+    list_orchestration_artifacts,
+    log_orchestration_event,
+    read_orchestration_artifact,
+    utc_now_iso,
+    write_orchestration_artifact,
+)
 
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
-ctx = json.loads(context_path.read_text(encoding="utf-8"))
+ctx = read_orchestration_artifact(
+    context_path,
+    profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+)
+if not ctx:
+    raise FileNotFoundError(f"Runtime context file not found: {context_path}")
 selected = ctx.get("selected_datasets", [])
 strict_mode = bool(ctx.get("strict_mode", True))
 status_dir = context_path.parent / "datasets"
 missing_status: list[str] = []
 failed_status: list[dict] = []
+status_by_dataset = {
+    str(row.get("dataset")): row
+    for row in list_orchestration_artifacts(
+        status_dir,
+        profile=str(ctx.get("profile", "local")),
+        artifact_type="ingestion_dataset_status",
+    )
+}
 rows: list[dict] = []
 
 for dataset in selected:
-    status_file = status_dir / f"{dataset}.json"
-    if not status_file.exists():
+    payload = status_by_dataset.get(dataset)
+    if not payload:
         missing_status.append(dataset)
         continue
-    payload = json.loads(status_file.read_text(encoding="utf-8"))
     rows.append(payload)
     if payload.get("status") not in {"success", "dry_run"}:
         failed_status.append(payload)
@@ -320,7 +380,12 @@ summary = {
     "failed_or_unexpected_status": failed_status,
 }
 target = context_path.parent / "ingestion_validation.json"
-target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(
+    target,
+    summary,
+    profile=str(ctx.get("profile", "local")),
+    artifact_type="ingestion_validation_summary",
+)
 print(json.dumps(summary))
 
 if strict_mode and (missing_status or failed_status):
@@ -350,22 +415,29 @@ if str(dags_dir) not in sys.path:
 from _fraudlens_orchestration_common import (
     canonical_run_metadata,
     infer_task_group,
+    list_orchestration_artifacts,
     log_orchestration_event,
+    read_orchestration_artifact,
     utc_now_iso,
+    write_orchestration_artifact,
 )
 
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
-ctx = json.loads(context_path.read_text(encoding="utf-8"))
+ctx = read_orchestration_artifact(
+    context_path,
+    profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+)
+if not ctx:
+    raise FileNotFoundError(f"Runtime context file not found: {context_path}")
 validation_file = context_path.parent / "ingestion_validation.json"
-validation = {}
-if validation_file.exists():
-    validation = json.loads(validation_file.read_text(encoding="utf-8"))
+validation = read_orchestration_artifact(validation_file, profile=str(ctx.get("profile", "local"))) or {}
 
-statuses: list[dict] = []
 status_dir = context_path.parent / "datasets"
-if status_dir.exists():
-    for entry in sorted(status_dir.glob("*.json")):
-        statuses.append(json.loads(entry.read_text(encoding="utf-8")))
+statuses = list_orchestration_artifacts(
+    status_dir,
+    profile=str(ctx.get("profile", "local")),
+    artifact_type="ingestion_dataset_status",
+)
 
 summary = {
     "dag_id": "fraudlens_ingestion_workflow",
@@ -404,7 +476,12 @@ summary["run_metadata"] = canonical_run_metadata(
     failure_category=summary.get("failure_category"),
 )
 target = context_path.parent / "ingestion_summary.json"
-target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(
+    target,
+    summary,
+    profile=str(ctx.get("profile", "local")),
+    artifact_type="ingestion_summary",
+)
 log_orchestration_event("INFO", "ingestion_summary_published", dag_id="fraudlens_ingestion_workflow", run_id=ctx.get("run_id"), summary_file=str(target))
 print(json.dumps({"status": "published", "summary_file": str(target)}))
 PY

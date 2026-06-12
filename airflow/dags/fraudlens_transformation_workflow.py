@@ -40,10 +40,10 @@ from _fraudlens_orchestration_common import (
     infer_task_group,
     latest_batch_id,
     log_orchestration_event,
-    orchestration_artifact_dir,
     orchestration_profile_settings,
     resolve_orchestration_profile,
     utc_now_iso,
+    write_orchestration_artifact,
 )
 
 profile = resolve_orchestration_profile("{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}")
@@ -53,10 +53,7 @@ transform_settings = profile_settings.get("transformation", {})
 batch_id_raw = "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}"
 batch_id = latest_batch_id() if str(batch_id_raw).strip().lower() in {"", "latest"} else str(batch_id_raw).strip()
 
-artifact_dir = orchestration_artifact_dir("transformation", "{{ ts_nodash }}")
-artifact_dir.mkdir(parents=True, exist_ok=True)
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
-context_path.parent.mkdir(parents=True, exist_ok=True)
 started_at_utc = utc_now_iso()
 payload = {
     "dag_id": "fraudlens_transformation_workflow",
@@ -81,7 +78,7 @@ payload = {
         run_status="SUCCESS",
     ),
 }
-context_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(context_path, payload, profile=profile, artifact_type="transformation_runtime_context")
 log_orchestration_event("INFO", "transformation_runtime_context_prepared", dag_id="fraudlens_transformation_workflow", run_id="{{ run_id }}", batch_id=batch_id)
 print(json.dumps(payload))
 PY
@@ -146,16 +143,34 @@ python - <<'PY'
 import json
 import os
 from pathlib import Path
+import sys
+
+repo_root = Path(r'REPO_ROOT_PLACEHOLDER')
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+dags_dir = repo_root / "airflow" / "dags"
+if str(dags_dir) not in sys.path:
+    sys.path.insert(0, str(dags_dir))
+
+from _fraudlens_orchestration_common import write_orchestration_artifact
 
 target = Path(r'STAGE_STATUS_FILE_PLACEHOLDER')
-target.parent.mkdir(parents=True, exist_ok=True)
 exit_code = int(os.environ.get("RC", "1"))
 payload = {{"stage": "parse_preflight", "exit_code": exit_code, "status": "success" if exit_code == 0 else "failed"}}
-target.write_text(json.dumps(payload, indent=2) + "\\n", encoding="utf-8")
+write_orchestration_artifact(
+    target,
+    payload,
+    profile="PROFILE_PLACEHOLDER",
+    artifact_type="transformation_stage_status",
+)
 print(json.dumps(payload))
 PY
 exit $RC
 """.replace(
+        "REPO_ROOT_PLACEHOLDER", REPO_ROOT.as_posix()
+    ).replace(
+        "PROFILE_PLACEHOLDER", "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}"
+    ).replace(
         "STAGE_STATUS_FILE_PLACEHOLDER", _stage_status_file("parse_preflight").replace("\\", "\\\\")
     ).strip()
 
@@ -193,9 +208,18 @@ python - <<'PY'
 import json
 import os
 from pathlib import Path
+import sys
+
+repo_root = Path(r'REPO_ROOT_PLACEHOLDER')
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+dags_dir = repo_root / "airflow" / "dags"
+if str(dags_dir) not in sys.path:
+    sys.path.insert(0, str(dags_dir))
+
+from _fraudlens_orchestration_common import write_orchestration_artifact
 
 target = Path(r'STAGE_STATUS_FILE_PLACEHOLDER')
-target.parent.mkdir(parents=True, exist_ok=True)
 exit_code = int(os.environ.get("RC", "1"))
 payload = {{
     "stage": "{layer}",
@@ -203,11 +227,20 @@ payload = {{
     "exit_code": exit_code,
     "status": "success" if exit_code == 0 else "failed",
 }}
-target.write_text(json.dumps(payload, indent=2) + "\\n", encoding="utf-8")
+write_orchestration_artifact(
+    target,
+    payload,
+    profile="PROFILE_PLACEHOLDER",
+    artifact_type="transformation_stage_status",
+)
 print(json.dumps(payload))
 PY
 exit $RC
 """.replace(
+        "REPO_ROOT_PLACEHOLDER", REPO_ROOT.as_posix()
+    ).replace(
+        "PROFILE_PLACEHOLDER", "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}"
+    ).replace(
         "STAGE_STATUS_FILE_PLACEHOLDER", _stage_status_file(layer).replace("\\", "\\\\")
     ).strip()
 
@@ -226,16 +259,27 @@ dags_dir = repo_root / "airflow" / "dags"
 if str(dags_dir) not in sys.path:
     sys.path.insert(0, str(dags_dir))
 
-from _fraudlens_orchestration_common import log_orchestration_event, utc_now_iso
-from _fraudlens_orchestration_common import canonical_run_metadata, infer_task_group
+from _fraudlens_orchestration_common import (
+    canonical_run_metadata,
+    infer_task_group,
+    list_orchestration_artifacts,
+    log_orchestration_event,
+    read_orchestration_artifact,
+    utc_now_iso,
+    write_orchestration_artifact,
+)
 
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
-ctx = json.loads(context_path.read_text(encoding="utf-8")) if context_path.exists() else {}
+ctx = read_orchestration_artifact(
+    context_path,
+    profile="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+) or {}
 stage_dir = context_path.parent / "stages"
-stage_status = []
-if stage_dir.exists():
-    for entry in sorted(stage_dir.glob("*.json")):
-        stage_status.append(json.loads(entry.read_text(encoding="utf-8")))
+stage_status = list_orchestration_artifacts(
+    stage_dir,
+    profile=str(ctx.get("profile", "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}")),
+    artifact_type="transformation_stage_status",
+)
 
 overall_status = "success"
 if any(item.get("status") != "success" for item in stage_status):
@@ -272,7 +316,12 @@ summary["run_metadata"] = canonical_run_metadata(
     failure_category=summary.get("failure_category"),
 )
 target = context_path.parent / "transformation_summary.json"
-target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+write_orchestration_artifact(
+    target,
+    summary,
+    profile=str(ctx.get("profile", "local")),
+    artifact_type="transformation_summary",
+)
 log_orchestration_event("INFO", "transformation_summary_published", dag_id="fraudlens_transformation_workflow", run_id=ctx.get("run_id"), summary_file=str(target))
 print(json.dumps({"status": "published", "summary_file": str(target), "overall_status": overall_status}))
 PY
