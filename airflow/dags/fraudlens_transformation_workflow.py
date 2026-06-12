@@ -104,12 +104,32 @@ def _dbt_command(action: str, selector: str | None = None, *, full_refresh: bool
         "fraudlens_local_spark",
         "--target",
         "local",
+        "--threads",
+        "{{ (dag_run.conf if dag_run else {}).get('threads', params.threads) }}",
     ]
     if selector:
         parts.extend(["--select", selector])
     if full_refresh:
         parts.append("--full-refresh")
     return " ".join(parts)
+
+
+def _local_runtime_bootstrap_command() -> str:
+    return r"""
+PROFILE="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}"
+if [ "$PROFILE" != "local" ]; then
+  echo "Skipping local runtime bootstrap for profile=$PROFILE"
+  exit 0
+fi
+
+set -euo pipefail
+source /home/datalab/app/tech/common.sh
+source /home/datalab/app/tech/hadoop/manage.sh
+source /home/datalab/app/tech/hive/manage.sh
+
+hadoop::ensure_running
+hive::prepare_cli
+""".strip()
 
 
 def _stage_status_file(stage_name: str) -> str:
@@ -160,9 +180,9 @@ if [ -n "$SELECTOR_OVERRIDE" ]; then
 fi
 
 if [[ ",$FULL_REFRESH_LAYERS," == *",{layer},"* ]]; then
-  DBT_COMMAND="{_dbt_command("build")} --select $SELECTOR --full-refresh"
+  DBT_COMMAND="{_dbt_command("run")} --select $SELECTOR --full-refresh"
 else
-  DBT_COMMAND="{_dbt_command("build")} --select $SELECTOR"
+  DBT_COMMAND="{_dbt_command("run")} --select $SELECTOR"
 fi
 
 set +e
@@ -296,13 +316,19 @@ with DAG(
             cwd=REPO_ROOT.as_posix(),
             **task_policy_kwargs("infra_transient"),
         )
+        bootstrap_local_runtime = BashOperator(
+            task_id="bootstrap_local_runtime",
+            bash_command=_local_runtime_bootstrap_command(),
+            cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("infra_transient"),
+        )
         preflight_parse = BashOperator(
             task_id="preflight_parse",
             bash_command=_dbt_parse_with_status_command(),
             cwd=REPO_ROOT.as_posix(),
             **task_policy_kwargs("deterministic_contract"),
         )
-        resolve_runtime_context >> preflight_parse
+        resolve_runtime_context >> bootstrap_local_runtime >> preflight_parse
 
     with TaskGroup(group_id="run_bronze_models") as run_bronze_models:
         bronze_build = BashOperator(

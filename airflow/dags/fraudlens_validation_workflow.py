@@ -30,6 +30,8 @@ def _dbt_test_command(selector: str) -> str:
             "fraudlens_local_spark",
             "--target",
             "local",
+            "--threads",
+            "{{ (dag_run.conf if dag_run else {}).get('threads', params.threads) }}",
             "--select",
             selector,
         ]
@@ -49,8 +51,28 @@ def _dbt_parse_command() -> str:
             "fraudlens_local_spark",
             "--target",
             "local",
+            "--threads",
+            "{{ (dag_run.conf if dag_run else {}).get('threads', params.threads) }}",
         ]
     )
+
+
+def _local_runtime_bootstrap_command() -> str:
+    return r"""
+PROFILE="{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}"
+if [ "$PROFILE" != "local" ]; then
+  echo "Skipping local runtime bootstrap for profile=$PROFILE"
+  exit 0
+fi
+
+set -euo pipefail
+source /home/datalab/app/tech/common.sh
+source /home/datalab/app/tech/hadoop/manage.sh
+source /home/datalab/app/tech/hive/manage.sh
+
+hadoop::ensure_running
+hive::prepare_cli
+""".strip()
 
 
 def _validation_status_file(check_name: str) -> str:
@@ -146,6 +168,8 @@ target.parent.mkdir(parents=True, exist_ok=True)
 target.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
 log_orchestration_event("INFO", "validation_summary_published", dag_id="fraudlens_validation_workflow", run_id="{{ run_id }}", summary_file=str(target))
 print(json.dumps({"status": "published", "summary_file": str(target), "overall_status": overall_status}))
+if overall_status != "success":
+    raise SystemExit(4)
 PY
 """.replace(
         "REPO_ROOT_PLACEHOLDER", REPO_ROOT.as_posix()
@@ -173,18 +197,26 @@ with DAG(
         "profile": "local",
         "target": "local",
         "batch_id": "latest",
+        "threads": 4,
     },
 ) as dag:
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")
 
     with TaskGroup(group_id="validate_preflight") as validate_preflight:
+        bootstrap_local_runtime = BashOperator(
+            task_id="bootstrap_local_runtime",
+            bash_command=_local_runtime_bootstrap_command(),
+            cwd=REPO_ROOT.as_posix(),
+            **task_policy_kwargs("infra_transient"),
+        )
         preflight_parse = BashOperator(
             task_id="preflight_parse",
             bash_command=_command_with_status("preflight_parse", _dbt_parse_command()),
             cwd=REPO_ROOT.as_posix(),
             **task_policy_kwargs("deterministic_contract"),
         )
+        bootstrap_local_runtime >> preflight_parse
 
     with TaskGroup(group_id="validate_bronze_gate") as validate_bronze_gate:
         bronze_tag_test = BashOperator(

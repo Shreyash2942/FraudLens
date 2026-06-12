@@ -327,6 +327,8 @@ if strict_mode and (missing_status or failed_status):
     raise SystemExit(3)
 PY
 """.replace(
+        "REPO_ROOT_PLACEHOLDER", REPO_ROOT.as_posix()
+    ).replace(
         "CONTEXT_FILE_PLACEHOLDER", _context_file().replace("\\", "\\\\")
     ).strip()
 
@@ -336,6 +338,21 @@ def _publish_ingestion_metadata_command() -> str:
 python - <<'PY'
 import json
 from pathlib import Path
+import sys
+
+repo_root = Path(r'REPO_ROOT_PLACEHOLDER')
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+dags_dir = repo_root / "airflow" / "dags"
+if str(dags_dir) not in sys.path:
+    sys.path.insert(0, str(dags_dir))
+
+from _fraudlens_orchestration_common import (
+    canonical_run_metadata,
+    infer_task_group,
+    log_orchestration_event,
+    utc_now_iso,
+)
 
 context_path = Path(r'CONTEXT_FILE_PLACEHOLDER')
 ctx = json.loads(context_path.read_text(encoding="utf-8"))

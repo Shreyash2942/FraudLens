@@ -46,6 +46,12 @@ class OrchestrationAirflowScaffoldTest(unittest.TestCase):
         for token in expected_tokens:
             self.assertIn(token, text)
 
+    def test_master_dag_triggers_ingestion_workflow(self) -> None:
+        text = MASTER_DAG_FILE.read_text(encoding="utf-8")
+        self.assertIn('task_id="run_ingestion_workflow"', text)
+        self.assertIn('trigger_dag_id="fraudlens_ingestion_workflow"', text)
+        self.assertIn("conf=_stage_trigger_conf()", text)
+
     def test_ingestion_dag_contains_expected_task_groups(self) -> None:
         text = INGESTION_DAG_FILE.read_text(encoding="utf-8")
         expected_groups = [

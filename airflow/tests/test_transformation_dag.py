@@ -36,7 +36,7 @@ class TransformationDagScaffoldTest(unittest.TestCase):
         command_tokens = [
             '"dbt"',
             '"parse"',
-            '"build"',
+            '"run"',
             '"tag:bronze"',
             '"tag:silver"',
             '"tag:gold"',
@@ -52,4 +52,3 @@ class TransformationDagScaffoldTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -19,6 +19,13 @@ from _fraudlens_orchestration_common import (
 )
 
 
+def _stage_trigger_conf() -> dict[str, str]:
+    return {
+        "profile": "{{ (dag_run.conf if dag_run else {}).get('profile', params.profile) }}",
+        "batch_id": "{{ (dag_run.conf if dag_run else {}).get('batch_id', params.batch_id) }}",
+    }
+
+
 def _runtime_context_command() -> str:
     return r"""
 python - <<'PY'
@@ -260,7 +267,14 @@ with DAG(
         )
 
     with TaskGroup(group_id="ingestion_layer") as ingestion_layer:
-        ingestion_entry = EmptyOperator(task_id="ingestion_entrypoint")
+        ingestion_entry = TriggerDagRunOperator(
+            task_id="run_ingestion_workflow",
+            trigger_dag_id="fraudlens_ingestion_workflow",
+            conf=_stage_trigger_conf(),
+            wait_for_completion=True,
+            poke_interval=30,
+            **task_policy_kwargs("infra_transient"),
+        )
 
     ingestion_complete_gate = EmptyOperator(task_id="ingestion_complete_gate")
 
@@ -268,6 +282,7 @@ with DAG(
         transformation_entry = TriggerDagRunOperator(
             task_id="run_transformation_workflow",
             trigger_dag_id="fraudlens_transformation_workflow",
+            conf=_stage_trigger_conf(),
             wait_for_completion=True,
             poke_interval=30,
             **task_policy_kwargs("infra_transient"),
@@ -279,6 +294,7 @@ with DAG(
         validation_entry = TriggerDagRunOperator(
             task_id="run_validation_workflow",
             trigger_dag_id="fraudlens_validation_workflow",
+            conf=_stage_trigger_conf(),
             wait_for_completion=True,
             poke_interval=30,
             **task_policy_kwargs("infra_transient"),
