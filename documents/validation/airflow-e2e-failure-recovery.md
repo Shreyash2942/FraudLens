@@ -1,7 +1,7 @@
 # Airflow E2E Failure And Recovery Evidence
 
 Issue: `#72`
-Captured date: `2026-05-30`
+Captured date: `2026-06-09`
 
 ## Goal
 
@@ -32,7 +32,7 @@ py -m pytest airflow/tests -q
 
 Result:
 
-- `15 passed in 0.16s`
+- `19 passed in 0.11s`
 
 This includes logging metadata checks in `airflow/tests/test_logging_metadata.py` that assert presence of:
 
@@ -42,24 +42,27 @@ This includes logging metadata checks in `airflow/tests/test_logging_metadata.py
 
 ## Runtime Failure-Path Execution Status
 
-Runtime branch execution is currently blocked before DAG run startup because Airflow metadata DB is unavailable:
+Runtime failure-path evidence is now partially captured:
 
-- `psycopg2.OperationalError`
-- connection refused to `localhost:5432`
+- transformation Bronze stage writes a failed stage artifact
+- validation Bronze gate writes a failed task artifact under `airflow/artifacts/orchestration/failures/...`
+- validation summary artifacts now surface `run_status: FAILED` instead of ending green on gate failure
 
-Because of this, live task-state evidence (`failed`, `upstream_failed`, retry events) cannot be collected in this window.
+What is still missing:
 
-## Recovery Procedure (When DB Is Restored)
+- a successful recovery run after the Bronze-stage blocker is removed
+- a full master-DAG failure/recovery sequence captured through `fraudlens_pipeline_orchestration`
 
-1. Re-run DAG import checks:
-   - `airflow dags list`
-   - `airflow dags list-import-errors`
-2. Trigger controlled strict-mode ingestion failure with invalid batch input.
-3. Capture task state output for failure run:
-   - `airflow tasks states-for-dag-run fraudlens_ingestion_workflow <run_id>`
-4. Verify downstream tasks show `upstream_failed` where expected.
-5. Trigger recovery run with valid batch and, where applicable, relaxed strict mode.
-6. Verify failure artifact JSON and successful recovery summary artifacts.
+## Recovery Procedure
+
+1. Resolve the Bronze-stage runtime blocker in the warehouse/dbt path.
+2. Re-run component DAGs until transformation and validation complete successfully.
+3. Trigger `fraudlens_pipeline_orchestration` with a known-good batch.
+4. Capture task state output for the controlled failure run:
+   - `airflow tasks states-for-dag-run fraudlens_pipeline_orchestration <run_id>`
+5. Verify downstream tasks show `upstream_failed` where expected.
+6. Trigger the recovery run with corrected inputs/runtime state.
+7. Verify failure artifact JSON and successful recovery summary artifacts.
 
 ## Expected Runtime Evidence Files
 
@@ -69,4 +72,4 @@ Because of this, live task-state evidence (`failed`, `upstream_failed`, retry ev
 
 ## Conclusion
 
-Failure and retry behavior is validated at design and test-contract level; live execution evidence remains blocked by infrastructure dependency (Airflow metadata DB availability).
+Failure and retry behavior is now validated at design, test-contract, and partial runtime evidence level; full recovery evidence still depends on clearing the Bronze-stage runtime blocker and completing a master-DAG rerun.

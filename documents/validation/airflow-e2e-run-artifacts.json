@@ -1,7 +1,7 @@
 {
   "issue": 72,
   "artifact_version": "1.0.0",
-  "captured_at": "2026-05-30T21:20:41.8615150-04:00",
+  "captured_at": "2026-06-09T10:34:00-04:00",
   "environment": {
     "repo_root": "d:/GitHub/FraudLens",
     "container": "fraudlens",
@@ -19,35 +19,52 @@
     "pytest_airflow_tests": {
       "command": "py -m pytest airflow/tests -q",
       "status": "passed",
-      "summary": "15 passed in 0.16s"
+      "summary": "19 passed in 0.11s"
     },
     "dag_sync": {
       "command": "powershell -ExecutionPolicy Bypass -File scripts/sync_airflow_dags_to_fraudlens_container.ps1",
-      "status": "completed_with_runtime_errors",
-      "summary": "DAG files copied; Airflow CLI import/list checks failed due metadata DB connection refusal"
+      "status": "completed",
+      "summary": "DAG files copied into the Data Lab container"
     },
     "dag_list": {
       "command": "docker exec fraudlens sh -lc \"export FRAUDLENS_REPO_ROOT=/home/datalab/fraudlens; airflow dags list\"",
-      "status": "blocked",
-      "error_type": "infra_dependency",
-      "error": "psycopg2.OperationalError connection refused at localhost:5432"
+      "status": "passed",
+      "summary": "Airflow CLI lists DAGs after starting the managed PostgreSQL service"
     },
     "dag_import_errors": {
       "command": "docker exec fraudlens sh -lc \"export FRAUDLENS_REPO_ROOT=/home/datalab/fraudlens; airflow dags list-import-errors || true\"",
-      "status": "blocked",
-      "error_type": "infra_dependency",
-      "error": "psycopg2.OperationalError connection refused at localhost:5432"
+      "status": "passed",
+      "summary": "No DAG import errors reported"
     }
   },
   "e2e_execution": {
     "pipeline_dag": "fraudlens_pipeline_orchestration",
     "trigger_attempted": false,
-    "blocked_reason": "Airflow metadata database unavailable; DAG runtime commands cannot initialize"
+    "blocked_reason": "Master DAG not yet re-run after runtime recovery; component DAG validation shows remaining Bronze-stage blockers"
   },
   "artifact_completeness": {
-    "runtime_artifacts_present": false,
+    "runtime_artifacts_present": true,
     "expected_root": "airflow/artifacts/orchestration",
-    "notes": "No runtime artifacts can be generated until Airflow metadata DB is reachable"
+    "notes": "Runtime artifacts exist for ingestion, transformation, validation, and failure capture, but the full master-DAG artifact chain is still incomplete"
   },
-  "result": "partially_validated_static_only"
+  "runtime_component_checks": {
+    "ingestion_workflow": {
+      "command": "docker exec fraudlens bash -lc 'export FRAUDLENS_REPO_ROOT=/home/datalab/fraudlens; airflow dags test fraudlens_ingestion_workflow 2026-06-07'",
+      "status": "passed",
+      "artifact": "airflow/artifacts/orchestration/ingestion/20260607T000000/ingestion_summary.json"
+    },
+    "transformation_workflow": {
+      "command": "docker exec fraudlens bash -lc 'export FRAUDLENS_REPO_ROOT=/home/datalab/fraudlens; airflow dags test fraudlens_transformation_workflow 2026-06-08'",
+      "status": "failed",
+      "artifact": "airflow/artifacts/orchestration/transformation/20260608T000000/stages/bronze.json",
+      "summary": "Bronze stage exits with code 1 after successful local runtime bootstrap and parse preflight"
+    },
+    "validation_workflow": {
+      "command": "docker exec fraudlens bash -lc 'export FRAUDLENS_REPO_ROOT=/home/datalab/fraudlens; airflow dags test fraudlens_validation_workflow 2026-06-09'",
+      "status": "failed",
+      "artifact": "airflow/artifacts/orchestration/failures/fraudlens_validation_workflow/20260609T000000/validate_bronze_gate.bronze_tag_test.json",
+      "summary": "Bronze validation gate fails and publishes failure evidence as expected"
+    }
+  },
+  "result": "partially_validated_runtime_incomplete"
 }

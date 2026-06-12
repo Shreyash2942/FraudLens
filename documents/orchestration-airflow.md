@@ -1,6 +1,6 @@
 # Orchestration Airflow
 
-Status date: `2026-05-30`
+Status date: `2026-06-09`
 Milestone scope: `#65` with sub-issues `#66`-`#73`
 Branch: `orchestration-airflow`
 
@@ -12,7 +12,7 @@ This document is the orchestration delivery ledger and closeout summary for the 
 
 ### Issue #72 - End-to-End Pipeline Validation
 
-Outcome: `PARTIALLY CLOSED (static validation complete, runtime blocked)`
+Outcome: `PARTIALLY CLOSED (runtime environment restored, stage execution still incomplete)`
 
 Delivered artifacts:
 
@@ -24,8 +24,12 @@ Delivered artifacts:
 
 Key result:
 
-- Airflow DAG tests pass (`15 passed`)
-- runtime DAG execution remains blocked by Airflow metadata DB connectivity (`localhost:5432 connection refused`)
+- Airflow DAG tests pass (`19 passed`)
+- Airflow metadata DB can be restored and DAG import checks are clean after service startup
+- live runtime validation now includes:
+  - successful ingestion DAG execution
+  - transformation runtime reaching Bronze and failing there
+  - validation runtime publishing failure evidence for the Bronze gate
 
 Commits:
 
@@ -64,8 +68,8 @@ Commits:
 ## Readiness Signal
 
 - Documentation and design handoff for orchestration: `READY`
-- Full runtime e2e validation handoff: `PENDING` (requires Airflow metadata DB availability)
+- Full runtime e2e validation handoff: `PENDING` (requires full master-DAG success and Bronze/dbt readiness)
 
 ## Next Required Action
 
-Restore Airflow metadata DB connectivity in runtime environment, then execute the e2e happy-path and failure/recovery runs from `documents/airflow-e2e-validation-runbook.md` to move readiness from `AMBER` to `GREEN`.
+Replace the remaining Bronze-stage runtime blockers, then execute the master DAG happy-path and failure/recovery runs from `documents/airflow-e2e-validation-runbook.md` to move readiness from `AMBER` to `GREEN`.
