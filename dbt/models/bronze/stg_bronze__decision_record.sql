@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_DECISION_RECORD', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_decision_record', tags=['bronze', 'staging_raw']) }}
 
 select
     src.DECISION_ID as decision_id,

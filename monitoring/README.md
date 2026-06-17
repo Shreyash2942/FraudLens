@@ -1,5 +1,16 @@
 # Monitoring
 
-Reserved for future monitoring, observability, and lineage assets such as dashboard definitions and metric conventions.
+Monitoring, observability, and lineage assets for FraudLens pipeline operations.
 
-Phase 0 intentionally keeps this directory as a placeholder only.
+## Current Contents
+
+- `observability-contract.yaml`
+  - canonical metric and lineage event contract
+- `STANDARDS.md`
+  - directory standards and integration expectations
+
+## Planned Extensions
+
+- Prometheus-facing metric export adapters
+- Grafana dashboard definitions
+- OpenLineage/Marquez integration payload mapping

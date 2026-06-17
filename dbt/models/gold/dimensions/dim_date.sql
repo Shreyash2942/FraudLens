@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_DATE', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_date', tags=['gold', 'dim']) }}
 
 select
     {{ fraudlens_fact_sk(['cast(cal.calendar_date as string)']) }} as dim_date_sk,

@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_FACT_FRAUD_ALERTS', tags=['gold', 'fact'], materialized='incremental') }}
+{{ config(alias='gold_fact_fraud_alerts', tags=['gold', 'fact'], materialized='incremental') }}
 
 with fraud_alerts as (
     select *

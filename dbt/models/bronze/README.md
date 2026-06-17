@@ -18,7 +18,7 @@ Issue `#49` establishes the Bronze dbt layer as the governed access point for ra
 ## Model Naming
 
 - dbt model files: `stg_bronze__<dataset>.sql`
-- built relation alias: `BRONZE_STG_<DATASET>`
+- built relation alias: `bronze_stg_<dataset>`
 
 This avoids collisions with raw Bronze tables named `BRONZE_<DATASET>`.
 

@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_CASE_DISPOSITION', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_case_disposition', tags=['bronze', 'staging_raw']) }}
 
 select
     src.DISPOSITION_ID as disposition_id,

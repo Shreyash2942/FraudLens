@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_ANALYST_TEAM', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_analyst_team', tags=['bronze', 'staging_raw']) }}
 
 select
     src.ANALYST_TEAM_ID as analyst_team_id,

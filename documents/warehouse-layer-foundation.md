@@ -7,6 +7,10 @@ Milestone scope: `#38` with sub-issues `#39`-`#46`
 
 This document consolidates Phase 3 planning, execution sequencing, operations runbooks, and readiness guidance into one warehouse implementation artifact.
 
+## Primary Phase File
+
+Use this as the primary Phase 3 review and handoff file in `documents/`.
+
 ## Scope Consolidated
 
 - `#39` Setup Snowflake environment and access
@@ -89,14 +93,10 @@ Primary failure classes and first-response handling are consolidated for:
 - stage checklist aligns each workstream to execution gates
 - standards and contracts are treated as blocking controls, not advisory guidance
 
-## Consolidation Source Set
+## Consolidation Note
 
-- `documents/phase-3-snowflake-warehouse-plan.md`
-- `documents/phase-3-stage-checklist.md`
-- `documents/phase-3-warehouse-setup-runbook.md`
-- `documents/phase-3-layer-orchestration-runbook.md`
-- `documents/phase-3-troubleshooting.md`
-- `documents/phase-3-issue-commit-summary.md`
+Earlier Phase 3 working documents were consolidated into this file and are not retained separately
+in the root `documents/` directory.
 
 ## Reviewer Notes
 

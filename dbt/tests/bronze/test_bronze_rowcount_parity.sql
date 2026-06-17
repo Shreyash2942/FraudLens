@@ -1,28 +1,43 @@
-with parity as (
-    select
-        'payment_instruction' as dataset_name,
-        (select count(*) from {{ source('bronze', 'payment_instruction') }}) as source_count,
-        (select count(*) from {{ ref('stg_bronze__payment_instruction') }}) as model_count
+with source_counts as (
+    select 'payment_instruction' as dataset_name, count(*) as source_count
+    from {{ source('bronze', 'payment_instruction') }}
     union all
-    select
-        'payment_transaction' as dataset_name,
-        (select count(*) from {{ source('bronze', 'payment_transaction') }}) as source_count,
-        (select count(*) from {{ ref('stg_bronze__payment_transaction') }}) as model_count
+    select 'payment_transaction' as dataset_name, count(*) as source_count
+    from {{ source('bronze', 'payment_transaction') }}
     union all
-    select
-        'risk_signal' as dataset_name,
-        (select count(*) from {{ source('bronze', 'risk_signal') }}) as source_count,
-        (select count(*) from {{ ref('stg_bronze__risk_signal') }}) as model_count
+    select 'risk_signal' as dataset_name, count(*) as source_count
+    from {{ source('bronze', 'risk_signal') }}
     union all
-    select
-        'fraud_alert' as dataset_name,
-        (select count(*) from {{ source('bronze', 'fraud_alert') }}) as source_count,
-        (select count(*) from {{ ref('stg_bronze__fraud_alert') }}) as model_count
+    select 'fraud_alert' as dataset_name, count(*) as source_count
+    from {{ source('bronze', 'fraud_alert') }}
     union all
+    select 'fraud_case' as dataset_name, count(*) as source_count
+    from {{ source('bronze', 'fraud_case') }}
+),
+model_counts as (
+    select 'payment_instruction' as dataset_name, count(*) as model_count
+    from {{ ref('stg_bronze__payment_instruction') }}
+    union all
+    select 'payment_transaction' as dataset_name, count(*) as model_count
+    from {{ ref('stg_bronze__payment_transaction') }}
+    union all
+    select 'risk_signal' as dataset_name, count(*) as model_count
+    from {{ ref('stg_bronze__risk_signal') }}
+    union all
+    select 'fraud_alert' as dataset_name, count(*) as model_count
+    from {{ ref('stg_bronze__fraud_alert') }}
+    union all
+    select 'fraud_case' as dataset_name, count(*) as model_count
+    from {{ ref('stg_bronze__fraud_case') }}
+),
+parity as (
     select
-        'fraud_case' as dataset_name,
-        (select count(*) from {{ source('bronze', 'fraud_case') }}) as source_count,
-        (select count(*) from {{ ref('stg_bronze__fraud_case') }}) as model_count
+        source_counts.dataset_name,
+        source_counts.source_count,
+        model_counts.model_count
+    from source_counts
+    inner join model_counts
+        on source_counts.dataset_name = model_counts.dataset_name
 )
 select
     dataset_name,

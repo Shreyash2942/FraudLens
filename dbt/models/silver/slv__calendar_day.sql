@@ -1,4 +1,4 @@
-{{ config(alias='SILVER_CALENDAR_DAY', tags=['silver', 'conformed']) }}
+{{ config(alias='silver_calendar_day', tags=['silver', 'conformed']) }}
 
 with standardized as (
     select

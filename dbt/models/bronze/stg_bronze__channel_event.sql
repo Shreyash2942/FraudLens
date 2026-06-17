@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_CHANNEL_EVENT', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_channel_event', tags=['bronze', 'staging_raw']) }}
 
 select
     src.CHANNEL_EVENT_ID as channel_event_id,

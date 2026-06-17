@@ -2,6 +2,13 @@
 
 Use this checklist to confirm the repository is ready to move from standards-first planning into future implementation.
 
+## Primary Phase File
+
+Use this as the retained Phase 0 review file in `documents/`.
+The broader project context remains in the canonical cross-phase documents such as
+`project-charter.md`, `architecture-overview.md`, `governance-overview.md`, and
+`github-project-management.md`.
+
 - [x] project name standardized to `FraudLens`
 - [x] canonical Markdown documentation established
 - [x] domain-driven `specs/` structure created

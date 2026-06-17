@@ -7,6 +7,10 @@ Milestone scope: `#21` with sub-issues `#22`-`#28`
 
 This document consolidates Phase 1 platform integration expectations and validation steps for FraudLens.
 
+## Primary Phase File
+
+Use this as the primary Phase 1 review and handoff file in `documents/`.
+
 ## Scope Consolidated
 
 - `#22` Setup Docker environment
@@ -68,4 +72,4 @@ Minimum Definition of Done evidence requires all critical interfaces reachable a
 
 ## Reviewer Notes
 
-Use this as the consolidated Phase 1 review artifact.
+Use this as the retained Phase 1 review artifact.

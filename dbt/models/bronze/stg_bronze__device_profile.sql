@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_DEVICE_PROFILE', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_device_profile', tags=['bronze', 'staging_raw']) }}
 
 select
     src.DEVICE_ID as device_id,

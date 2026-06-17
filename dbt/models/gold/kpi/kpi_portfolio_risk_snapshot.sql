@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_KPI_PORTFOLIO_RISK_SNAPSHOT', tags=['gold', 'kpi']) }}
+{{ config(alias='gold_kpi_portfolio_risk_snapshot', tags=['gold', 'kpi']) }}
 
 with payment_event_rollup as (
     select

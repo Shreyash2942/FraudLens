@@ -39,6 +39,7 @@ data/**/validation_report.json
 # Local Hive runtime artifacts
 warehouse/snowflake-warehouse-setup/sql/bronze/hive/runtime_sql/
 derby.log
+airflow/artifacts/
 
 # dbt local artifacts
 dbt/target/

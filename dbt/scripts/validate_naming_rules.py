@@ -54,8 +54,8 @@ def _validate_model_naming(manifest: dict) -> tuple[list[str], int]:
             )
 
         alias = str(node.get("alias", ""))
-        if alias and alias != alias.upper():
-            errors.append(f"{model_name}: alias must be uppercase; found '{alias}'")
+        if alias and not SNAKE_CASE_PATTERN.match(alias):
+            errors.append(f"{model_name}: alias must be lowercase snake_case; found '{alias}'")
 
         tags = set(node.get("tags", []))
         if "bronze" in original_file_path and "bronze" not in tags:

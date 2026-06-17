@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_KPI_DAILY_FRAUD_OPERATIONS', tags=['gold', 'kpi']) }}
+{{ config(alias='gold_kpi_daily_fraud_operations', tags=['gold', 'kpi']) }}
 
 select
     fdm.metric_date,

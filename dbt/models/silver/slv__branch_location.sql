@@ -1,4 +1,4 @@
-{{ config(alias='SILVER_BRANCH_LOCATION', tags=['silver', 'conformed']) }}
+{{ config(alias='silver_branch_location', tags=['silver', 'conformed']) }}
 
 with standardized as (
     select

@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_PAYMENT_CARD', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_payment_card', tags=['bronze', 'staging_raw']) }}
 
 select
     src.CARD_ID as card_id,

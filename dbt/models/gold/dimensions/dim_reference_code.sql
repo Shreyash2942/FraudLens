@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_REFERENCE_CODE', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_reference_code', tags=['gold', 'dim']) }}
 
 select
     {{ fraudlens_fact_sk(['rc.code_set_name', 'rc.code_value']) }} as dim_reference_code_sk,

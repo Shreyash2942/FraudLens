@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_PARTY', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_party', tags=['bronze', 'staging_raw']) }}
 
 select
     src.PARTY_ID as party_id,

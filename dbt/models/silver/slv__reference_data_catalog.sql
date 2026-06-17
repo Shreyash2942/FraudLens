@@ -1,4 +1,4 @@
-{{ config(alias='SILVER_REFERENCE_DATA_CATALOG', tags=['silver', 'conformed']) }}
+{{ config(alias='silver_reference_data_catalog', tags=['silver', 'conformed']) }}
 
 with standardized as (
     select

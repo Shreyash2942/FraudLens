@@ -1,4 +1,4 @@
-{{ config(alias='GOLD_DIM_BRANCH', tags=['gold', 'dim']) }}
+{{ config(alias='gold_dim_branch', tags=['gold', 'dim']) }}
 
 select
     {{ fraudlens_fact_sk(['bl.branch_id']) }} as dim_branch_sk,

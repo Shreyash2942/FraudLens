@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_DEPOSIT_ACCOUNT', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_deposit_account', tags=['bronze', 'staging_raw']) }}
 
 select
     src.DEPOSIT_ACCOUNT_ID as deposit_account_id,

@@ -1,4 +1,4 @@
-{{ config(alias='BRONZE_STG_FRAUD_CASE', tags=['bronze', 'staging_raw']) }}
+{{ config(alias='bronze_stg_fraud_case', tags=['bronze', 'staging_raw']) }}
 
 select
     src.FRAUD_CASE_ID as fraud_case_id,

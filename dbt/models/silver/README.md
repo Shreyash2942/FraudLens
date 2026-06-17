@@ -21,7 +21,7 @@ Each model follows a consistent 3-step pattern:
 ## Naming and Build Output
 
 - dbt model files: `slv__<dataset>.sql`
-- built relation alias: `SILVER_<DATASET>`
+- built relation alias: `silver_<dataset>`
 
 ## Validation Assets
 

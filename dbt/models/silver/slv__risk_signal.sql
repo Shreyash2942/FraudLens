@@ -1,4 +1,4 @@
-{{ config(alias='SILVER_RISK_SIGNAL', tags=['silver', 'conformed']) }}
+{{ config(alias='silver_risk_signal', tags=['silver', 'conformed']) }}
 
 with standardized as (
     select

@@ -1,0 +1,50 @@
+metrics_contract_version: 1.0
+lineage_contract_version: 1.0
+
+metrics:
+  namespace_pattern: fraudlens.orchestration.<profile>
+  stream_path_pattern: airflow/artifacts/observability/metrics/<workflow>/<run_stamp>/metric_events.jsonl
+  required_fields:
+    - metric_name
+    - metric_value
+    - metric_type
+    - emitted_at_utc
+    - dag_id
+    - run_id
+    - batch_id
+    - run_profile
+    - run_target
+    - workflow
+  metric_types:
+    - gauge
+    - counter
+  canonical_metrics:
+    - metric_name: pipeline_run_status
+      metric_type: gauge
+      value_rule: 1 for success, 0 for failure
+    - metric_name: pipeline_artifact_completeness
+      metric_type: gauge
+      value_rule: completed_stage_artifacts / expected_stage_artifacts
+
+lineage:
+  namespace_pattern: fraudlens.orchestration.<profile>
+  stream_path_pattern: airflow/artifacts/observability/lineage/<workflow>/<run_stamp>/lineage_events.jsonl
+  required_fields:
+    - event_type
+    - event_time_utc
+    - namespace
+    - job_name
+    - run_id
+    - batch_id
+    - run_profile
+    - status
+    - inputs
+    - outputs
+  event_types:
+    - pipeline_run_completed
+    - stage_transition
+    - quality_gate_result
+  status_values:
+    - SUCCESS
+    - FAILED
+    - PARTIAL
