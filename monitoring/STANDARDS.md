@@ -9,13 +9,17 @@ This directory contains executable or contract assets for FraudLens observabilit
   - stream storage path patterns for artifact-first review
 - `metrics-catalog.md`
   - Phase 7 metric names, types, labels, and dashboard usage
+- `alert-thresholds.md`
+  - Phase 7 alert threshold guidance
+- `prometheus/`
+  - Prometheus scrape configuration and FraudLens metric adapter assets
 - `README.md`
   - scope and usage index
 
 ## Integration Targets
 
 - Airflow orchestration run emitters
-- future Prometheus exporter adaptation
+- Prometheus metric collection
 - future OpenLineage/Marquez integration bridge
 
 ## Rule
@@ -33,3 +37,11 @@ When adding new observability assets, include:
 - avoid raw exception text, command text, SQL text, timestamps, and full file paths as labels
 - put high-detail debugging context in logs or artifacts instead of metric labels
 - keep Prometheus-facing metric names aligned with the `fraudlens_` prefix
+
+## Prometheus Asset Standards
+
+- keep `prometheus.yml` parseable as standard Prometheus YAML
+- keep local service targets labeled with `environment` and `service_name`
+- keep adapter mapping names aligned with `metrics-catalog.md`
+- include sample input and expected output whenever mapping behavior changes
+- update `prometheus/storage-verification.md` when storage evidence expectations change
