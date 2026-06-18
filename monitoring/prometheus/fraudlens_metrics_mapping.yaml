@@ -1,0 +1,75 @@
+mapping_version: 1.0
+prometheus_metric_prefix: fraudlens_
+
+source:
+  event_stream_pattern: airflow/artifacts/observability/metrics/<workflow>/<run_stamp>/metric_events.jsonl
+  required_fields:
+    - metric_name
+    - metric_value
+    - metric_type
+    - emitted_at_utc
+    - run_profile
+    - run_target
+    - workflow
+
+labels:
+  allowed:
+    - environment
+    - run_profile
+    - run_target
+    - dag_id
+    - workflow
+    - stage
+    - task_id
+    - batch_id
+    - status
+    - failure_category
+    - quality_gate
+    - severity
+    - dataset_name
+    - service_name
+    - lineage_namespace
+    - lineage_event_type
+  defaults:
+    environment: local
+    stage: pipeline
+    status: unknown
+  blocked_sources:
+    - raw_exception_message
+    - full_file_path
+    - command_text
+    - sql_text
+    - timestamp
+
+metrics:
+  pipeline_run_status:
+    prometheus_name: fraudlens_pipeline_run_status
+    type: gauge
+    help: FraudLens pipeline run status, 1 for success and 0 for failure.
+  pipeline_artifact_completeness:
+    prometheus_name: fraudlens_pipeline_artifact_completeness
+    type: gauge
+    help: Completed run artifacts divided by expected run artifacts.
+  pipeline_stage_duration_seconds:
+    prometheus_name: fraudlens_pipeline_stage_duration_seconds
+    type: gauge
+    help: FraudLens pipeline stage duration in seconds.
+  pipeline_failure_total:
+    prometheus_name: fraudlens_pipeline_failure_total
+    type: counter
+    help: FraudLens pipeline failures by stage and failure category.
+  pipeline_lineage_event_total:
+    prometheus_name: fraudlens_pipeline_lineage_event_total
+    type: counter
+    help: FraudLens lineage events emitted by type and status.
+
+self_metrics:
+  parsed_events_total:
+    prometheus_name: fraudlens_metric_adapter_events_parsed_total
+    type: counter
+    help: Metric events parsed by the FraudLens Prometheus adapter.
+  skipped_events_total:
+    prometheus_name: fraudlens_metric_adapter_events_skipped_total
+    type: counter
+    help: Metric events skipped by the FraudLens Prometheus adapter.
+
