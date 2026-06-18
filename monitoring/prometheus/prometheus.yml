@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: fraudlens_metrics_exporter
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9108
+        labels:
+          environment: local
+          service_name: fraudlens_metrics_exporter
+
+  - job_name: prometheus
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9090
+        labels:
+          environment: local
+          service_name: prometheus
+
