@@ -13,4 +13,3 @@ fraudlens_metric_adapter_events_parsed_total 3
 # HELP fraudlens_metric_adapter_events_skipped_total Metric events skipped by the FraudLens Prometheus adapter.
 # TYPE fraudlens_metric_adapter_events_skipped_total counter
 fraudlens_metric_adapter_events_skipped_total 0
-
