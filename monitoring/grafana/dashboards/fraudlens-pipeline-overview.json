@@ -1,0 +1,88 @@
+{
+  "uid": "fraudlens-pipeline-overview",
+  "title": "FraudLens Pipeline Overview",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "timezone": "browser",
+  "tags": ["fraudlens", "phase-7", "pipeline"],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_run_status, environment)",
+        "current": {"text": "local", "value": "local"}
+      },
+      {
+        "name": "run_profile",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_run_status{environment=\"$environment\"}, run_profile)",
+        "current": {"text": "local", "value": "local"}
+      },
+      {
+        "name": "workflow",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_stage_status{environment=\"$environment\",run_profile=\"$run_profile\"}, workflow)",
+        "current": {"text": "pipeline", "value": "pipeline"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Latest Run Status",
+      "type": "stat",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "fraudlens_pipeline_run_status{environment=\"$environment\",run_profile=\"$run_profile\"}"
+        }
+      ],
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "Artifact Completeness",
+      "type": "gauge",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "fraudlens_pipeline_artifact_completeness{environment=\"$environment\",run_profile=\"$run_profile\"}"
+        }
+      ],
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "id": 3,
+      "title": "Stage Status",
+      "type": "table",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "fraudlens_pipeline_stage_status{environment=\"$environment\",run_profile=\"$run_profile\"}"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+    },
+    {
+      "id": 4,
+      "title": "Failures By Stage",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (stage, failure_category) (increase(fraudlens_pipeline_failure_total{environment=\"$environment\",run_profile=\"$run_profile\"}[1h]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+    }
+  ]
+}
