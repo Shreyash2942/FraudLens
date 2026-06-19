@@ -266,7 +266,12 @@ def runtime_failure_callback(context: dict[str, Any]) -> None:
     if isinstance(conf, dict):
         profile = conf.get("profile")
     write_orchestration_artifact(target, payload, profile=profile, artifact_type="failure_artifact")
-    print(json.dumps({"event": "task_failure_classified", **payload}))
+    log_orchestration_event(
+        "ERROR",
+        "task_failure_classified",
+        **payload,
+        artifact_reference=_repo_relative_path(target),
+    )
 
 
 def canonical_run_metadata(
