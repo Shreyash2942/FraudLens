@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import io
+import json
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 
 
@@ -51,6 +54,25 @@ class LoggingVisibilityTest(unittest.TestCase):
         for task_id, error_text, expected_category in cases:
             with self.subTest(task_id=task_id):
                 self.assertEqual(self.common.classify_failure_category(task_id, error_text), expected_category)
+
+    def test_structured_logger_redacts_sensitive_values(self) -> None:
+        output = io.StringIO()
+        with redirect_stdout(output):
+            self.common.log_orchestration_event(
+                "info",
+                "credential_probe",
+                batch_id="batch_001",
+                password="plain-text",
+                nested={"access_token": "token-value", "safe_field": "visible"},
+            )
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(payload["level"], "INFO")
+        self.assertEqual(payload["event"], "credential_probe")
+        self.assertEqual(payload["batch_id"], "batch_001")
+        self.assertEqual(payload["password"], self.common.REDACTED_LOG_VALUE)
+        self.assertEqual(payload["nested"]["access_token"], self.common.REDACTED_LOG_VALUE)
+        self.assertEqual(payload["nested"]["safe_field"], "visible")
 
 
 if __name__ == "__main__":
