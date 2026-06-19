@@ -40,6 +40,18 @@ class LoggingVisibilityTest(unittest.TestCase):
         }
         self.assertTrue(expected_fields.issubset(set(self.common.LOG_CONTEXT_FIELDS)))
 
+    def test_failure_category_classifier_supports_triage_taxonomy(self) -> None:
+        cases = [
+            ("check_input_assets", "missing input", "infra_transient"),
+            ("validate_contract_alignment", "contract mismatch", "config_contract"),
+            ("run_quality_gate", "accepted values failed", "data_quality"),
+            ("publish_governance_traceability", "policy blocked", "governance_block"),
+            ("unknown_task", "unexpected failure", "unknown"),
+        ]
+        for task_id, error_text, expected_category in cases:
+            with self.subTest(task_id=task_id):
+                self.assertEqual(self.common.classify_failure_category(task_id, error_text), expected_category)
+
 
 if __name__ == "__main__":
     unittest.main()
