@@ -51,6 +51,32 @@ RUN_METADATA_FIELDS: tuple[str, ...] = (
     "run_status",
     "failure_category",
 )
+LOG_CONTEXT_FIELDS: tuple[str, ...] = (
+    "pipeline_run_id",
+    "batch_id",
+    "dag_id",
+    "task_id",
+    "task_group",
+    "run_profile",
+    "run_target",
+    "workflow",
+    "stage",
+    "status",
+    "failure_category",
+    "artifact_reference",
+)
+REDACTED_LOG_VALUE = "***REDACTED***"
+SENSITIVE_LOG_FIELD_MARKERS: tuple[str, ...] = (
+    "password",
+    "passwd",
+    "secret",
+    "token",
+    "credential",
+    "connection_uri",
+    "mongodb_uri",
+    "access_key",
+    "private_key",
+)
 
 
 def load_orchestration_profile_contract() -> dict[str, Any]:
@@ -280,6 +306,21 @@ def utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def redact_log_field(key: str, value: Any) -> Any:
+    normalized_key = key.lower()
+    if any(marker in normalized_key for marker in SENSITIVE_LOG_FIELD_MARKERS):
+        return REDACTED_LOG_VALUE
+    if isinstance(value, dict):
+        return redact_log_payload(value)
+    if isinstance(value, list):
+        return [redact_log_field(key, item) for item in value]
+    return value
+
+
+def redact_log_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    return {key: redact_log_field(key, value) for key, value in payload.items()}
+
+
 def log_orchestration_event(level: str, event: str, **fields: Any) -> None:
     payload = {
         "level": level.upper(),
@@ -287,7 +328,7 @@ def log_orchestration_event(level: str, event: str, **fields: Any) -> None:
         "timestamp_utc": utc_now_iso(),
         **fields,
     }
-    print(json.dumps(payload))
+    print(json.dumps(redact_log_payload(payload)))
 
 
 def artifact_backend_settings(profile: str | None) -> dict[str, str]:
