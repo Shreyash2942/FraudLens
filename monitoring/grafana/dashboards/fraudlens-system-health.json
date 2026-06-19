@@ -1,0 +1,89 @@
+{
+  "uid": "fraudlens-system-health",
+  "title": "FraudLens System Health",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "timezone": "browser",
+  "tags": ["fraudlens", "phase-7", "system-health"],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(up, environment)",
+        "current": {"text": "local", "value": "local"}
+      },
+      {
+        "name": "service_name",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(up{environment=\"$environment\"}, service_name)",
+        "current": {"text": "airflow", "value": "airflow"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Prometheus Target Health",
+      "type": "stat",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{environment=\"$environment\"}"
+        }
+      ],
+      "gridPos": {"h": 6, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "FraudLens Service Health",
+      "type": "stat",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "fraudlens_service_health_status{environment=\"$environment\"}"
+        }
+      ],
+      "gridPos": {"h": 6, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "id": 3,
+      "title": "Service Response Time",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "fraudlens_service_response_time_seconds{environment=\"$environment\",service_name=\"$service_name\"}"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6}
+    },
+    {
+      "id": 4,
+      "title": "Runtime Resource Availability",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "fraudlens_runtime_memory_utilization_percent{environment=\"$environment\",service_name=\"$service_name\"}"
+        },
+        {
+          "refId": "B",
+          "expr": "fraudlens_runtime_cpu_utilization_percent{environment=\"$environment\",service_name=\"$service_name\"}"
+        },
+        {
+          "refId": "C",
+          "expr": "fraudlens_runtime_disk_free_bytes{environment=\"$environment\",service_name=\"$service_name\"}"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6}
+    }
+  ]
+}
