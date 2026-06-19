@@ -527,6 +527,28 @@ def write_orchestration_artifact(
                 error=repr(exc),
             )
 
+    artifact_reference = _repo_relative_path(target)
+    log_fields: dict[str, Any] = {
+        "artifact_reference": artifact_reference,
+        "artifact_path": artifact_reference,
+        "artifact_type": artifact_type,
+        "artifact_backend": backend,
+    }
+    for key in (
+        "dag_id",
+        "task_id",
+        "run_id",
+        "run_stamp",
+        "pipeline_run_id",
+        "batch_id",
+        "status",
+        "run_status",
+        "failure_category",
+        "stage",
+    ):
+        if key in payload:
+            log_fields[key] = payload[key]
+    log_orchestration_event("INFO", "artifact_published", **log_fields)
     return target
 
 
@@ -685,7 +707,17 @@ def emit_metric_event(
             profile=run_profile,
             artifact_type="observability_metric_event",
         )
-    log_orchestration_event("INFO", "metric_event_emitted", metric_name=metric_name, target_file=str(target))
+    artifact_reference = _repo_relative_path(target)
+    log_orchestration_event(
+        "INFO",
+        "metric_event_emitted",
+        metric_name=metric_name,
+        workflow=workflow,
+        run_stamp=run_stamp,
+        run_profile=run_profile,
+        artifact_reference=artifact_reference,
+        target_file=artifact_reference,
+    )
     return target
 
 
@@ -719,5 +751,15 @@ def emit_lineage_event(
             profile=run_profile,
             artifact_type="observability_lineage_event",
         )
-    log_orchestration_event("INFO", "lineage_event_emitted", event_type=event_type, target_file=str(target))
+    artifact_reference = _repo_relative_path(target)
+    log_orchestration_event(
+        "INFO",
+        "lineage_event_emitted",
+        event_type=event_type,
+        workflow=workflow,
+        run_stamp=run_stamp,
+        run_profile=run_profile,
+        artifact_reference=artifact_reference,
+        target_file=artifact_reference,
+    )
     return target
