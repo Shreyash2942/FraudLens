@@ -12,12 +12,13 @@ Monitoring, observability, and lineage assets for FraudLens pipeline operations.
   - conservative alert threshold guidance
 - `prometheus/`
   - Prometheus scrape configuration, FraudLens metric adapter assets, samples, and storage verification
+- `grafana/`
+  - Grafana datasource provisioning, dashboard provisioning, dashboards, and validation guidance
 - `STANDARDS.md`
   - directory standards and integration expectations
 
 ## Planned Extensions
 
-- Grafana dashboard definitions
 - OpenLineage/Marquez integration payload mapping
 
 ## Prometheus Quick Start
@@ -31,3 +32,10 @@ py monitoring\prometheus\render_fraudlens_metrics.py monitoring\prometheus\sampl
 
 3. Compare output with `prometheus/expected-fraudlens-metrics.prom`.
 4. Use `prometheus/storage-verification.md` after Data-Lab Prometheus is running.
+
+## Grafana Quick Start
+
+1. Review `grafana/provisioning/datasources/prometheus.yaml`.
+2. Import or provision dashboards from `grafana/dashboards/`.
+3. Validate the Prometheus datasource UID is `prometheus`.
+4. Use `grafana/provisioning.md` for dashboard smoke tests and evidence capture.

@@ -13,6 +13,8 @@ This directory contains executable or contract assets for FraudLens observabilit
   - Phase 7 alert threshold guidance
 - `prometheus/`
   - Prometheus scrape configuration and FraudLens metric adapter assets
+- `grafana/`
+  - Grafana provisioning and dashboard assets
 - `README.md`
   - scope and usage index
 
@@ -20,6 +22,7 @@ This directory contains executable or contract assets for FraudLens observabilit
 
 - Airflow orchestration run emitters
 - Prometheus metric collection
+- Grafana operational dashboards
 - future OpenLineage/Marquez integration bridge
 
 ## Rule
@@ -45,3 +48,11 @@ When adding new observability assets, include:
 - keep adapter mapping names aligned with `metrics-catalog.md`
 - include sample input and expected output whenever mapping behavior changes
 - update `prometheus/storage-verification.md` when storage evidence expectations change
+
+## Grafana Asset Standards
+
+- keep dashboard JSON files parseable and version-controlled
+- use datasource UID `prometheus`
+- keep dashboard variables aligned with governed metric labels
+- do not hard-code run IDs, batch IDs, or local hostnames into PromQL queries
+- update dashboard validation tests when dashboards or query conventions change
