@@ -37,6 +37,8 @@ from synthetic_generator.contracts import DATASET_ORDER
 
 ORCHESTRATION_PROFILE_PATH = REPO_ROOT / "airflow" / "config" / "orchestration_profiles.yml"
 RUN_METADATA_SCHEMA_VERSION = "1.0"
+OPENLINEAGE_EVENT_SCHEMA_VERSION = "1.0"
+DEFAULT_OPENLINEAGE_PRODUCER = "https://github.com/Shreyash2942/FraudLens"
 RUN_METADATA_FIELDS: tuple[str, ...] = (
     "pipeline_run_id",
     "batch_id",
@@ -672,6 +674,107 @@ def observability_settings(profile: str | None) -> dict[str, Any]:
 def observability_enabled(profile: str | None) -> bool:
     section = observability_settings(profile)
     return parse_bool(section.get("enabled"), default=True)
+
+
+def openlineage_settings(profile: str | None) -> dict[str, str]:
+    section = observability_settings(profile)
+    return {
+        "enabled": str(parse_bool(section.get("openlineage_enabled"), default=True)).lower(),
+        "transport": str(section.get("openlineage_transport", "http")).strip().lower() or "http",
+        "url_env": str(section.get("openlineage_url_env", "OPENLINEAGE_URL")).strip() or "OPENLINEAGE_URL",
+        "default_url": str(section.get("openlineage_default_url", "")).strip(),
+        "producer": str(section.get("openlineage_producer", DEFAULT_OPENLINEAGE_PRODUCER)).strip()
+        or DEFAULT_OPENLINEAGE_PRODUCER,
+    }
+
+
+def openlineage_event_type(status: str | None) -> str:
+    normalized_status = str(status or "").strip().upper()
+    if normalized_status == "SUCCESS":
+        return "COMPLETE"
+    if normalized_status == "FAILED":
+        return "FAIL"
+    return "OTHER"
+
+
+def openlineage_dataset(dataset: Any, *, default_namespace: str) -> dict[str, Any]:
+    if isinstance(dataset, dict):
+        namespace = str(dataset.get("namespace") or default_namespace).strip() or default_namespace
+        name = str(dataset.get("name") or dataset.get("dataset") or dataset.get("path") or "").strip()
+        facets = dataset.get("facets", {})
+    else:
+        namespace = default_namespace
+        name = str(dataset).strip()
+        facets = {}
+    payload: dict[str, Any] = {
+        "namespace": namespace,
+        "name": name,
+    }
+    if isinstance(facets, dict) and facets:
+        payload["facets"] = facets
+    return payload
+
+
+def build_openlineage_event(
+    *,
+    job_name: str,
+    run_id: str,
+    run_profile: str,
+    event_time_utc: str,
+    status: str,
+    inputs: list[Any] | None = None,
+    outputs: list[Any] | None = None,
+    batch_id: str | None = None,
+    namespace: str | None = None,
+    producer: str | None = None,
+    run_facets: dict[str, Any] | None = None,
+    job_facets: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    lineage_namespace = namespace or str(
+        observability_settings(run_profile).get("lineage_namespace", f"fraudlens.orchestration.{run_profile}")
+    )
+    fraudlens_run_facet: dict[str, Any] = {
+        "_producer": producer or DEFAULT_OPENLINEAGE_PRODUCER,
+        "_schemaURL": "https://fraudlens.local/openlineage/facets/fraudlens-run-v1.json",
+        "pipeline_run_id": run_id,
+        "run_profile": run_profile,
+        "status": status,
+    }
+    if batch_id:
+        fraudlens_run_facet["batch_id"] = batch_id
+
+    merged_run_facets = {"fraudlens_run": fraudlens_run_facet}
+    if run_facets:
+        merged_run_facets.update(run_facets)
+
+    merged_job_facets = dict(job_facets or {})
+    merged_job_facets.setdefault(
+        "fraudlens_job",
+        {
+            "_producer": producer or DEFAULT_OPENLINEAGE_PRODUCER,
+            "_schemaURL": "https://fraudlens.local/openlineage/facets/fraudlens-job-v1.json",
+            "job_name": job_name,
+            "run_profile": run_profile,
+        },
+    )
+
+    return {
+        "eventType": openlineage_event_type(status),
+        "eventTime": event_time_utc,
+        "producer": producer or DEFAULT_OPENLINEAGE_PRODUCER,
+        "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json",
+        "run": {
+            "runId": run_id,
+            "facets": merged_run_facets,
+        },
+        "job": {
+            "namespace": lineage_namespace,
+            "name": job_name,
+            "facets": merged_job_facets,
+        },
+        "inputs": [openlineage_dataset(item, default_namespace=lineage_namespace) for item in inputs or []],
+        "outputs": [openlineage_dataset(item, default_namespace=lineage_namespace) for item in outputs or []],
+    }
 
 
 def observability_artifact_dir(signal_type: str, workflow: str, run_stamp: str) -> Path:
