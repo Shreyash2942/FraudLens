@@ -14,15 +14,16 @@ Monitoring, observability, and lineage assets for FraudLens pipeline operations.
   - Prometheus scrape configuration, FraudLens metric adapter assets, samples, and storage verification
 - `grafana/`
   - Grafana datasource provisioning, dashboard provisioning, dashboards, and validation guidance
+- `marquez/`
+  - Marquez environment defaults, visualization checklist, and lineage validation guidance
 - `STANDARDS.md`
   - directory standards and integration expectations
 - OpenLineage documentation
   - `../documents/openlineage-tracking-contract.md`
   - `../documents/openlineage-airflow-dbt-runbook.md`
-
-## Planned Extensions
-
-- Marquez visualization and delivery validation assets
+- Marquez documentation
+  - `../documents/marquez-lineage-visualization-design.md`
+  - `../documents/marquez-lineage-visualization-runbook.md`
 
 ## Prometheus Quick Start
 
@@ -42,3 +43,11 @@ py monitoring\prometheus\render_fraudlens_metrics.py monitoring\prometheus\sampl
 2. Import or provision dashboards from `grafana/dashboards/`.
 3. Validate the Prometheus datasource UID is `prometheus`.
 4. Use `grafana/provisioning.md` for dashboard smoke tests and evidence capture.
+
+## Marquez Quick Start
+
+1. Review `marquez/marquez.env.example`.
+2. Run `py scripts\check_marquez_health.py`.
+3. Dry-run event delivery with `py scripts\deliver_openlineage_to_marquez.py --input <lineage_jsonl>`.
+4. Send events with `--send` after dry-run validation succeeds.
+5. Use `../documents/marquez-lineage-visualization-runbook.md` for UI evidence capture.
