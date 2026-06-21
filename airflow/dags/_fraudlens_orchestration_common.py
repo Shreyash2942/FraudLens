@@ -841,10 +841,29 @@ def emit_lineage_event(
     namespace = str(section.get("lineage_namespace", f"fraudlens.orchestration.{run_profile}")).strip()
     target_dir = observability_artifact_dir("lineage", workflow, run_stamp)
     target = target_dir / "lineage_events.jsonl"
+    event_time_utc = utc_now_iso()
+    status = str(payload.get("status", "UNKNOWN"))
+    producer = openlineage_settings(run_profile)["producer"]
+    openlineage_event = build_openlineage_event(
+        job_name=str(payload.get("job_name", f"fraudlens_{workflow}")),
+        run_id=str(payload.get("run_id", run_stamp)),
+        run_profile=run_profile,
+        event_time_utc=event_time_utc,
+        status=status,
+        inputs=list(payload.get("inputs", [])) if isinstance(payload.get("inputs", []), list) else [],
+        outputs=list(payload.get("outputs", [])) if isinstance(payload.get("outputs", []), list) else [],
+        batch_id=str(payload.get("batch_id", "")) if payload.get("batch_id") is not None else None,
+        namespace=namespace,
+        producer=producer,
+        run_facets=payload.get("run_facets") if isinstance(payload.get("run_facets"), dict) else None,
+        job_facets=payload.get("job_facets") if isinstance(payload.get("job_facets"), dict) else None,
+    )
     event = {
         "event_type": event_type,
-        "event_time_utc": utc_now_iso(),
+        "event_time_utc": event_time_utc,
         "namespace": namespace,
+        "openlineage_schema_version": OPENLINEAGE_EVENT_SCHEMA_VERSION,
+        "openlineage_event": openlineage_event,
         **payload,
     }
     backend = artifact_backend_settings(run_profile)["backend"]
