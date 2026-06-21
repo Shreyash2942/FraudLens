@@ -16,10 +16,13 @@ Monitoring, observability, and lineage assets for FraudLens pipeline operations.
   - Grafana datasource provisioning, dashboard provisioning, dashboards, and validation guidance
 - `STANDARDS.md`
   - directory standards and integration expectations
+- OpenLineage documentation
+  - `../documents/openlineage-tracking-contract.md`
+  - `../documents/openlineage-airflow-dbt-runbook.md`
 
 ## Planned Extensions
 
-- OpenLineage/Marquez integration payload mapping
+- Marquez visualization and delivery validation assets
 
 ## Prometheus Quick Start
 
