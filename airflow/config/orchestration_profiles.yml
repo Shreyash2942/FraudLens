@@ -80,6 +80,11 @@ profiles:
       mongodb_collection: orchestration_artifacts
       metrics_namespace: fraudlens.orchestration.local
       lineage_namespace: fraudlens.orchestration.local
+      openlineage_enabled: true
+      openlineage_transport: http
+      openlineage_url_env: OPENLINEAGE_URL
+      openlineage_default_url: http://localhost:5000
+      openlineage_producer: https://github.com/Shreyash2942/FraudLens
 
   ci:
     description: CI contract mode without dataset load execution.
@@ -117,6 +122,11 @@ profiles:
       mongodb_collection: orchestration_artifacts
       metrics_namespace: fraudlens.orchestration.ci
       lineage_namespace: fraudlens.orchestration.ci
+      openlineage_enabled: true
+      openlineage_transport: file
+      openlineage_url_env: OPENLINEAGE_URL
+      openlineage_default_url: ""
+      openlineage_producer: https://github.com/Shreyash2942/FraudLens
 
   snowflake:
     description: Future Snowflake COPY INTO mode (scaffold only).
@@ -154,3 +164,8 @@ profiles:
       mongodb_collection: orchestration_artifacts
       metrics_namespace: fraudlens.orchestration.snowflake
       lineage_namespace: fraudlens.orchestration.snowflake
+      openlineage_enabled: true
+      openlineage_transport: http
+      openlineage_url_env: OPENLINEAGE_URL
+      openlineage_default_url: ""
+      openlineage_producer: https://github.com/Shreyash2942/FraudLens
