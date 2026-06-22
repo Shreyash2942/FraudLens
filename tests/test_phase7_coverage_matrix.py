@@ -40,6 +40,19 @@ class Phase7CoverageMatrixTest(unittest.TestCase):
         self.assertEqual(result["missing_layers"], [])
         self.assertEqual(result["missing_evidence"], [])
 
+    def test_lineage_covers_ingestion_transformation_and_serving(self) -> None:
+        layers = {item["layer"]: item for item in self.matrix["pipeline_layers"]}
+        self.assertEqual(set(layers), {"ingestion", "transformation", "serving"})
+        self.assertIn("input batch dataset", layers["ingestion"]["lineage"])
+        self.assertIn("dbt_transformation_completed", layers["transformation"]["lineage"])
+        self.assertIn("kpi outputs", layers["serving"]["lineage"])
+        for layer_name, layer in layers.items():
+            with self.subTest(layer=layer_name):
+                self.assertEqual(layer["status"], "covered")
+                self.assertGreaterEqual(len(layer["metrics"]), 2)
+                self.assertGreaterEqual(len(layer["logs"]), 2)
+                self.assertGreaterEqual(len(layer["lineage"]), 2)
+
 
 if __name__ == "__main__":
     unittest.main()
