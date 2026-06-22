@@ -16,8 +16,15 @@ Monitoring, observability, and lineage assets for FraudLens pipeline operations.
   - Grafana datasource provisioning, dashboard provisioning, dashboards, and validation guidance
 - `marquez/`
   - Marquez environment defaults, visualization checklist, and lineage validation guidance
+- `coverage/`
+  - observability and lineage coverage matrix
 - `STANDARDS.md`
   - directory standards and integration expectations
+- Phase 7 setup documentation
+  - `../documents/observability-lineage-setup-guide.md`
+  - `../documents/observability-metrics-dashboards-guide.md`
+  - `../documents/lineage-interpretation-guide.md`
+  - `../documents/observability-lineage-troubleshooting-guide.md`
 - OpenLineage documentation
   - `../documents/openlineage-tracking-contract.md`
   - `../documents/openlineage-airflow-dbt-runbook.md`
@@ -51,3 +58,10 @@ py monitoring\prometheus\render_fraudlens_metrics.py monitoring\prometheus\sampl
 3. Dry-run event delivery with `py scripts\deliver_openlineage_to_marquez.py --input <lineage_jsonl>`.
 4. Send events with `--send` after dry-run validation succeeds.
 5. Use `../documents/marquez-lineage-visualization-runbook.md` for UI evidence capture.
+
+## Coverage Validation
+
+1. Review `coverage/observability-lineage-coverage.json`.
+2. Run `py scripts\validate_observability_lineage_coverage.py`.
+3. Run `py -m pytest tests\test_phase7_coverage_matrix.py tests\test_phase7_documentation_complete.py -q`.
+4. Use `../documents/observability-lineage-coverage-readiness-report.md` for closure evidence.
