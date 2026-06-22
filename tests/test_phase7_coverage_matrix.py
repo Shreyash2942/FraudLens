@@ -53,6 +53,25 @@ class Phase7CoverageMatrixTest(unittest.TestCase):
                 self.assertGreaterEqual(len(layer["logs"]), 2)
                 self.assertGreaterEqual(len(layer["lineage"]), 2)
 
+    def test_production_like_readiness_gaps_are_explicit(self) -> None:
+        readiness = {item["criterion"]: item for item in self.matrix["production_like_readiness"]}
+        self.assertEqual(
+            set(readiness),
+            {
+                "metrics_collected",
+                "dashboards_available",
+                "logs_debuggable",
+                "lineage_captured",
+                "lineage_visualizable",
+            },
+        )
+        self.assertEqual(readiness["metrics_collected"]["status"], "covered")
+        self.assertEqual(readiness["dashboards_available"]["status"], "covered")
+        self.assertEqual(readiness["logs_debuggable"]["status"], "covered")
+        self.assertEqual(readiness["lineage_captured"]["status"], "covered")
+        self.assertEqual(readiness["lineage_visualizable"]["status"], "partial")
+        self.assertIn("Requires live Marquez service", readiness["lineage_visualizable"]["gap"])
+
 
 if __name__ == "__main__":
     unittest.main()
