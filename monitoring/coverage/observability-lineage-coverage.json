@@ -1,0 +1,121 @@
+{
+  "phase": "7",
+  "issue": "81",
+  "coverage_version": "1.0",
+  "critical_services": [
+    {
+      "service": "airflow",
+      "status": "covered",
+      "coverage": ["structured_logs", "run_artifacts", "metric_events", "lineage_events"],
+      "evidence": [
+        "airflow/dags/_fraudlens_orchestration_common.py",
+        "airflow/tests/test_logging_visibility.py",
+        "airflow/tests/test_openlineage_integration.py"
+      ]
+    },
+    {
+      "service": "prometheus",
+      "status": "covered",
+      "coverage": ["scrape_targets", "metric_rendering", "storage_verification"],
+      "evidence": [
+        "monitoring/prometheus/prometheus.yml",
+        "monitoring/prometheus/render_fraudlens_metrics.py",
+        "tests/test_phase7_prometheus_scrape_config.py"
+      ]
+    },
+    {
+      "service": "grafana",
+      "status": "covered",
+      "coverage": ["datasource_provisioning", "pipeline_dashboards", "system_dashboards", "lineage_dashboards"],
+      "evidence": [
+        "monitoring/grafana/provisioning/datasources/prometheus.yaml",
+        "monitoring/grafana/dashboards/fraudlens-pipeline-overview.json",
+        "monitoring/grafana/dashboards/fraudlens-lineage-health.json",
+        "tests/test_phase7_grafana_dashboards.py"
+      ]
+    },
+    {
+      "service": "openlineage",
+      "status": "covered",
+      "coverage": ["airflow_payloads", "dbt_manifest_export", "local_jsonl_stream"],
+      "evidence": [
+        "documents/openlineage-tracking-contract.md",
+        "dbt/scripts/export_openlineage_from_manifest.py",
+        "tests/test_phase7_dbt_openlineage_export.py"
+      ]
+    },
+    {
+      "service": "marquez",
+      "status": "partial",
+      "coverage": ["config_assets", "dry_run_delivery", "health_helper", "ui_checklist"],
+      "evidence": [
+        "monitoring/marquez/marquez.env.example",
+        "scripts/deliver_openlineage_to_marquez.py",
+        "scripts/check_marquez_health.py",
+        "tests/test_phase7_marquez_assets.py"
+      ],
+      "gap": "Live UI confirmation requires a running Marquez service."
+    }
+  ],
+  "pipeline_layers": [
+    {
+      "layer": "ingestion",
+      "status": "covered",
+      "metrics": ["pipeline_stage_status", "pipeline_dataset_processed_total"],
+      "logs": ["runtime_context_prepared", "artifact_published"],
+      "lineage": ["input batch dataset", "bronze output dataset"],
+      "evidence": ["airflow/dags/fraudlens_ingestion_workflow.py"]
+    },
+    {
+      "layer": "transformation",
+      "status": "covered",
+      "metrics": ["pipeline_stage_status", "pipeline_stage_duration_seconds"],
+      "logs": ["transformation_summary_published", "artifact_published"],
+      "lineage": ["dbt_transformation_completed", "dbt manifest dependencies"],
+      "evidence": [
+        "airflow/dags/fraudlens_transformation_workflow.py",
+        "dbt/scripts/export_openlineage_from_manifest.py"
+      ]
+    },
+    {
+      "layer": "serving",
+      "status": "covered",
+      "metrics": ["pipeline_quality_gate_total", "pipeline_artifact_completeness"],
+      "logs": ["pipeline_summary_published", "artifact_published"],
+      "lineage": ["gold facts", "gold dimensions", "kpi outputs"],
+      "evidence": [
+        "dbt/models/gold/facts/gold_fact_models.yml",
+        "dbt/models/gold/dimensions/gold_dimension_models.yml",
+        "dbt/models/gold/kpi/gold_kpi_models.yml"
+      ]
+    }
+  ],
+  "production_like_readiness": [
+    {
+      "criterion": "metrics_collected",
+      "status": "covered",
+      "evidence": "monitoring/prometheus"
+    },
+    {
+      "criterion": "dashboards_available",
+      "status": "covered",
+      "evidence": "monitoring/grafana"
+    },
+    {
+      "criterion": "logs_debuggable",
+      "status": "covered",
+      "evidence": "documents/airflow-logging-visibility-contract.md"
+    },
+    {
+      "criterion": "lineage_captured",
+      "status": "covered",
+      "evidence": "documents/openlineage-tracking-contract.md"
+    },
+    {
+      "criterion": "lineage_visualizable",
+      "status": "partial",
+      "evidence": "documents/marquez-lineage-visualization-runbook.md",
+      "gap": "Requires live Marquez service for final UI evidence."
+    }
+  ]
+}
