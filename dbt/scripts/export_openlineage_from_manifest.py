@@ -5,6 +5,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from uuid import NAMESPACE_URL, uuid5
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -114,7 +115,7 @@ def build_openlineage_event(
             "producer": DEFAULT_PRODUCER,
             "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json",
             "run": {
-                "runId": run_id,
+                "runId": str(uuid5(NAMESPACE_URL, json.dumps([namespace, f"dbt.{node_id}", run_id]))),
                 "facets": {
                     "fraudlens_run": {
                         "_producer": DEFAULT_PRODUCER,

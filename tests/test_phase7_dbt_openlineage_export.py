@@ -4,6 +4,7 @@ import importlib.util
 import json
 import tempfile
 import unittest
+from uuid import UUID
 from pathlib import Path
 
 
@@ -68,6 +69,15 @@ class DbtOpenLineageExportTest(unittest.TestCase):
         self.assertEqual(event["openlineage_event"]["inputs"][0]["name"], "fraudlens.bronze.payment_transaction")
         self.assertEqual(event["openlineage_event"]["outputs"][0]["name"], "fraudlens.silver.slv__payment_transaction")
         self.assertEqual(event["openlineage_event"]["job"]["facets"]["dbt_job"]["layer"], "silver")
+        self.assertEqual(UUID(event["openlineage_event"]["run"]["runId"]).version, 5)
+        self.assertEqual(event["openlineage_event"]["run"]["facets"]["fraudlens_run"]["pipeline_run_id"], "dbt-run-001")
+
+        manifest["nodes"]["model.fraudlens.another_model"] = dict(manifest["nodes"]["model.fraudlens.slv__payment_transaction"])
+        repeated = self.exporter.iter_model_events(manifest, namespace="fraudlens.orchestration.local",
+            run_id="dbt-run-001", batch_id="batch_001", event_time="2026-06-20T00:00:00Z")
+        run_ids = [item["openlineage_event"]["run"]["runId"] for item in repeated]
+        self.assertEqual(len(set(run_ids)), 2)
+        self.assertIn(event["openlineage_event"]["run"]["runId"], run_ids)
 
     def test_write_events_outputs_jsonl(self) -> None:
         event = {

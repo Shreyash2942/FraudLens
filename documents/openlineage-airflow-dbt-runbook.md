@@ -17,7 +17,9 @@ OpenLineage settings live under each profile in `airflow/config/orchestration_pr
 - `openlineage_default_url`
 - `openlineage_producer`
 
-Local development defaults to `OPENLINEAGE_URL=http://localhost:5000`.
+Container-local delivery defaults to `OPENLINEAGE_URL=http://localhost:5000/api/v1/lineage`. On the Windows host, the current `fraudlens` container maps this to `http://127.0.0.1:5002/api/v1/lineage`; confirm with `docker port fraudlens`.
+
+OpenLineage `run.runId` is a deterministic UUID scoped to namespace, job, and pipeline execution. The original Airflow/dbt ID remains in the local envelope and `run.facets.fraudlens_run.pipeline_run_id`. Each model receives its own UUID so Marquez keeps model inputs and outputs separate.
 
 ## Airflow Lineage Events
 

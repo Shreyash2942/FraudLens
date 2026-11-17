@@ -8,6 +8,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from uuid import NAMESPACE_URL, uuid5
 
 import yaml
 
@@ -764,7 +765,7 @@ def build_openlineage_event(
         "producer": producer or DEFAULT_OPENLINEAGE_PRODUCER,
         "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json",
         "run": {
-            "runId": run_id,
+            "runId": str(uuid5(NAMESPACE_URL, json.dumps([lineage_namespace, job_name, run_id]))),
             "facets": merged_run_facets,
         },
         "job": {

@@ -43,7 +43,7 @@ Required OpenLineage payload fields:
 | `eventType` | OpenLineage event type, mapped from FraudLens status. |
 | `eventTime` | UTC event timestamp. |
 | `producer` | FraudLens producer URI. |
-| `run.runId` | Stable run identifier. |
+| `run.runId` | Deterministic UUIDv5 derived from namespace, job name, and pipeline execution ID. Stable across updates of that job execution; distinct across models. |
 | `run.facets.fraudlens_run` | FraudLens run metadata. |
 | `job.namespace` | OpenLineage namespace. |
 | `job.name` | Stable job name. |
@@ -51,6 +51,8 @@ Required OpenLineage payload fields:
 | `outputs[]` | Output datasets with namespace and name. |
 
 ## Status Mapping
+
+The original pipeline execution ID remains in `run.facets.fraudlens_run.pipeline_run_id` and the envelope `run_id`. This preserves log and metric correlation while satisfying the [OpenLineage run identity contract](https://openlineage.io/docs/spec/object-model/).
 
 | FraudLens Status | OpenLineage `eventType` |
 | --- | --- |

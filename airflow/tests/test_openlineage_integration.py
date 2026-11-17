@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from uuid import UUID
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -53,11 +54,21 @@ class OpenLineageIntegrationTest(unittest.TestCase):
         )
 
         self.assertEqual(event["eventType"], "COMPLETE")
-        self.assertEqual(event["run"]["runId"], "manual__2026-06-20")
+        self.assertEqual(UUID(event["run"]["runId"]).version, 5)
+        self.assertEqual(event["run"]["facets"]["fraudlens_run"]["pipeline_run_id"], "manual__2026-06-20")
         self.assertEqual(event["job"]["namespace"], "fraudlens.orchestration.local")
         self.assertEqual(event["inputs"][0]["name"], "data/batches/batch_001")
         self.assertEqual(event["outputs"][0]["name"], "airflow/artifacts/orchestration/pipeline/summary.json")
         self.assertEqual(event["run"]["facets"]["fraudlens_run"]["batch_id"], "batch_001")
+
+    def test_run_uuid_is_stable_and_isolated_by_job_and_namespace(self) -> None:
+        kwargs = dict(job_name="job_a", run_id="manual__2026-06-20", run_profile="local",
+                      event_time_utc="2026-06-20T00:00:00Z", status="SUCCESS", namespace="local")
+        first = self.common.build_openlineage_event(**kwargs)["run"]["runId"]
+        self.assertEqual(first, self.common.build_openlineage_event(**kwargs)["run"]["runId"])
+        for changes in ({"job_name": "job_b"}, {"namespace": "ci"}, {"run_id": "next_run"}):
+            with self.subTest(changes=changes):
+                self.assertNotEqual(first, self.common.build_openlineage_event(**(kwargs | changes))["run"]["runId"])
 
     def test_emit_lineage_event_writes_openlineage_payload(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
