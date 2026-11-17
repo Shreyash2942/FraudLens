@@ -15,8 +15,11 @@ This directory contains FraudLens Marquez configuration and helper assets for va
 
 ## Expected Local URLs
 
-- Marquez API/UI: `http://localhost:3003`
-- OpenLineage endpoint: `http://localhost:5000`
+- Marquez API: `http://localhost:5000`
+- Marquez UI: `http://localhost:3000`
+- OpenLineage endpoint: `http://localhost:5000/api/v1/lineage`
+
+These are container-local defaults. For the current `fraudlens` Data-Lab container, Windows host mappings are API `http://127.0.0.1:5002` and UI `http://127.0.0.1:3004`. Confirm mappings with `docker port fraudlens`.
 
 ## Workflow
 

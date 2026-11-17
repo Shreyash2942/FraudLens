@@ -71,7 +71,7 @@ def deliver_events(
         try:
             status_code = post_event(url, event, timeout_seconds=timeout_seconds)
             responses.append({"index": index, "status": "delivered", "status_code": status_code})
-        except urllib.error.URLError as exc:
+        except (urllib.error.URLError, TimeoutError) as exc:
             responses.append({"index": index, "status": "failed", "error": repr(exc)})
     return {
         "input": str(input_path),
@@ -85,7 +85,7 @@ def deliver_events(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Deliver OpenLineage JSONL events to Marquez/OpenLineage endpoint.")
     parser.add_argument("--input", type=Path, required=True, help="Lineage JSONL file containing OpenLineage events.")
-    parser.add_argument("--url", default=os.getenv("OPENLINEAGE_URL", "http://localhost:5000"))
+    parser.add_argument("--url", default=os.getenv("OPENLINEAGE_URL", "http://localhost:5000/api/v1/lineage"))
     parser.add_argument("--timeout-seconds", type=int, default=10)
     parser.add_argument("--send", action="store_true", help="Post events. Omit for dry-run validation.")
     return parser.parse_args()

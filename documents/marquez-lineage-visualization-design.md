@@ -23,8 +23,9 @@ Airflow/dbt lineage events
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `MARQUEZ_BASE_URL` | `http://localhost:3003` | Marquez API/UI base URL for health checks and operator links. |
-| `OPENLINEAGE_URL` | `http://localhost:5000` | OpenLineage ingestion endpoint for event delivery. |
+| `MARQUEZ_BASE_URL` | `http://localhost:5000` | Marquez API base URL for health checks. |
+| `MARQUEZ_UI_URL` | `http://localhost:3000` | Marquez web UI. |
+| `OPENLINEAGE_URL` | `http://localhost:5000/api/v1/lineage` | Full OpenLineage ingestion endpoint for event delivery. |
 
 ## Visualization Expectations
 

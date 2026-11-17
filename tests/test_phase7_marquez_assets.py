@@ -4,6 +4,8 @@ import importlib.util
 import json
 import tempfile
 import unittest
+import urllib.error
+from unittest.mock import patch
 from pathlib import Path
 
 
@@ -78,6 +80,22 @@ class MarquezAssetsTest(unittest.TestCase):
             health.normalize_url("http://localhost:3003/", "/api/v1/namespaces"),
             "http://localhost:3003/api/v1/namespaces",
         )
+
+    def test_health_reports_timeout_and_http_failure(self) -> None:
+        health = load_module(HEALTH_HELPER, "check_marquez_health_errors")
+        for error, expected in ((TimeoutError("timed out"), "unreachable"),
+                (urllib.error.HTTPError("http://localhost", 404, "missing", {}, None), "unhealthy")):
+            with self.subTest(error=type(error).__name__), patch.object(health.urllib.request, "urlopen", side_effect=error):
+                result = health.check_marquez_health(base_url="http://localhost", health_path="/api/v1/namespaces", timeout_seconds=1)
+                self.assertEqual(result["status"], expected)
+
+    def test_delivery_reports_timeout_without_losing_summary(self) -> None:
+        delivery = load_module(DELIVERY_HELPER, "deliver_openlineage_timeout")
+        event = {"eventType": "COMPLETE", "eventTime": "2026-06-20T00:00:00Z", "run": {}, "job": {}, "inputs": [], "outputs": []}
+        with patch.object(delivery, "extract_openlineage_events", return_value=[event]), patch.object(delivery, "post_event", side_effect=TimeoutError("timed out")):
+            result = delivery.deliver_events(input_path=Path("unused"), url="http://localhost/api/v1/lineage", dry_run=False, timeout_seconds=1)
+        self.assertEqual(result["event_count"], 1)
+        self.assertEqual(result["responses"][0]["status"], "failed")
 
 
 if __name__ == "__main__":

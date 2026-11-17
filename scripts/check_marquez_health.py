@@ -30,8 +30,11 @@ def check_marquez_health(*, base_url: str, health_path: str, timeout_seconds: in
     try:
         with urllib.request.urlopen(url, timeout=timeout_seconds) as response:
             payload["status_code"] = int(response.status)
-            payload["status"] = "healthy" if 200 <= int(response.status) < 500 else "unhealthy"
-    except urllib.error.URLError as exc:
+            payload["status"] = "healthy" if 200 <= int(response.status) < 300 else "unhealthy"
+    except urllib.error.HTTPError as exc:
+        payload["status_code"] = exc.code
+        payload["status"] = "unhealthy"
+    except (urllib.error.URLError, TimeoutError) as exc:
         payload["status"] = "unreachable"
         payload["error"] = repr(exc)
     finally:
@@ -41,7 +44,7 @@ def check_marquez_health(*, base_url: str, health_path: str, timeout_seconds: in
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Check Marquez API reachability for FraudLens lineage validation.")
-    parser.add_argument("--base-url", default=os.getenv("MARQUEZ_BASE_URL", "http://localhost:3003"))
+    parser.add_argument("--base-url", default=os.getenv("MARQUEZ_BASE_URL", "http://localhost:5000"))
     parser.add_argument("--health-path", default=os.getenv("MARQUEZ_HEALTH_PATH", "/api/v1/namespaces"))
     parser.add_argument("--timeout-seconds", type=int, default=5)
     return parser.parse_args()

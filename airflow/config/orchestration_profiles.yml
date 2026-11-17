@@ -83,7 +83,7 @@ profiles:
       openlineage_enabled: true
       openlineage_transport: http
       openlineage_url_env: OPENLINEAGE_URL
-      openlineage_default_url: http://localhost:5000
+      openlineage_default_url: http://localhost:5000/api/v1/lineage
       openlineage_producer: https://github.com/Shreyash2942/FraudLens
 
   ci:
