@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import re
 import unittest
 
 import yaml
@@ -57,6 +58,17 @@ class Phase7PrometheusAssetsTest(unittest.TestCase):
         )
         self.assertIn("fraudlens_metric_adapter_events_parsed_total 0", rendered)
         self.assertIn("fraudlens_metric_adapter_events_skipped_total 1", rendered)
+
+    def test_dashboard_metric_sources_can_be_rendered(self) -> None:
+        required = set()
+        for path in (PROMETHEUS_DIR.parent / "grafana/dashboards").glob("*.json"):
+            required.update(re.findall(r"fraudlens_(?:pipeline|service|runtime)_[a-z_]+", path.read_text(encoding="utf-8")))
+        events = [{"metric_name": name.removeprefix("fraudlens_"), "metric_value": 1, "run_profile": "local"} for name in sorted(required)]
+        rendered = self.render_module.render_events(events, self.mapping)
+        for name in required:
+            with self.subTest(metric=name):
+                self.assertIn(name + "{", rendered)
+        self.assertIn("fraudlens_metric_adapter_events_skipped_total 0", rendered)
 
 
 if __name__ == "__main__":

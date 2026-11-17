@@ -42,6 +42,66 @@ labels:
     - timestamp
 
 metrics:
+  pipeline_run_duration_seconds:
+    prometheus_name: fraudlens_pipeline_run_duration_seconds
+    type: gauge
+    help: Total FraudLens orchestration runtime in seconds.
+  pipeline_stage_status:
+    prometheus_name: fraudlens_pipeline_stage_status
+    type: gauge
+    help: FraudLens stage status, 1 for success and 0 for failure.
+  pipeline_task_attempt_total:
+    prometheus_name: fraudlens_pipeline_task_attempt_total
+    type: counter
+    help: FraudLens task attempts by status.
+  pipeline_task_retry_total:
+    prometheus_name: fraudlens_pipeline_task_retry_total
+    type: counter
+    help: FraudLens task retries by failure category.
+  pipeline_dataset_processed_total:
+    prometheus_name: fraudlens_pipeline_dataset_processed_total
+    type: counter
+    help: FraudLens datasets processed by stage.
+  pipeline_quality_gate_total:
+    prometheus_name: fraudlens_pipeline_quality_gate_total
+    type: counter
+    help: FraudLens quality gate outcomes.
+  pipeline_quality_failure_total:
+    prometheus_name: fraudlens_pipeline_quality_failure_total
+    type: counter
+    help: FraudLens failed quality checks.
+  pipeline_freshness_lag_seconds:
+    prometheus_name: fraudlens_pipeline_freshness_lag_seconds
+    type: gauge
+    help: FraudLens batch freshness lag in seconds.
+  pipeline_lineage_delivery_total:
+    prometheus_name: fraudlens_pipeline_lineage_delivery_total
+    type: counter
+    help: FraudLens external lineage delivery attempts.
+  pipeline_lineage_delivery_latency_seconds:
+    prometheus_name: fraudlens_pipeline_lineage_delivery_latency_seconds
+    type: gauge
+    help: FraudLens external lineage delivery latency in seconds.
+  service_health_status:
+    prometheus_name: fraudlens_service_health_status
+    type: gauge
+    help: FraudLens service availability, 1 for healthy and 0 for unhealthy.
+  service_response_time_seconds:
+    prometheus_name: fraudlens_service_response_time_seconds
+    type: gauge
+    help: FraudLens service health probe duration in seconds.
+  runtime_cpu_utilization_percent:
+    prometheus_name: fraudlens_runtime_cpu_utilization_percent
+    type: gauge
+    help: Local runtime CPU utilization when a resource exporter is available.
+  runtime_memory_utilization_percent:
+    prometheus_name: fraudlens_runtime_memory_utilization_percent
+    type: gauge
+    help: Local runtime memory utilization when a resource exporter is available.
+  runtime_disk_free_bytes:
+    prometheus_name: fraudlens_runtime_disk_free_bytes
+    type: gauge
+    help: Local runtime free storage when a resource exporter is available.
   pipeline_run_status:
     prometheus_name: fraudlens_pipeline_run_status
     type: gauge

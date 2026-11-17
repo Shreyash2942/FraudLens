@@ -10,10 +10,10 @@ The scrape config in `prometheus.yml` includes the local targets FraudLens expec
 | Job | Default Target | Purpose | Notes |
 |---|---|---|---|
 | `fraudlens_metrics_exporter` | `localhost:9108` | FraudLens pipeline metrics rendered from canonical metric artifacts | Primary Phase 7 target. |
-| `prometheus` | `localhost:9090` | Prometheus self-health | Expected when Data-Lab exposes Prometheus locally. |
-| `airflow` | `localhost:8080` | Airflow service health | Uses Airflow health endpoint when exposed. |
-| `grafana` | `localhost:3000` | Grafana service health | Metrics endpoint availability depends on Grafana configuration. |
-| `marquez` | `localhost:5000` | Marquez lineage service health | API path validates reachability for lineage visualization work. |
+| `prometheus` | `localhost:9095` | Prometheus self-health | Data-Lab container-local Prometheus port. |
+| `airflow` | `localhost:9102` | Airflow StatsD/Prometheus metrics | Optional exporter; `/health` is JSON and cannot be scraped as Prometheus text. |
+| `grafana` | `localhost:3001` | Grafana service health | Data-Lab container-local Grafana metrics endpoint. |
+| `marquez` | `localhost:9217` | Marquez lineage service metrics | Optional metrics bridge; validate API health separately with `check_marquez_health.py`. |
 | `mongodb` | `localhost:9216` | MongoDB artifact storage health | Requires exporter or compatible synthetic probe. |
 | `spark_hive_runtime` | `localhost:9109` | Local Spark/Hive surrogate runtime health | Requires exporter or compatible synthetic probe. |
 

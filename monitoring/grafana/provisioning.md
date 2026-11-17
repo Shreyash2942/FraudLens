@@ -20,6 +20,8 @@ In Grafana, validate the Prometheus datasource:
 3. Confirm the URL points to the local Data-Lab Prometheus endpoint.
 4. Run a test query such as `up`.
 
+For the all-in-one Data-Lab runtime, Grafana connects to Prometheus at container-local `http://localhost:9095`. On the current Windows host, Grafana is mapped to `http://127.0.0.1:3005` and Prometheus to `http://127.0.0.1:9098`. Use `docker port fraudlens` to verify environment-specific mappings.
+
 Expected result:
 
 - the datasource test succeeds

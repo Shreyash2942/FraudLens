@@ -16,16 +16,17 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-          - localhost:9090
+          - localhost:9095
         labels:
           environment: local
           service_name: prometheus
 
   - job_name: airflow
-    metrics_path: /health
+    # Optional StatsD/Prometheus exporter; Airflow /health returns JSON.
+    metrics_path: /metrics
     static_configs:
       - targets:
-          - localhost:8080
+          - localhost:9102
         labels:
           environment: local
           service_name: airflow
@@ -34,16 +35,17 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-          - localhost:3000
+          - localhost:3001
         labels:
           environment: local
           service_name: grafana
 
   - job_name: marquez
-    metrics_path: /api/v1/namespaces
+    # Optional metrics bridge; Marquez API health is validated separately.
+    metrics_path: /metrics
     static_configs:
       - targets:
-          - localhost:5000
+          - localhost:9217
         labels:
           environment: local
           service_name: marquez

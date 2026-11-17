@@ -66,7 +66,10 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "fraudlens_pipeline_stage_status{environment=\"$environment\",run_profile=\"$run_profile\"}"
+          "expr": "fraudlens_pipeline_stage_status{environment=\"$environment\",run_profile=\"$run_profile\"}",
+          "format": "table",
+          "instant": true,
+          "range": false
         }
       ],
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
