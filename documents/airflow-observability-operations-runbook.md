@@ -41,6 +41,12 @@ Get-ChildItem airflow\artifacts\observability -Recurse -File |
   Select-Object -First 20 FullName, LastWriteTime
 ```
 
+Locate latest orchestration, metric, and lineage artifacts:
+
+```powershell
+py scripts\locate_latest_airflow_artifacts.py --workflow pipeline --limit 10
+```
+
 Print latest metric events:
 
 ```powershell
@@ -66,6 +72,24 @@ Relevant keys under each profile `observability` block:
 - `emit_lineage`
 - `metrics_namespace`
 - `lineage_namespace`
+
+## Airflow UI Log Inspection
+
+Use the Airflow UI when a run fails or when an operator needs to correlate a task with emitted evidence:
+
+1. open the DAG run in Airflow
+2. select the failed or suspicious task instance
+3. open task logs and search for structured JSON events
+4. capture `pipeline_run_id`, `batch_id`, `dag_id`, `task_id`, `run_profile`, and `failure_category`
+5. search the log for `artifact_published`, `metric_event_emitted`, or `lineage_event_emitted`
+6. copy `artifact_reference` and inspect the referenced file locally or in the configured artifact backend
+
+Important task log events:
+
+- `task_failure_classified` — task failure with triage category and failure artifact reference
+- `artifact_published` — orchestration evidence persisted for later inspection
+- `metric_event_emitted` — metric event artifact created for Prometheus-facing conversion
+- `lineage_event_emitted` — lineage event artifact created for OpenLineage/Marquez-facing conversion
 
 ## Troubleshooting
 

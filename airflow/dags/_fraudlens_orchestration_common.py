@@ -8,6 +8,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from uuid import NAMESPACE_URL, uuid5
 
 import yaml
 
@@ -37,6 +38,8 @@ from synthetic_generator.contracts import DATASET_ORDER
 
 ORCHESTRATION_PROFILE_PATH = REPO_ROOT / "airflow" / "config" / "orchestration_profiles.yml"
 RUN_METADATA_SCHEMA_VERSION = "1.0"
+OPENLINEAGE_EVENT_SCHEMA_VERSION = "1.0"
+DEFAULT_OPENLINEAGE_PRODUCER = "https://github.com/Shreyash2942/FraudLens"
 RUN_METADATA_FIELDS: tuple[str, ...] = (
     "pipeline_run_id",
     "batch_id",
@@ -50,6 +53,32 @@ RUN_METADATA_FIELDS: tuple[str, ...] = (
     "ended_at_utc",
     "run_status",
     "failure_category",
+)
+LOG_CONTEXT_FIELDS: tuple[str, ...] = (
+    "pipeline_run_id",
+    "batch_id",
+    "dag_id",
+    "task_id",
+    "task_group",
+    "run_profile",
+    "run_target",
+    "workflow",
+    "stage",
+    "status",
+    "failure_category",
+    "artifact_reference",
+)
+REDACTED_LOG_VALUE = "***REDACTED***"
+SENSITIVE_LOG_FIELD_MARKERS: tuple[str, ...] = (
+    "password",
+    "passwd",
+    "secret",
+    "token",
+    "credential",
+    "connection_uri",
+    "mongodb_uri",
+    "access_key",
+    "private_key",
 )
 
 
@@ -240,7 +269,12 @@ def runtime_failure_callback(context: dict[str, Any]) -> None:
     if isinstance(conf, dict):
         profile = conf.get("profile")
     write_orchestration_artifact(target, payload, profile=profile, artifact_type="failure_artifact")
-    print(json.dumps({"event": "task_failure_classified", **payload}))
+    log_orchestration_event(
+        "ERROR",
+        "task_failure_classified",
+        **payload,
+        artifact_reference=_repo_relative_path(target),
+    )
 
 
 def canonical_run_metadata(
@@ -280,6 +314,21 @@ def utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def redact_log_field(key: str, value: Any) -> Any:
+    normalized_key = key.lower()
+    if any(marker in normalized_key for marker in SENSITIVE_LOG_FIELD_MARKERS):
+        return REDACTED_LOG_VALUE
+    if isinstance(value, dict):
+        return redact_log_payload(value)
+    if isinstance(value, list):
+        return [redact_log_field(key, item) for item in value]
+    return value
+
+
+def redact_log_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    return {key: redact_log_field(key, value) for key, value in payload.items()}
+
+
 def log_orchestration_event(level: str, event: str, **fields: Any) -> None:
     payload = {
         "level": level.upper(),
@@ -287,7 +336,7 @@ def log_orchestration_event(level: str, event: str, **fields: Any) -> None:
         "timestamp_utc": utc_now_iso(),
         **fields,
     }
-    print(json.dumps(payload))
+    print(json.dumps(redact_log_payload(payload)))
 
 
 def artifact_backend_settings(profile: str | None) -> dict[str, str]:
@@ -486,6 +535,28 @@ def write_orchestration_artifact(
                 error=repr(exc),
             )
 
+    artifact_reference = _repo_relative_path(target)
+    log_fields: dict[str, Any] = {
+        "artifact_reference": artifact_reference,
+        "artifact_path": artifact_reference,
+        "artifact_type": artifact_type,
+        "artifact_backend": backend,
+    }
+    for key in (
+        "dag_id",
+        "task_id",
+        "run_id",
+        "run_stamp",
+        "pipeline_run_id",
+        "batch_id",
+        "status",
+        "run_status",
+        "failure_category",
+        "stage",
+    ):
+        if key in payload:
+            log_fields[key] = payload[key]
+    log_orchestration_event("INFO", "artifact_published", **log_fields)
     return target
 
 
@@ -606,6 +677,107 @@ def observability_enabled(profile: str | None) -> bool:
     return parse_bool(section.get("enabled"), default=True)
 
 
+def openlineage_settings(profile: str | None) -> dict[str, str]:
+    section = observability_settings(profile)
+    return {
+        "enabled": str(parse_bool(section.get("openlineage_enabled"), default=True)).lower(),
+        "transport": str(section.get("openlineage_transport", "http")).strip().lower() or "http",
+        "url_env": str(section.get("openlineage_url_env", "OPENLINEAGE_URL")).strip() or "OPENLINEAGE_URL",
+        "default_url": str(section.get("openlineage_default_url", "")).strip(),
+        "producer": str(section.get("openlineage_producer", DEFAULT_OPENLINEAGE_PRODUCER)).strip()
+        or DEFAULT_OPENLINEAGE_PRODUCER,
+    }
+
+
+def openlineage_event_type(status: str | None) -> str:
+    normalized_status = str(status or "").strip().upper()
+    if normalized_status == "SUCCESS":
+        return "COMPLETE"
+    if normalized_status == "FAILED":
+        return "FAIL"
+    return "OTHER"
+
+
+def openlineage_dataset(dataset: Any, *, default_namespace: str) -> dict[str, Any]:
+    if isinstance(dataset, dict):
+        namespace = str(dataset.get("namespace") or default_namespace).strip() or default_namespace
+        name = str(dataset.get("name") or dataset.get("dataset") or dataset.get("path") or "").strip()
+        facets = dataset.get("facets", {})
+    else:
+        namespace = default_namespace
+        name = str(dataset).strip()
+        facets = {}
+    payload: dict[str, Any] = {
+        "namespace": namespace,
+        "name": name,
+    }
+    if isinstance(facets, dict) and facets:
+        payload["facets"] = facets
+    return payload
+
+
+def build_openlineage_event(
+    *,
+    job_name: str,
+    run_id: str,
+    run_profile: str,
+    event_time_utc: str,
+    status: str,
+    inputs: list[Any] | None = None,
+    outputs: list[Any] | None = None,
+    batch_id: str | None = None,
+    namespace: str | None = None,
+    producer: str | None = None,
+    run_facets: dict[str, Any] | None = None,
+    job_facets: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    lineage_namespace = namespace or str(
+        observability_settings(run_profile).get("lineage_namespace", f"fraudlens.orchestration.{run_profile}")
+    )
+    fraudlens_run_facet: dict[str, Any] = {
+        "_producer": producer or DEFAULT_OPENLINEAGE_PRODUCER,
+        "_schemaURL": "https://fraudlens.local/openlineage/facets/fraudlens-run-v1.json",
+        "pipeline_run_id": run_id,
+        "run_profile": run_profile,
+        "status": status,
+    }
+    if batch_id:
+        fraudlens_run_facet["batch_id"] = batch_id
+
+    merged_run_facets = {"fraudlens_run": fraudlens_run_facet}
+    if run_facets:
+        merged_run_facets.update(run_facets)
+
+    merged_job_facets = dict(job_facets or {})
+    merged_job_facets.setdefault(
+        "fraudlens_job",
+        {
+            "_producer": producer or DEFAULT_OPENLINEAGE_PRODUCER,
+            "_schemaURL": "https://fraudlens.local/openlineage/facets/fraudlens-job-v1.json",
+            "job_name": job_name,
+            "run_profile": run_profile,
+        },
+    )
+
+    return {
+        "eventType": openlineage_event_type(status),
+        "eventTime": event_time_utc,
+        "producer": producer or DEFAULT_OPENLINEAGE_PRODUCER,
+        "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json",
+        "run": {
+            "runId": str(uuid5(NAMESPACE_URL, json.dumps([lineage_namespace, job_name, run_id]))),
+            "facets": merged_run_facets,
+        },
+        "job": {
+            "namespace": lineage_namespace,
+            "name": job_name,
+            "facets": merged_job_facets,
+        },
+        "inputs": [openlineage_dataset(item, default_namespace=lineage_namespace) for item in inputs or []],
+        "outputs": [openlineage_dataset(item, default_namespace=lineage_namespace) for item in outputs or []],
+    }
+
+
 def observability_artifact_dir(signal_type: str, workflow: str, run_stamp: str) -> Path:
     return REPO_ROOT / "airflow" / "artifacts" / "observability" / signal_type / workflow / run_stamp
 
@@ -644,7 +816,17 @@ def emit_metric_event(
             profile=run_profile,
             artifact_type="observability_metric_event",
         )
-    log_orchestration_event("INFO", "metric_event_emitted", metric_name=metric_name, target_file=str(target))
+    artifact_reference = _repo_relative_path(target)
+    log_orchestration_event(
+        "INFO",
+        "metric_event_emitted",
+        metric_name=metric_name,
+        workflow=workflow,
+        run_stamp=run_stamp,
+        run_profile=run_profile,
+        artifact_reference=artifact_reference,
+        target_file=artifact_reference,
+    )
     return target
 
 
@@ -660,10 +842,29 @@ def emit_lineage_event(
     namespace = str(section.get("lineage_namespace", f"fraudlens.orchestration.{run_profile}")).strip()
     target_dir = observability_artifact_dir("lineage", workflow, run_stamp)
     target = target_dir / "lineage_events.jsonl"
+    event_time_utc = utc_now_iso()
+    status = str(payload.get("status", "UNKNOWN"))
+    producer = openlineage_settings(run_profile)["producer"]
+    openlineage_event = build_openlineage_event(
+        job_name=str(payload.get("job_name", f"fraudlens_{workflow}")),
+        run_id=str(payload.get("run_id", run_stamp)),
+        run_profile=run_profile,
+        event_time_utc=event_time_utc,
+        status=status,
+        inputs=list(payload.get("inputs", [])) if isinstance(payload.get("inputs", []), list) else [],
+        outputs=list(payload.get("outputs", [])) if isinstance(payload.get("outputs", []), list) else [],
+        batch_id=str(payload.get("batch_id", "")) if payload.get("batch_id") is not None else None,
+        namespace=namespace,
+        producer=producer,
+        run_facets=payload.get("run_facets") if isinstance(payload.get("run_facets"), dict) else None,
+        job_facets=payload.get("job_facets") if isinstance(payload.get("job_facets"), dict) else None,
+    )
     event = {
         "event_type": event_type,
-        "event_time_utc": utc_now_iso(),
+        "event_time_utc": event_time_utc,
         "namespace": namespace,
+        "openlineage_schema_version": OPENLINEAGE_EVENT_SCHEMA_VERSION,
+        "openlineage_event": openlineage_event,
         **payload,
     }
     backend = artifact_backend_settings(run_profile)["backend"]
@@ -678,5 +879,15 @@ def emit_lineage_event(
             profile=run_profile,
             artifact_type="observability_lineage_event",
         )
-    log_orchestration_event("INFO", "lineage_event_emitted", event_type=event_type, target_file=str(target))
+    artifact_reference = _repo_relative_path(target)
+    log_orchestration_event(
+        "INFO",
+        "lineage_event_emitted",
+        event_type=event_type,
+        workflow=workflow,
+        run_stamp=run_stamp,
+        run_profile=run_profile,
+        artifact_reference=artifact_reference,
+        target_file=artifact_reference,
+    )
     return target

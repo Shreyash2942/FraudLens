@@ -15,8 +15,9 @@ Use these as the primary phase review and handoff files:
 | `4` | `transformation-layer-dbt.md` | consolidated dbt transformation layer handoff |
 | `5` | `data-quality-governance.md` | consolidated quality, governance, readiness, and controls handoff |
 | `6` | `orchestration-airflow.md` | consolidated Airflow orchestration branch handoff |
+| `7` | `phase-7-observability-lineage.md` | observability, lineage, validation evidence, and operations handoff |
 
-Future phases `7` through `10` do not yet have their final consolidated handoff documents in `documents/`.
+Future phases `8` through `10` do not yet have their final consolidated handoff documents in `documents/`.
 
 ## Canonical Documents
 
@@ -35,6 +36,7 @@ Future phases `7` through `10` do not yet have their final consolidated handoff 
 - `graphify-workflow.md` Graphify usage and branch portability workflow
 - `data-quality-governance.md` consolidated Phase 5 document (issues `#57`-`#64`, controls, validation, readiness, and handoff)
 - `orchestration-airflow.md` consolidated Phase 6 branch handoff for `orchestration-airflow`, including architecture, operations, MongoDB artifact persistence, validation status, and commit ledger
+- `phase-7-observability-lineage.md` Phase 7 handoff for metrics, dashboards, logs, OpenLineage, Marquez, and validation evidence
 
 ## Supporting Airflow Reference Set
 
@@ -52,5 +54,6 @@ These remain available as detailed supporting references behind `orchestration-a
 ## Planning Workspace
 
 - `phase-6-plan/` detailed per-sub-issue planning workspace for Phase 6 implementation
+- `phase-7-plan/` detailed per-sub-issue planning workspace for Phase 7 observability and lineage implementation
 
 Legacy `.docx` files are retained as reference sources only. Active planning and design content should be maintained in Markdown and YAML.

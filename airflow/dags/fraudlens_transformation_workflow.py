@@ -261,9 +261,12 @@ if str(dags_dir) not in sys.path:
 
 from _fraudlens_orchestration_common import (
     canonical_run_metadata,
+    emit_lineage_event,
     infer_task_group,
     list_orchestration_artifacts,
     log_orchestration_event,
+    observability_settings,
+    parse_bool,
     read_orchestration_artifact,
     utc_now_iso,
     write_orchestration_artifact,
@@ -322,6 +325,41 @@ write_orchestration_artifact(
     profile=str(ctx.get("profile", "local")),
     artifact_type="transformation_summary",
 )
+run_profile = str(ctx.get("profile", "local")).strip().lower() or "local"
+obs_settings = observability_settings(run_profile)
+if parse_bool(obs_settings.get("enabled"), default=True) and parse_bool(obs_settings.get("emit_lineage"), default=True):
+    emit_lineage_event(
+        workflow="transformation",
+        run_stamp=str(ctx.get("run_stamp", "{{ ts_nodash }}")),
+        event_type="dbt_transformation_completed",
+        run_profile=run_profile,
+        payload={
+            "job_name": "fraudlens_dbt_transformation_workflow",
+            "run_id": str(ctx.get("run_id", "")),
+            "batch_id": str(ctx.get("batch_id", "")),
+            "run_profile": run_profile,
+            "status": str(summary.get("run_status", "UNKNOWN")),
+            "inputs": [
+                {"name": f"bronze.{item.get('stage', 'unknown')}", "facets": {"fraudlens_stage": item}}
+                for item in stage_status
+                if item.get("stage") == "bronze"
+            ],
+            "outputs": [
+                {"name": f"dbt.{item.get('stage', 'unknown')}", "facets": {"fraudlens_stage": item}}
+                for item in stage_status
+                if item.get("stage") in {"silver", "gold", "kpi"}
+            ],
+            "job_facets": {
+                "dbt_transformation": {
+                    "_producer": "https://github.com/Shreyash2942/FraudLens",
+                    "_schemaURL": "https://fraudlens.local/openlineage/facets/dbt-transformation-v1.json",
+                    "dbt_profile": ctx.get("dbt_profile"),
+                    "dbt_target": ctx.get("dbt_target"),
+                    "threads": ctx.get("threads"),
+                }
+            },
+        },
+    )
 log_orchestration_event("INFO", "transformation_summary_published", dag_id="fraudlens_transformation_workflow", run_id=ctx.get("run_id"), summary_file=str(target))
 print(json.dumps({"status": "published", "summary_file": str(target), "overall_status": overall_status}))
 PY

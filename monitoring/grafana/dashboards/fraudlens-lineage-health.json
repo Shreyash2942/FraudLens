@@ -1,0 +1,88 @@
+{
+  "uid": "fraudlens-lineage-health",
+  "title": "FraudLens Lineage Health",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "timezone": "browser",
+  "tags": ["fraudlens", "phase-7", "lineage"],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_lineage_event_total, environment)",
+        "current": {"text": "local", "value": "local"}
+      },
+      {
+        "name": "run_profile",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_lineage_event_total{environment=\"$environment\"}, run_profile)",
+        "current": {"text": "local", "value": "local"}
+      },
+      {
+        "name": "lineage_namespace",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_lineage_event_total{environment=\"$environment\",run_profile=\"$run_profile\"}, lineage_namespace)",
+        "current": {"text": "fraudlens.orchestration.local", "value": "fraudlens.orchestration.local"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Lineage Events Emitted",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (lineage_event_type, status) (increase(fraudlens_pipeline_lineage_event_total{environment=\"$environment\",run_profile=\"$run_profile\",lineage_namespace=\"$lineage_namespace\"}[1h]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "Lineage Delivery Attempts",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (status) (increase(fraudlens_pipeline_lineage_delivery_total{environment=\"$environment\",run_profile=\"$run_profile\",lineage_namespace=\"$lineage_namespace\"}[1h]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "id": 3,
+      "title": "Lineage Delivery Latency",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "fraudlens_pipeline_lineage_delivery_latency_seconds{environment=\"$environment\",run_profile=\"$run_profile\",lineage_namespace=\"$lineage_namespace\"}"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+    },
+    {
+      "id": 4,
+      "title": "Marquez Target Health",
+      "type": "stat",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{environment=\"$environment\",service_name=\"marquez\"}"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+    }
+  ]
+}

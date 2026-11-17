@@ -1,0 +1,88 @@
+{
+  "uid": "fraudlens-failure-quality",
+  "title": "FraudLens Failure And Quality",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "timezone": "browser",
+  "tags": ["fraudlens", "phase-7", "quality"],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_failure_total, environment)",
+        "current": {"text": "local", "value": "local"}
+      },
+      {
+        "name": "run_profile",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_failure_total{environment=\"$environment\"}, run_profile)",
+        "current": {"text": "local", "value": "local"}
+      },
+      {
+        "name": "status",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_quality_gate_total{environment=\"$environment\",run_profile=\"$run_profile\"}, status)",
+        "current": {"text": "FAILED", "value": "FAILED"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Failures By Category",
+      "type": "barchart",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (failure_category) (increase(fraudlens_pipeline_failure_total{environment=\"$environment\",run_profile=\"$run_profile\"}[24h]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "Quality Gate Outcomes",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (quality_gate, status) (increase(fraudlens_pipeline_quality_gate_total{environment=\"$environment\",run_profile=\"$run_profile\"}[24h]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "id": 3,
+      "title": "Quality Failures By Severity",
+      "type": "barchart",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (severity) (increase(fraudlens_pipeline_quality_failure_total{environment=\"$environment\",run_profile=\"$run_profile\"}[24h]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+    },
+    {
+      "id": 4,
+      "title": "Failed Stages",
+      "type": "table",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (workflow, stage, failure_category) (increase(fraudlens_pipeline_failure_total{environment=\"$environment\",run_profile=\"$run_profile\"}[24h]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+    }
+  ]
+}

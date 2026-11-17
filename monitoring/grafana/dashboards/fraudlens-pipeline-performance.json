@@ -1,0 +1,88 @@
+{
+  "uid": "fraudlens-pipeline-performance",
+  "title": "FraudLens Pipeline Performance",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "timezone": "browser",
+  "tags": ["fraudlens", "phase-7", "performance"],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_run_duration_seconds, environment)",
+        "current": {"text": "local", "value": "local"}
+      },
+      {
+        "name": "run_profile",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_run_duration_seconds{environment=\"$environment\"}, run_profile)",
+        "current": {"text": "local", "value": "local"}
+      },
+      {
+        "name": "stage",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(fraudlens_pipeline_stage_duration_seconds{environment=\"$environment\",run_profile=\"$run_profile\"}, stage)",
+        "current": {"text": "ingestion", "value": "ingestion"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Run Duration",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "fraudlens_pipeline_run_duration_seconds{environment=\"$environment\",run_profile=\"$run_profile\"}"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "Stage Duration",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (stage) (fraudlens_pipeline_stage_duration_seconds{environment=\"$environment\",run_profile=\"$run_profile\"})"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "id": 3,
+      "title": "Task Attempts",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (task_id, status) (increase(fraudlens_pipeline_task_attempt_total{environment=\"$environment\",run_profile=\"$run_profile\"}[1h]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+    },
+    {
+      "id": 4,
+      "title": "Task Retries",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (task_id, failure_category) (increase(fraudlens_pipeline_task_retry_total{environment=\"$environment\",run_profile=\"$run_profile\"}[1h]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+    }
+  ]
+}

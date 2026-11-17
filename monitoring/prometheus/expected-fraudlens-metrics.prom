@@ -1,0 +1,15 @@
+# HELP fraudlens_pipeline_run_status FraudLens pipeline run status, 1 for success and 0 for failure.
+# TYPE fraudlens_pipeline_run_status gauge
+fraudlens_pipeline_run_status{batch_id="batch_20260617",dag_id="fraudlens_pipeline_orchestration",environment="local",run_profile="local",run_target="local",stage="publish",status="SUCCESS",workflow="pipeline"} 1
+# HELP fraudlens_pipeline_artifact_completeness Completed run artifacts divided by expected run artifacts.
+# TYPE fraudlens_pipeline_artifact_completeness gauge
+fraudlens_pipeline_artifact_completeness{batch_id="batch_20260617",dag_id="fraudlens_pipeline_orchestration",environment="local",run_profile="local",run_target="local",stage="publish",status="SUCCESS",workflow="pipeline"} 1.0
+# HELP fraudlens_pipeline_stage_duration_seconds FraudLens pipeline stage duration in seconds.
+# TYPE fraudlens_pipeline_stage_duration_seconds gauge
+fraudlens_pipeline_stage_duration_seconds{batch_id="batch_20260617",dag_id="fraudlens_pipeline_orchestration",environment="local",run_profile="local",run_target="local",stage="ingestion",status="SUCCESS",workflow="ingestion"} 42.5
+# HELP fraudlens_metric_adapter_events_parsed_total Metric events parsed by the FraudLens Prometheus adapter.
+# TYPE fraudlens_metric_adapter_events_parsed_total counter
+fraudlens_metric_adapter_events_parsed_total 3
+# HELP fraudlens_metric_adapter_events_skipped_total Metric events skipped by the FraudLens Prometheus adapter.
+# TYPE fraudlens_metric_adapter_events_skipped_total counter
+fraudlens_metric_adapter_events_skipped_total 0

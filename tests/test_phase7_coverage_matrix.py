@@ -1,0 +1,77 @@
+from __future__ import annotations
+
+import importlib.util
+import json
+import unittest
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+COVERAGE_MATRIX = REPO_ROOT / "monitoring" / "coverage" / "observability-lineage-coverage.json"
+VALIDATOR_PATH = REPO_ROOT / "scripts" / "validate_observability_lineage_coverage.py"
+
+
+def load_validator_module():
+    spec = importlib.util.spec_from_file_location("validate_observability_lineage_coverage", VALIDATOR_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load validator module from {VALIDATOR_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class Phase7CoverageMatrixTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.matrix = json.loads(COVERAGE_MATRIX.read_text(encoding="utf-8"))
+        cls.validator = load_validator_module()
+
+    def test_critical_services_are_represented(self) -> None:
+        services = {item["service"] for item in self.matrix["critical_services"]}
+        self.assertEqual(
+            services,
+            {"airflow", "prometheus", "grafana", "openlineage", "marquez"},
+        )
+
+    def test_coverage_validator_accepts_matrix(self) -> None:
+        result = self.validator.validate_matrix(self.matrix, repo_root=REPO_ROOT)
+        self.assertTrue(result["valid"], msg=result)
+        self.assertEqual(result["missing_services"], [])
+        self.assertEqual(result["missing_layers"], [])
+        self.assertEqual(result["missing_evidence"], [])
+
+    def test_lineage_covers_ingestion_transformation_and_serving(self) -> None:
+        layers = {item["layer"]: item for item in self.matrix["pipeline_layers"]}
+        self.assertEqual(set(layers), {"ingestion", "transformation", "serving"})
+        self.assertIn("input batch dataset", layers["ingestion"]["lineage"])
+        self.assertIn("dbt_transformation_completed", layers["transformation"]["lineage"])
+        self.assertIn("kpi outputs", layers["serving"]["lineage"])
+        for layer_name, layer in layers.items():
+            with self.subTest(layer=layer_name):
+                self.assertEqual(layer["status"], "covered")
+                self.assertGreaterEqual(len(layer["metrics"]), 2)
+                self.assertGreaterEqual(len(layer["logs"]), 2)
+                self.assertGreaterEqual(len(layer["lineage"]), 2)
+
+    def test_production_like_readiness_gaps_are_explicit(self) -> None:
+        readiness = {item["criterion"]: item for item in self.matrix["production_like_readiness"]}
+        self.assertEqual(
+            set(readiness),
+            {
+                "metrics_collected",
+                "dashboards_available",
+                "logs_debuggable",
+                "lineage_captured",
+                "lineage_visualizable",
+            },
+        )
+        self.assertEqual(readiness["metrics_collected"]["status"], "covered")
+        self.assertEqual(readiness["dashboards_available"]["status"], "covered")
+        self.assertEqual(readiness["logs_debuggable"]["status"], "covered")
+        self.assertEqual(readiness["lineage_captured"]["status"], "covered")
+        self.assertEqual(readiness["lineage_visualizable"]["status"], "covered")
+        self.assertTrue((REPO_ROOT / readiness["lineage_visualizable"]["evidence"]).exists())
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -53,7 +53,10 @@ Start with these documents:
 5. `documents/platform-validation-runbook.md`
 6. `specs/README.md`
 7. `standards/README.md`
+8. `documents/phase-7-observability-lineage.md`
 
 ## Current Status
 
 Phase 0 is implemented as a repo baseline. Phase 1 is implemented as an external-runtime integration layer with documentation, service contracts, and local configuration examples. Phase 2 adds a deterministic synthetic dataset generator with mixed and blueprint-curated batch modes, seeded Faker-backed realism, 21 governed CSV datasets, batch-style landing/control/quality outputs, validation reporting, organization-aware dashboard controls, and optional MinIO upload for local data-foundation work.
+
+Phases 3–6 add warehouse loading, dbt transformations, quality/governance, and Airflow orchestration. Phase 7 delivers monitoring, dashboards, structured logs, and OpenLineage/Marquez integration. See [the Phase 7 handoff](documents/phase-7-observability-lineage.md) for validation evidence and local-runtime boundaries. Phase 8 covers CI/CD.

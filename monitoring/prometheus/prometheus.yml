@@ -1,0 +1,69 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: fraudlens_metrics_exporter
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9108
+        labels:
+          environment: local
+          service_name: fraudlens_metrics_exporter
+
+  - job_name: prometheus
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9095
+        labels:
+          environment: local
+          service_name: prometheus
+
+  - job_name: airflow
+    # Optional StatsD/Prometheus exporter; Airflow /health returns JSON.
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9102
+        labels:
+          environment: local
+          service_name: airflow
+
+  - job_name: grafana
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:3001
+        labels:
+          environment: local
+          service_name: grafana
+
+  - job_name: marquez
+    # Optional metrics bridge; Marquez API health is validated separately.
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9217
+        labels:
+          environment: local
+          service_name: marquez
+
+  - job_name: mongodb
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9216
+        labels:
+          environment: local
+          service_name: mongodb
+
+  - job_name: spark_hive_runtime
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9109
+        labels:
+          environment: local
+          service_name: spark_hive_runtime

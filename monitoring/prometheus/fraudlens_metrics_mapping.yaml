@@ -1,0 +1,135 @@
+mapping_version: 1.0
+prometheus_metric_prefix: fraudlens_
+
+source:
+  event_stream_pattern: airflow/artifacts/observability/metrics/<workflow>/<run_stamp>/metric_events.jsonl
+  required_fields:
+    - metric_name
+    - metric_value
+    - metric_type
+    - emitted_at_utc
+    - run_profile
+    - run_target
+    - workflow
+
+labels:
+  allowed:
+    - environment
+    - run_profile
+    - run_target
+    - dag_id
+    - workflow
+    - stage
+    - task_id
+    - batch_id
+    - status
+    - failure_category
+    - quality_gate
+    - severity
+    - dataset_name
+    - service_name
+    - lineage_namespace
+    - lineage_event_type
+  defaults:
+    environment: local
+    stage: pipeline
+    status: unknown
+  blocked_sources:
+    - raw_exception_message
+    - full_file_path
+    - command_text
+    - sql_text
+    - timestamp
+
+metrics:
+  pipeline_run_duration_seconds:
+    prometheus_name: fraudlens_pipeline_run_duration_seconds
+    type: gauge
+    help: Total FraudLens orchestration runtime in seconds.
+  pipeline_stage_status:
+    prometheus_name: fraudlens_pipeline_stage_status
+    type: gauge
+    help: FraudLens stage status, 1 for success and 0 for failure.
+  pipeline_task_attempt_total:
+    prometheus_name: fraudlens_pipeline_task_attempt_total
+    type: counter
+    help: FraudLens task attempts by status.
+  pipeline_task_retry_total:
+    prometheus_name: fraudlens_pipeline_task_retry_total
+    type: counter
+    help: FraudLens task retries by failure category.
+  pipeline_dataset_processed_total:
+    prometheus_name: fraudlens_pipeline_dataset_processed_total
+    type: counter
+    help: FraudLens datasets processed by stage.
+  pipeline_quality_gate_total:
+    prometheus_name: fraudlens_pipeline_quality_gate_total
+    type: counter
+    help: FraudLens quality gate outcomes.
+  pipeline_quality_failure_total:
+    prometheus_name: fraudlens_pipeline_quality_failure_total
+    type: counter
+    help: FraudLens failed quality checks.
+  pipeline_freshness_lag_seconds:
+    prometheus_name: fraudlens_pipeline_freshness_lag_seconds
+    type: gauge
+    help: FraudLens batch freshness lag in seconds.
+  pipeline_lineage_delivery_total:
+    prometheus_name: fraudlens_pipeline_lineage_delivery_total
+    type: counter
+    help: FraudLens external lineage delivery attempts.
+  pipeline_lineage_delivery_latency_seconds:
+    prometheus_name: fraudlens_pipeline_lineage_delivery_latency_seconds
+    type: gauge
+    help: FraudLens external lineage delivery latency in seconds.
+  service_health_status:
+    prometheus_name: fraudlens_service_health_status
+    type: gauge
+    help: FraudLens service availability, 1 for healthy and 0 for unhealthy.
+  service_response_time_seconds:
+    prometheus_name: fraudlens_service_response_time_seconds
+    type: gauge
+    help: FraudLens service health probe duration in seconds.
+  runtime_cpu_utilization_percent:
+    prometheus_name: fraudlens_runtime_cpu_utilization_percent
+    type: gauge
+    help: Local runtime CPU utilization when a resource exporter is available.
+  runtime_memory_utilization_percent:
+    prometheus_name: fraudlens_runtime_memory_utilization_percent
+    type: gauge
+    help: Local runtime memory utilization when a resource exporter is available.
+  runtime_disk_free_bytes:
+    prometheus_name: fraudlens_runtime_disk_free_bytes
+    type: gauge
+    help: Local runtime free storage when a resource exporter is available.
+  pipeline_run_status:
+    prometheus_name: fraudlens_pipeline_run_status
+    type: gauge
+    help: FraudLens pipeline run status, 1 for success and 0 for failure.
+  pipeline_artifact_completeness:
+    prometheus_name: fraudlens_pipeline_artifact_completeness
+    type: gauge
+    help: Completed run artifacts divided by expected run artifacts.
+  pipeline_stage_duration_seconds:
+    prometheus_name: fraudlens_pipeline_stage_duration_seconds
+    type: gauge
+    help: FraudLens pipeline stage duration in seconds.
+  pipeline_failure_total:
+    prometheus_name: fraudlens_pipeline_failure_total
+    type: counter
+    help: FraudLens pipeline failures by stage and failure category.
+  pipeline_lineage_event_total:
+    prometheus_name: fraudlens_pipeline_lineage_event_total
+    type: counter
+    help: FraudLens lineage events emitted by type and status.
+
+self_metrics:
+  parsed_events_total:
+    prometheus_name: fraudlens_metric_adapter_events_parsed_total
+    type: counter
+    help: Metric events parsed by the FraudLens Prometheus adapter.
+  skipped_events_total:
+    prometheus_name: fraudlens_metric_adapter_events_skipped_total
+    type: counter
+    help: Metric events skipped by the FraudLens Prometheus adapter.
+
