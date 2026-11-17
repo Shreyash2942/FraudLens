@@ -70,6 +70,46 @@ branches:
   enable_required_checks_only_after_verified_on_main: true
   enforcement_owner_issue: 89
   exception_fields: [owner, reason, affected_control, approved_scope, timestamp, compensating_validation, follow_up_issue]
+promotion:
+  policy_status: planned
+  required_portfolio_path: [local_development, pull_request_ci, main_candidate, dev, release_record]
+  optional_cloud_path: [dev, test, prod]
+  trigger: workflow_dispatch
+  automatic_after_merge: false
+  candidate_source_branch: main
+  verify_candidate_digest_before_deployment: true
+  preflight_existing_environment_protections: true
+  implicit_environment_creation_is_approval: false
+  full_ci_orchestration_profile_is_offline_validation: false
+  environments:
+    dev:
+      activation: pending_implementation
+      runtime: external_data_lab_spark_hive
+      runtime_profile: local
+      approval: recorded_owner_approval
+      runner: explicitly_configured_trusted_isolated_runtime_access
+      required_evidence: [success_run, controlled_failure_recovery, quality_gates, correlated_logs_artifacts_metrics_lineage]
+    test:
+      activation: disabled_by_default
+      runtime: snowflake_nonproduction
+      runtime_profile: snowflake
+      profile_readiness: scaffold_only
+      prerequisites: [dev_qualified_same_candidate, implemented_cloud_path, separate_database_schema_role, environment_protections]
+      approval: independent_authorized_reviewer
+      self_approval_allowed: false
+    prod:
+      activation: disabled_by_default
+      runtime: snowflake_production
+      runtime_profile: snowflake
+      profile_readiness: scaffold_only
+      prerequisites: [test_qualified_same_candidate, separate_production_identity, migration_restore_plan, environment_protections]
+      approval: independent_authorized_reviewer
+      self_approval_allowed: false
+  credentials:
+    scope: selected_github_environment
+    commit_secret_values: false
+    put_secret_values_in_artifacts: false
+  implementation_owner_issues: [88, 89, 90]
 release:
   policy_status: planned
   version_pattern: v0.MINOR.PATCH
