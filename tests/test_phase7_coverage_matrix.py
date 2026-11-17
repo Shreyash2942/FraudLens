@@ -69,8 +69,8 @@ class Phase7CoverageMatrixTest(unittest.TestCase):
         self.assertEqual(readiness["dashboards_available"]["status"], "covered")
         self.assertEqual(readiness["logs_debuggable"]["status"], "covered")
         self.assertEqual(readiness["lineage_captured"]["status"], "covered")
-        self.assertEqual(readiness["lineage_visualizable"]["status"], "partial")
-        self.assertIn("Requires live Marquez service", readiness["lineage_visualizable"]["gap"])
+        self.assertEqual(readiness["lineage_visualizable"]["status"], "covered")
+        self.assertTrue((REPO_ROOT / readiness["lineage_visualizable"]["evidence"]).exists())
 
 
 if __name__ == "__main__":

@@ -46,15 +46,17 @@
     },
     {
       "service": "marquez",
-      "status": "partial",
+      "status": "covered",
       "coverage": ["config_assets", "dry_run_delivery", "health_helper", "ui_checklist"],
       "evidence": [
         "monitoring/marquez/marquez.env.example",
         "scripts/deliver_openlineage_to_marquez.py",
         "scripts/check_marquez_health.py",
-        "tests/test_phase7_marquez_assets.py"
-      ],
-      "gap": "Live UI confirmation requires a running Marquez service."
+        "tests/test_phase7_marquez_assets.py",
+        "documents/evidence/phase-7/runtime-validation.json",
+        "documents/evidence/phase-7/marquez-lineage.png",
+        "documents/phase-7-closeout.md"
+      ]
     }
   ],
   "pipeline_layers": [
@@ -113,9 +115,8 @@
     },
     {
       "criterion": "lineage_visualizable",
-      "status": "partial",
-      "evidence": "documents/marquez-lineage-visualization-runbook.md",
-      "gap": "Requires live Marquez service for final UI evidence."
+      "status": "covered",
+      "evidence": "documents/phase-7-closeout.md"
     }
   ]
 }

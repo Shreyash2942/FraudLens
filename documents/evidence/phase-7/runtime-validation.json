@@ -1,0 +1,755 @@
+{
+  "checked_at_utc": "2026-11-17T04:12:29.781427+00:00",
+  "scope": "Live local integration smoke; dbt manifest metadata and synthetic metric fixture, not a fresh warehouse execution",
+  "namespace": "fraudlens.phase7.verified",
+  "dbt_jobs_verified": 61,
+  "dbt_delivery_status_codes": [
+    201
+  ],
+  "dry_run_events": 61,
+  "airflow_run_uuid": "e85f9d36-9f06-571f-985e-4a3d219796ff",
+  "airflow_pipeline_id": "manual__phase7_metadata_smoke",
+  "datasource_health": {
+    "details": {
+      "application": "Prometheus",
+      "features": {
+        "rulerApiEnabled": false
+      }
+    },
+    "message": "Successfully queried the Prometheus API.",
+    "status": "OK"
+  },
+  "dashboards": [
+    {
+      "uid": "fraudlens-failure-quality",
+      "title": "FraudLens Failure And Quality",
+      "url": "/d/fraudlens-failure-quality/fraudlens-failure-and-quality"
+    },
+    {
+      "uid": "fraudlens-lineage-health",
+      "title": "FraudLens Lineage Health",
+      "url": "/d/fraudlens-lineage-health/fraudlens-lineage-health"
+    },
+    {
+      "uid": "fraudlens-pipeline-overview",
+      "title": "FraudLens Pipeline Overview",
+      "url": "/d/fraudlens-pipeline-overview/fraudlens-pipeline-overview"
+    },
+    {
+      "uid": "fraudlens-pipeline-performance",
+      "title": "FraudLens Pipeline Performance",
+      "url": "/d/fraudlens-pipeline-performance/fraudlens-pipeline-performance"
+    },
+    {
+      "uid": "fraudlens-system-health",
+      "title": "FraudLens System Health",
+      "url": "/d/fraudlens-system-health/fraudlens-system-health"
+    }
+  ],
+  "jobs": [
+    {
+      "job": "dbt.model.fraudlens.dim_account",
+      "run_uuid": "39326a42-16ae-5429-879a-878faa27ab5b",
+      "inputs": [
+        "SILVER.silver_branch_location",
+        "SILVER.silver_business_unit",
+        "SILVER.silver_deposit_account",
+        "SILVER.silver_party",
+        "SILVER.silver_region"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_account"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_analyst_team",
+      "run_uuid": "6960975a-29cb-5f9b-a2e0-75bb665c1f15",
+      "inputs": [
+        "SILVER.silver_analyst_team",
+        "SILVER.silver_business_unit",
+        "SILVER.silver_region"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_analyst_team"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_branch",
+      "run_uuid": "4857e4e9-e3ee-57f5-b63c-1799139b0907",
+      "inputs": [
+        "SILVER.silver_branch_location",
+        "SILVER.silver_branch_territory",
+        "SILVER.silver_region"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_branch"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_business_unit",
+      "run_uuid": "0dba74f0-dc7c-58ec-9b69-8017693a0a00",
+      "inputs": [
+        "SILVER.silver_business_unit",
+        "SILVER.silver_region"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_business_unit"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_card",
+      "run_uuid": "d3feb021-82a7-5430-a698-914e924a6e06",
+      "inputs": [
+        "SILVER.silver_deposit_account",
+        "SILVER.silver_payment_card"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_card"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_channel",
+      "run_uuid": "6160a00d-5669-5773-842a-cdf4abcc421d",
+      "inputs": [
+        "SILVER.silver_branch_location",
+        "SILVER.silver_channel_event"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_channel"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_customer",
+      "run_uuid": "7751c717-7a06-55c8-b982-75e1ddb495a3",
+      "inputs": [
+        "SILVER.silver_analyst_team",
+        "SILVER.silver_branch_location",
+        "SILVER.silver_business_unit",
+        "SILVER.silver_party",
+        "SILVER.silver_party_org_assignment",
+        "SILVER.silver_region"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_customer"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_customer_org_assignment",
+      "run_uuid": "1d533003-6e1d-5302-8095-688aa44fffa2",
+      "inputs": [
+        "SILVER.silver_analyst_team",
+        "SILVER.silver_branch_location",
+        "SILVER.silver_business_unit",
+        "SILVER.silver_party_org_assignment"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_customer_org_assignment"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_date",
+      "run_uuid": "99619f64-9206-5238-9ff9-aea3ebc47b1e",
+      "inputs": [
+        "SILVER.silver_calendar_day"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_date"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_device",
+      "run_uuid": "850f7c7c-e6fa-5365-8b1b-ae58c319a90f",
+      "inputs": [
+        "SILVER.silver_device_profile"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_device"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_merchant",
+      "run_uuid": "534af8b9-ec43-528c-be91-bc1db9a3f5b5",
+      "inputs": [
+        "SILVER.silver_payment_instruction",
+        "SILVER.silver_payment_transaction"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_merchant"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_reference_code",
+      "run_uuid": "c5f4bf52-1447-57d6-ac9f-23cfa044a936",
+      "inputs": [
+        "SILVER.silver_reference_data_catalog"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_reference_code"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.dim_region",
+      "run_uuid": "fc438ab8-6a0b-557a-9add-36276eb92da8",
+      "inputs": [
+        "SILVER.silver_region"
+      ],
+      "outputs": [
+        "GOLD.gold_dim_region"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.fact_daily_fraud_metrics",
+      "run_uuid": "7088a35c-dcf5-5c13-89cf-16b92eea1a37",
+      "inputs": [
+        "GOLD.gold_fact_fraud_alerts",
+        "GOLD.gold_fact_payment_events",
+        "GOLD.gold_fact_transactions",
+        "SILVER.silver_calendar_day"
+      ],
+      "outputs": [
+        "GOLD.gold_fact_daily_fraud_metrics"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.fact_fraud_alerts",
+      "run_uuid": "a7bdf0c1-023b-55d5-b55f-32fbee6844fa",
+      "inputs": [
+        "SILVER.silver_case_disposition",
+        "SILVER.silver_decision_record",
+        "SILVER.silver_fraud_alert",
+        "SILVER.silver_fraud_case",
+        "SILVER.silver_payment_instruction",
+        "SILVER.silver_risk_signal"
+      ],
+      "outputs": [
+        "GOLD.gold_fact_fraud_alerts"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.fact_payment_events",
+      "run_uuid": "08524a79-5551-5843-99be-744ad5b7223d",
+      "inputs": [
+        "SILVER.silver_fraud_alert",
+        "SILVER.silver_fraud_case",
+        "SILVER.silver_payment_instruction",
+        "SILVER.silver_payment_transaction",
+        "SILVER.silver_risk_signal"
+      ],
+      "outputs": [
+        "GOLD.gold_fact_payment_events"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.fact_transactions",
+      "run_uuid": "253acc0d-d9d9-5e3b-be85-cbe0ffd00b6f",
+      "inputs": [
+        "SILVER.silver_fraud_alert",
+        "SILVER.silver_fraud_case",
+        "SILVER.silver_payment_instruction",
+        "SILVER.silver_payment_transaction",
+        "SILVER.silver_risk_signal"
+      ],
+      "outputs": [
+        "GOLD.gold_fact_transactions"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.kpi_daily_fraud_operations",
+      "run_uuid": "070f2d7a-83f4-564f-9df1-d269156ceade",
+      "inputs": [
+        "GOLD.gold_fact_daily_fraud_metrics"
+      ],
+      "outputs": [
+        "GOLD.gold_kpi_daily_fraud_operations"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.kpi_portfolio_risk_snapshot",
+      "run_uuid": "bc0e0223-a8b4-5965-8d66-54ec96b6c570",
+      "inputs": [
+        "GOLD.gold_fact_daily_fraud_metrics",
+        "GOLD.gold_fact_payment_events"
+      ],
+      "outputs": [
+        "GOLD.gold_kpi_portfolio_risk_snapshot"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__analyst_team",
+      "run_uuid": "cc73d7b2-bfb2-516e-a5f7-887e62832573",
+      "inputs": [
+        "BRONZE.bronze_stg_analyst_team"
+      ],
+      "outputs": [
+        "SILVER.silver_analyst_team"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__branch_location",
+      "run_uuid": "36d8c7b0-1d2d-5d1f-930f-7461b8ee068e",
+      "inputs": [
+        "BRONZE.bronze_stg_branch_location"
+      ],
+      "outputs": [
+        "SILVER.silver_branch_location"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__branch_territory",
+      "run_uuid": "5a311553-427a-5164-9dbc-bd12b2ee03d0",
+      "inputs": [
+        "BRONZE.bronze_stg_branch_territory"
+      ],
+      "outputs": [
+        "SILVER.silver_branch_territory"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__business_unit",
+      "run_uuid": "f30b21bc-381f-5fae-bc86-f857511a4dd1",
+      "inputs": [
+        "BRONZE.bronze_stg_business_unit"
+      ],
+      "outputs": [
+        "SILVER.silver_business_unit"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__calendar_day",
+      "run_uuid": "d9b65030-8103-5dd5-8af4-4b74408ef7a7",
+      "inputs": [
+        "BRONZE.bronze_stg_calendar_day"
+      ],
+      "outputs": [
+        "SILVER.silver_calendar_day"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__case_disposition",
+      "run_uuid": "1fff5303-c3de-5d18-aa5a-9ac9aeb037d5",
+      "inputs": [
+        "BRONZE.bronze_stg_case_disposition"
+      ],
+      "outputs": [
+        "SILVER.silver_case_disposition"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__channel_event",
+      "run_uuid": "294e9d97-3668-5afd-8491-6cb05d5a952e",
+      "inputs": [
+        "BRONZE.bronze_stg_channel_event"
+      ],
+      "outputs": [
+        "SILVER.silver_channel_event"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__decision_record",
+      "run_uuid": "5ecaee13-955b-577e-860a-c98543d2676a",
+      "inputs": [
+        "BRONZE.bronze_stg_decision_record"
+      ],
+      "outputs": [
+        "SILVER.silver_decision_record"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__deposit_account",
+      "run_uuid": "4d0a28fc-b85e-544a-b7ca-d289492e68c0",
+      "inputs": [
+        "BRONZE.bronze_stg_deposit_account"
+      ],
+      "outputs": [
+        "SILVER.silver_deposit_account"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__device_profile",
+      "run_uuid": "9cbac0e1-490c-5418-afea-df79361b03a1",
+      "inputs": [
+        "BRONZE.bronze_stg_device_profile"
+      ],
+      "outputs": [
+        "SILVER.silver_device_profile"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__fraud_alert",
+      "run_uuid": "34e3a270-7e93-500c-a018-59fbb6ff7740",
+      "inputs": [
+        "BRONZE.bronze_stg_fraud_alert"
+      ],
+      "outputs": [
+        "SILVER.silver_fraud_alert"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__fraud_case",
+      "run_uuid": "0d134914-3206-5263-aac0-6c7466edc10f",
+      "inputs": [
+        "BRONZE.bronze_stg_fraud_case"
+      ],
+      "outputs": [
+        "SILVER.silver_fraud_case"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__investigation_event",
+      "run_uuid": "d11bee9e-ba9f-5ce6-8da3-3200341813cb",
+      "inputs": [
+        "BRONZE.bronze_stg_investigation_event"
+      ],
+      "outputs": [
+        "SILVER.silver_investigation_event"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__party",
+      "run_uuid": "e90beb24-4f48-5eb2-9f14-e1298868cab1",
+      "inputs": [
+        "BRONZE.bronze_stg_party"
+      ],
+      "outputs": [
+        "SILVER.silver_party"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__party_org_assignment",
+      "run_uuid": "04fd7c84-61a8-5c3d-b1dd-2c2ee67969db",
+      "inputs": [
+        "BRONZE.bronze_stg_party_org_assignment"
+      ],
+      "outputs": [
+        "SILVER.silver_party_org_assignment"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__payment_card",
+      "run_uuid": "cf6cbe10-64c2-55b1-94da-cd8837c620c9",
+      "inputs": [
+        "BRONZE.bronze_stg_payment_card"
+      ],
+      "outputs": [
+        "SILVER.silver_payment_card"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__payment_instruction",
+      "run_uuid": "9fea8dab-fcd9-5ca2-b151-7e46f78d40b3",
+      "inputs": [
+        "BRONZE.bronze_stg_payment_instruction"
+      ],
+      "outputs": [
+        "SILVER.silver_payment_instruction"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__payment_transaction",
+      "run_uuid": "c90783c9-1a94-5ffe-a89a-034fcd952680",
+      "inputs": [
+        "BRONZE.bronze_stg_payment_transaction"
+      ],
+      "outputs": [
+        "SILVER.silver_payment_transaction"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__reference_data_catalog",
+      "run_uuid": "966d177f-f891-561c-81bf-f6a33d992910",
+      "inputs": [
+        "BRONZE.bronze_stg_reference_data_catalog"
+      ],
+      "outputs": [
+        "SILVER.silver_reference_data_catalog"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__region",
+      "run_uuid": "86d50151-6d9c-5f63-864a-35bf92690a20",
+      "inputs": [
+        "BRONZE.bronze_stg_region"
+      ],
+      "outputs": [
+        "SILVER.silver_region"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.slv__risk_signal",
+      "run_uuid": "b6d19202-c533-5718-aeb9-211435128b53",
+      "inputs": [
+        "BRONZE.bronze_stg_risk_signal"
+      ],
+      "outputs": [
+        "SILVER.silver_risk_signal"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__analyst_team",
+      "run_uuid": "a0c9c86f-a784-53a5-b7dc-614014d4d30e",
+      "inputs": [
+        "BRONZE.analyst_team"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_analyst_team"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__branch_location",
+      "run_uuid": "a3d2aa34-d6f4-5962-838e-7d20a7cbbe3b",
+      "inputs": [
+        "BRONZE.branch_location"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_branch_location"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__branch_territory",
+      "run_uuid": "126fe697-0c9f-5dde-bc0e-75078539f05f",
+      "inputs": [
+        "BRONZE.branch_territory"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_branch_territory"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__business_unit",
+      "run_uuid": "25a428f0-b16d-5b67-a8df-0c28c512526d",
+      "inputs": [
+        "BRONZE.business_unit"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_business_unit"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__calendar_day",
+      "run_uuid": "49911e12-a79b-55be-ad08-95a7f2e64165",
+      "inputs": [
+        "BRONZE.calendar_day"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_calendar_day"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__case_disposition",
+      "run_uuid": "e71882ba-40ce-5635-8b54-6f1172e5d22f",
+      "inputs": [
+        "BRONZE.case_disposition"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_case_disposition"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__channel_event",
+      "run_uuid": "1a3b1789-9dc1-59bc-9b38-b62368eed887",
+      "inputs": [
+        "BRONZE.channel_event"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_channel_event"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__decision_record",
+      "run_uuid": "31e3017e-a836-5172-9d10-618eaf0cfdb6",
+      "inputs": [
+        "BRONZE.decision_record"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_decision_record"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__deposit_account",
+      "run_uuid": "1974b68a-abe8-57dd-9850-9e2131b13697",
+      "inputs": [
+        "BRONZE.deposit_account"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_deposit_account"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__device_profile",
+      "run_uuid": "c4c14c29-781e-5c5a-add1-b2d96054a594",
+      "inputs": [
+        "BRONZE.device_profile"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_device_profile"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__fraud_alert",
+      "run_uuid": "f858329b-29ae-5beb-af66-512dda1345af",
+      "inputs": [
+        "BRONZE.fraud_alert"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_fraud_alert"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__fraud_case",
+      "run_uuid": "476e7afd-bd19-5e2a-9b3e-405c10a73ba2",
+      "inputs": [
+        "BRONZE.fraud_case"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_fraud_case"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__investigation_event",
+      "run_uuid": "165a06a6-b938-595e-b86d-457d5cfe75f1",
+      "inputs": [
+        "BRONZE.investigation_event"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_investigation_event"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__party",
+      "run_uuid": "b30d65a7-e80a-5ab9-a798-aa799f4231bf",
+      "inputs": [
+        "BRONZE.party"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_party"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__party_org_assignment",
+      "run_uuid": "d296bbf5-807d-5d63-b701-b51164116e05",
+      "inputs": [
+        "BRONZE.party_org_assignment"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_party_org_assignment"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__payment_card",
+      "run_uuid": "351706fe-b771-5443-ad55-59964ed36e65",
+      "inputs": [
+        "BRONZE.payment_card"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_payment_card"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__payment_instruction",
+      "run_uuid": "8179acd3-e937-5aa8-8ac0-d9ee4c69db40",
+      "inputs": [
+        "BRONZE.payment_instruction"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_payment_instruction"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__payment_transaction",
+      "run_uuid": "a5290c5e-63e1-5c89-a860-58111f8c002a",
+      "inputs": [
+        "BRONZE.payment_transaction"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_payment_transaction"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__reference_data_catalog",
+      "run_uuid": "34942d68-2249-5242-9402-70a0733daf93",
+      "inputs": [
+        "BRONZE.reference_data_catalog"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_reference_data_catalog"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__region",
+      "run_uuid": "92626780-8a54-560a-8195-d4108fc4c649",
+      "inputs": [
+        "BRONZE.region"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_region"
+      ]
+    },
+    {
+      "job": "dbt.model.fraudlens.stg_bronze__risk_signal",
+      "run_uuid": "16323f52-5a05-5589-aedf-48e261eabd79",
+      "inputs": [
+        "BRONZE.risk_signal"
+      ],
+      "outputs": [
+        "BRONZE.bronze_stg_risk_signal"
+      ]
+    }
+  ],
+  "panel_queries": [
+    {
+      "dashboard": "fraudlens-pipeline-overview",
+      "query": "fraudlens_pipeline_run_status{environment=\"local\",run_profile=\"local\"}",
+      "series_count": 1,
+      "values": [
+        "1"
+      ]
+    },
+    {
+      "dashboard": "fraudlens-pipeline-performance",
+      "query": "fraudlens_pipeline_stage_duration_seconds{environment=\"local\",run_profile=\"local\"}",
+      "series_count": 1,
+      "values": [
+        "42.5"
+      ]
+    },
+    {
+      "dashboard": "fraudlens-failure-quality",
+      "query": "fraudlens_pipeline_failure_total{environment=\"local\",run_profile=\"local\"}",
+      "series_count": 1,
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "dashboard": "fraudlens-system-health",
+      "query": "up{environment=\"local\"}",
+      "series_count": 1,
+      "values": [
+        "1"
+      ]
+    },
+    {
+      "dashboard": "fraudlens-lineage-health",
+      "query": "fraudlens_pipeline_lineage_event_total{environment=\"local\",run_profile=\"local\"}",
+      "series_count": 1,
+      "values": [
+        "61"
+      ]
+    },
+    {
+      "dashboard": "fraudlens-pipeline-overview",
+      "query": "fraudlens_pipeline_stage_status{environment=\"local\",run_profile=\"local\"}",
+      "series_count": 1,
+      "values": [
+        "1"
+      ]
+    }
+  ],
+  "queries_verified_at_utc": "2026-11-17T04:22:34.920481+00:00",
+  "browser_checks": {
+    "marquez_namespace_visible": true,
+    "marquez_dim_account_graph_visible": true,
+    "grafana_pipeline_overview_visible": true
+  },
+  "marquez_dim_account_graph_node_count": 58
+}

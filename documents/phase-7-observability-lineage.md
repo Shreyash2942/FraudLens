@@ -47,6 +47,10 @@ py scripts\validate_observability_lineage_coverage.py
 py -m pytest tests\test_phase7_coverage_matrix.py tests\test_phase7_marquez_assets.py tests\test_phase7_dbt_openlineage_export.py airflow\tests\test_openlineage_integration.py -q
 ```
 
-## Remaining External Evidence
+## Closeout Evidence
 
-Live Marquez UI evidence depends on the local/runtime Marquez service being available. The repository includes dry-run delivery, health checks, and UI validation checklist to capture that evidence when the service is running.
+Live local verification was completed on November 16, 2026 (America/New_York). See [the closeout record](phase-7-closeout.md) and [runtime evidence](evidence/phase-7/runtime-validation.json).
+
+Marquez accepted 61 dbt model events and an Airflow ingestion metadata event. Each dbt job's inputs and outputs were checked against its manifest event. Grafana has all five FraudLens dashboards, a healthy Prometheus datasource, and successful queries for each dashboard. The Marquez UI graph was inspected and captured.
+
+This validates local integration using manifest metadata and synthetic metric fixtures. A fresh warehouse pipeline execution, optional CPU/memory exporters, external alert delivery, and Snowflake production validation remain separate work. The feature branch requires pull request review and merge before Phase 8 begins on `main`.
