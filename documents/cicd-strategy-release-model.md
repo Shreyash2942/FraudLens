@@ -61,6 +61,35 @@ The candidate bundle must contain the commit SHA, pull request, workflow run/att
 - Serialize deployment per environment; do not cancel a deployment mid-migration to make way for a newer candidate. Pull-request checks may cancel superseded runs.
 - On failed runtime verification, stop promotion and capture evidence. Restore the prior verified code/configuration candidate only when the operator confirms compatibility. Warehouse data/schema changes require a documented restore or forward-fix decision; checking out old code does not roll back data.
 
+## 2. Branch and merge expectations
+
+### Branch lifecycle
+
+- `main` is the integration and candidate source branch. Feature branches start from current `origin/main` and use `NN-short-slug`, with the issue number in commits and the pull request.
+- Phase-wide branches may use the parent issue number. The existing `83-phase-8-cicd-implementation` branch groups Phase 8 work; issue #84 contributes four task commits to it. Closing #84 records design delivery on this branch, not a merge of the complete phase.
+- There is no permanent `develop`, `test`, or `prod` code branch. Promote an identified `main` candidate through environment gates instead of copying code between environment branches.
+- Preserve the task history with a merge commit for the phase pull request. Small corrective pull requests may use another documented merge method only when issue/commit traceability remains intact.
+- Synchronize changes from `main` and rerun qualification after conflict resolution. Avoid rewriting a branch under active review. An explicitly agreed rewrite requires a backup, `--force-with-lease`, and fresh checks; never force-push `main` or move an existing release tag.
+
+### Merge policy and enforcement handoff
+
+| Requirement | Policy | Enforcement owner |
+| --- | --- | --- |
+| Pull request | All ordinary changes to `main` use an issue-linked PR with scope, validation, control impact, and known limitations. | #85, #89 |
+| Current checks | The latest tested revision must have a successful `CI Summary`; resolve relevant failed checks and conversations. A newly changed revision invalidates older evidence. | #85–#87, #89 |
+| Review | With another qualified maintainer, require an independent approval and dismiss stale approval after material changes. A sole maintainer records the review checklist and explicit owner acceptance in the PR; this is self-review, not independent approval. | #89 |
+| Protected integration | Require PRs, passing aggregate checks, up-to-date integration, and resolved conversations; restrict deletion and force pushes, including administrative bypass where supported. | #89 |
+| Check availability | Enable required status contexts only after the jobs exist on `main` and their exact names are verified. Path-specific checks cannot be the only required workflow. | #85, #89 |
+| Release changes | Changes to workflows, contracts, environment controls, or release logic receive an explicit control-impact review even when no runtime code changes. | #87, #89 |
+
+Branch protection and rulesets are GitHub settings, not effects of this YAML contract. Issue #89 must record the configured settings and the sole-maintainer review arrangement. Until settings are enforced, the owner follows the same checklist manually and reports the enforcement gap rather than describing an unprotected branch as protected.
+
+### Exceptions and hotfixes
+
+A hotfix starts from the currently deployed release commit on an issue-linked branch. It follows the same validation, PR, and evidence requirements, is merged into `main`, and is revalidated as a new candidate before deployment. If `main` contains other undeployed changes, qualify the complete candidate or hold promotion; do not bypass the candidate-source rule by silently deploying an arbitrary hotfix ref.
+
+An exceptional administrative action requires a named owner, reason, affected control, approved scope, timestamp, compensating validation, and linked follow-up. Missing credentials, failed tests, unavailable reviewers for protected test/prod promotion, and absent environment rules do not turn into automatic approval. Do not weaken a gate to obtain a green run.
+
 ### Source references
 
 The design follows GitHub's documented [workflow events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows), [protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches), [deployment environments](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments), and [secure workflow practices](https://docs.github.com/en/actions/reference/security/secure-use). Workflow and repository-setting implementation is tracked separately from this design.

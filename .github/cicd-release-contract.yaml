@@ -51,6 +51,25 @@ candidate:
     - configuration_fingerprint_without_secrets
     - operator_owner
   include_secrets_or_generated_banking_data: false
+branches:
+  policy_status: planned
+  integration: main
+  feature_pattern: NN-short-slug
+  phase_8_branch: 83-phase-8-cicd-implementation
+  permanent_environment_branches: false
+  pull_request_required: true
+  phase_merge_method: merge_commit
+  required_check: CI Summary
+  require_current_revision: true
+  require_up_to_date_integration: true
+  resolve_conversations_before_merge: true
+  independent_approval_when_qualified_reviewer_available: true
+  sole_maintainer_acceptance_note_required: true
+  sole_maintainer_acceptance_is_independent_review: false
+  allow_main_force_push: false
+  enable_required_checks_only_after_verified_on_main: true
+  enforcement_owner_issue: 89
+  exception_fields: [owner, reason, affected_control, approved_scope, timestamp, compensating_validation, follow_up_issue]
 release:
   policy_status: planned
   version_pattern: v0.MINOR.PATCH

@@ -23,6 +23,16 @@ FraudLens uses a standards-first delivery model. Every material change should be
 - Feature branches should use `NN-short-slug`.
 - Branch names should reflect the issue being addressed.
 
+## CI/CD And Merge Policy
+
+The [CI/CD strategy and release model](documents/cicd-strategy-release-model.md) and [operational contract](.github/cicd-release-contract.yaml) define the Phase 8 delivery policy.
+
+- Use an issue-linked PR into `main`, preserve task-level commits, and include validation and control-impact evidence.
+- Require passing checks for the current revision and resolve review conversations before merging.
+- Record independent review when another qualified maintainer is available. A sole maintainer records explicit owner acceptance and the review checklist; do not describe this as independent approval.
+- Use the phase merge commit to preserve the issue and task history. Promote a validated `main` commit rather than an environment branch.
+- Treat branch protection, aggregate checks, and environment controls as planned until their implementation issues provide enforcement evidence.
+
 ## Definition Of Ready For Design Changes
 
 - Business purpose is clear.
