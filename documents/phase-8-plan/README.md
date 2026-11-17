@@ -1,0 +1,20 @@
+# Phase 8: CI/CD Implementation
+
+Parent: [#83](https://github.com/Shreyash2942/FraudLens/issues/83)  
+Milestone: Phase 8: CI/CD Implementation  
+Branch: `83-phase-8-cicd-implementation`
+
+The [CI/CD strategy and release model](../cicd-strategy-release-model.md) and [operational contract](../../.github/cicd-release-contract.yaml) define the issue #84 design baseline. This planning workspace tracks implementation dependencies and evidence; the final Phase 8 operations handoff belongs to #91.
+
+| Issue | Workstream | Delivery position |
+| --- | --- | --- |
+| [#84](https://github.com/Shreyash2942/FraudLens/issues/84) | Define CI/CD Strategy & Release Model | Design delivered through four task commits; implementation remains in the workstreams below. |
+| #85 | Implement CI Workflow for Code Validation | First implementation priority: PR/post-merge orchestration and aggregate gate. |
+| #86 | Integrate dbt Validation into CI | Reuse existing dbt validators after #85. |
+| #87 | Integrate Python Checks & Repository Standards | Clean-workspace tests and standards validation after #85. |
+| #89 | Configure Environment Controls & Secrets Handling | Must be ready before privileged #88 deployment execution. |
+| #88 | Implement Deployment Workflow | Build the candidate/dispatch path; dry-run scaffolding may proceed alongside #89. |
+| #90 | Validate End-to-End CI/CD Execution | Prove successful promotion, blocking failure, and recovery using real runtime evidence. |
+| #91 | Document CI/CD Workflows & Release Process | Publish the final runbook and clearly bounded Phase 8 handoff. |
+
+Issue closure records delivery on the feature branch. The Phase 8 parent and milestone stay open until the remaining workstreams are complete and the phase is reviewed and merged. Branch protection, environment controls, deployment credentials, and automatic workflows are not activated by this planning document.

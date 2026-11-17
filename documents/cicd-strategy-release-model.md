@@ -126,6 +126,51 @@ Archive sanitized summaries that correlate Airflow logs, artifact persistence, m
 
 Record the prior verified candidate and compatible configuration before promotion. If verification fails, stop, capture the failure, and have the owner choose a compatible restore or forward fix. Database changes require separate migration/restore evidence. Repeat validation after recovery before publishing any release.
 
+## 4. Milestone alignment and delivery handoff
+
+### Dependency and priority order
+
+| Issue | Priority / delivery step | Required deliverable | Dependency and exit evidence |
+| --- | --- | --- | --- |
+| #84 | P0 design foundation | This operating model and operational contract; four task commits. | Close after design review, link/contract validation, scoped graph refresh, and push. Does not close #83. |
+| #85 | P0 CI foundation | PR and post-merge validation orchestration with a stable `CI Summary`. | Implements #84; prove a passing change and a failing mandatory check. |
+| #86 | P0 dbt gates | Integrate the established parse, selectors, governance/contracts/failure-policy checks and docs generation. | Builds on #85; prove failures propagate to the aggregate check without a live warehouse. |
+| #87 | P0 repository/Python gates | Clean-workspace Python tests and relevant standards/link/YAML checks. | Builds on #85; prove code and documentation changes receive the right checks. |
+| #89 | P0 environment controls | Environment definitions, credentials/variables, review arrangement, branch/ref restrictions, and secret-safe execution. | Design alongside #88; configure and verify before any privileged live deployment. |
+| #88 | P1 controlled deployment | Explicitly dispatched candidate verification and runtime adapter, with environment serialization and recovery handling. | May develop dry-run scaffolding alongside #89; live use requires #85–#87 and #89. |
+| #90 | P1 end-to-end proof | Successful required `dev` path plus deliberate validation/promotion failure and controlled recovery. | Requires implemented #85–#89; archive real run/attempt IDs and sanitized evidence. |
+| #91 | P1 final handoff | Reproducible operations/release runbook and consolidated Phase 8 outcome. | Use #90 evidence; state implemented controls and remaining limitations explicitly. |
+
+Priority order follows control dependencies rather than issue-number order. No privileged deployment is enabled merely because #88 appears before #89 in the milestone.
+
+### Relationship to completed and future phases
+
+- Phases 0–5 supply standards, governed data contracts, deterministic generation, warehouse/dbt assets, and failure-blocking quality controls. CI reuses their existing validators rather than redefining domain semantics.
+- Phase 6 supplies runtime topology, failure handling, artifacts, and the [CI/CD handoff checklist](airflow-orchestration-cicd-handoff-checklist.md). Hosted CI can prove repository contracts; actual DAG imports, success runs, and failure/recovery belong to the configured runtime verification path.
+- Phase 7 supplies metrics, logs, lineage contracts, and [documented validation boundaries](phase-7-closeout.md). Preserve the distinction between fixture/manifest smoke evidence and fresh execution evidence.
+- Phase 8 completes when #85–#91 provide repeatable validation, enforced merge/promotion controls, required local runtime evidence, and the final runbook. A conditional cloud path must be described as disabled or qualified for a named target; it cannot be represented as production validation by inference.
+- Phase 9 analytics consumes a known, traceable code/data-model baseline with the CI gates available for subsequent dashboard/model changes. Phase 10 completes operational hardening and final reproducibility. These later milestones are not automatically completed by a passing Phase 8 workflow.
+
+### Issue #84 acceptance and owner decisions
+
+The four issue tasks are satisfied by sections 1–4 and the matching sections of the operational contract. Owner: `Shreyash2942`. The agreed defaults are issue-linked phase branches, merge commits preserving task history, recorded sole-maintainer acceptance for the portfolio, explicit `dev` promotion, and disabled cloud promotion until independent approval and target prerequisites exist.
+
+Review the design against the following scenarios before implementation:
+
+| Scenario | Required decision |
+| --- | --- |
+| Documentation-only PR | Run standards validation and `CI Summary`; record why runtime jobs are inapplicable. |
+| Python/dbt/contract change | Run affected validators and require every applicable result in the summary. |
+| Untrusted fork PR | Use hosted isolated validation without deployment secrets or persistent self-hosted execution. |
+| PR passed but merged SHA differs | Revalidate the actual `main` commit before packaging a candidate. |
+| Candidate digest or material configuration changes | Reject old qualification and repeat affected validation. |
+| Unknown/unprotected environment or unavailable required approval | Stop before privileged execution. |
+| Current scaffold-only Snowflake profile selected | Reject live cloud promotion until its activation prerequisites are proved. |
+| Runtime quality gate fails | Stop promotion, retain failure evidence, and perform a documented recovery decision. |
+| Issue #84 design is closed | Leave #83 and #85–#91 open; continue implementation on the Phase 8 branch. |
+
+These are reviewed design outcomes. Executable demonstration and enforcement are acceptance work for #85–#90. No live GitHub settings, deployment workflow, release tag, credentials, or runtime resource is created by issue #84.
+
 ### Source references
 
 The design follows GitHub's documented [workflow events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows), [protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches), [deployment environments](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments), and [secure workflow practices](https://docs.github.com/en/actions/reference/security/secure-use). Workflow and repository-setting implementation is tracked separately from this design.

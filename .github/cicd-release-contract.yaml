@@ -110,6 +110,25 @@ promotion:
     commit_secret_values: false
     put_secret_values_in_artifacts: false
   implementation_owner_issues: [88, 89, 90]
+delivery_alignment:
+  parent_issue: 83
+  issue_84_task_count: 4
+  one_commit_per_task: true
+  issue_84_completion_closes_parent: false
+  priority_order: [84, 85, 86, 87, 89, 88, 90, 91]
+  dependencies:
+    85: [84]
+    86: [85]
+    87: [85]
+    89: [84]
+    88: [85, 86, 87, 89]
+    90: [85, 86, 87, 88, 89]
+    91: [90]
+  deployment_dry_run_design_may_parallel_environment_controls: true
+  required_runtime_qualification: dev
+  cloud_runtime_qualification: optional_disabled_until_prerequisites_verified
+  next_phase: 9
+  final_hardening_phase: 10
 release:
   policy_status: planned
   version_pattern: v0.MINOR.PATCH
