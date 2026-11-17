@@ -1,0 +1,64 @@
+contract_version: "1.0"
+project: FraudLens
+phase: 8
+issue: 84
+owner: Shreyash2942
+status: design_defined
+decision_date: "2026-11-17"
+strategy_document: documents/cicd-strategy-release-model.md
+scope:
+  - validation
+  - merge_control
+  - candidate_identity
+  - environment_promotion
+  - release_evidence
+implementation_issues: [85, 86, 87, 88, 89, 90, 91]
+baseline:
+  source_commit: 0be6db22652c135df81aaad885e251a52d1bf314
+  workflow: .github/workflows/pr-validation.yml
+  existing_check: dbt Structure Validation
+  existing_triggers: [pull_request_path_filtered, workflow_dispatch]
+  protected_main: false
+  repository_rulesets: []
+  github_environments: []
+  published_releases: []
+validation:
+  policy_status: planned
+  aggregate_check: CI Summary
+  gates: [repository_standards, python_validation, dbt_validation]
+  required_summary_on_every_pull_request: true
+  unjustified_skip_or_missing_result: fail
+  cancelled_required_check: fail
+  pull_request_runner: ephemeral_github_hosted
+  default_token_permissions:
+    contents: read
+  pull_request_deployment_secrets: false
+  untrusted_pull_request_on_persistent_self_hosted_runner: false
+  privileged_pull_request_target_executes_untrusted_code: false
+  clean_workspace_required: true
+candidate:
+  source_branch: main
+  post_merge_revalidation_required: true
+  identity_fields: [commit_sha, workflow_run_id, workflow_run_attempt, artifact_digest]
+  changed_commit_or_configuration_requires_revalidation: true
+  evidence_retention_days: 30
+  evidence_fields:
+    - pull_request
+    - tested_head_and_merge_shas
+    - dependency_versions
+    - manifest_digest
+    - gate_outcomes
+    - configuration_fingerprint_without_secrets
+    - operator_owner
+  include_secrets_or_generated_banking_data: false
+release:
+  policy_status: planned
+  version_pattern: v0.MINOR.PATCH
+  automatic_on_phase_completion: false
+  validated_environment_must_be_named: true
+  immutable_tag_required: true
+  candidate_digest_verification_required: true
+  release_evidence_index_required: true
+  deployment_concurrency: serialize_per_environment
+  cancel_deployment_in_progress: false
+  rollback_data_by_reverting_code: false
