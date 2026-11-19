@@ -31,14 +31,24 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Validate repository foundation
-        run: |
-          python - <<'PY'
-          import subprocess
-          required = ["README.md", "AGENTS.md", "CONTRIBUTING.md", "specs/README.md", "standards/README.md"]
-          subprocess.run(["git", "ls-files", "--error-unmatch", "--", *required], check=True)
-          print("Required repository foundations are tracked.")
-          PY
+      - name: Install baseline validation dependency
+        run: python -m pip install --disable-pip-version-check -r requirements-ci.txt
+
+      - name: Test CI validation and failure propagation
+        run: python -m unittest discover -s tests/ci -p 'test_*.py' -v
+
+      - name: Validate tracked repository files
+        run: python scripts/ci/validate_repository.py --report .ci-artifacts/repository-checks.json
+
+      - name: Preserve baseline validation report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: baseline-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-artifacts/repository-checks.json
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
 
   ci-summary:
     name: CI Summary

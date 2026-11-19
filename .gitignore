@@ -5,6 +5,9 @@ synthetic_generator/runtime_config.yaml
 __pycache__/
 *.pyc
 
+# Local CI validation reports
+/.ci-artifacts/
+
 # Local Codex state
 .codex/
 
