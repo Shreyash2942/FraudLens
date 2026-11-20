@@ -1,4 +1,4 @@
-{{ config(alias='gold_fact_transactions', tags=['gold', 'fact'], materialized='incremental') }}
+{{ config(alias='INVALID_CI_ALIAS', tags=['gold', 'fact'], materialized='incremental') }}
 
 with transactions as (
     select *
