@@ -24,7 +24,7 @@ Diagnostics identify the path, failure category, and line when available without
 
 The baseline job runs `tests/ci` before checking repository files. These 11 tests prove syntax rejection, private-file handling, ignored-config isolation, inventory failures, PR trigger coverage, runner/permission boundaries, and summary exit behavior. `CI Summary` uses `always()` and accepts only `success`: failure, cancellation, skipped, missing, and unknown baseline results are rejected. If the entire run is cancelled before the summary can run, cancellation is not successful qualification.
 
-This foundation does not yet aggregate the existing dbt workflow or run all application tests in CI. Those are #86 and #87. Documentation-link, domain metadata, and broader standards enforcement also remain #87. Existing `pr-validation.yml` continues its path-filtered dbt checks independently. GitHub branch protection and deployment controls remain #89 and #88. No protection settings, environments, credentials, or releases are changed by #85.
+At issue #85 completion, this foundation did not aggregate the existing dbt workflow or run all application tests in CI. Issue [#86 now integrates offline dbt checks](issue-86-dbt-validation.md) into the aggregate and removes the separate `pr-validation.yml`. Documentation-link, domain metadata, broader Python and standards enforcement remain #87. GitHub branch protection and deployment controls remain #89 and #88. No protection settings, environments, credentials, or releases are changed by #85.
 
 ## Live execution evidence
 

@@ -21,7 +21,7 @@ The three P0 decisions establish the control boundaries before workflow implemen
 
 ### Observed baseline
 
-At the Phase 8 baseline, `main` contains merged Phase 7 at `0be6db2`. The existing [PR workflow](../.github/workflows/pr-validation.yml) runs `dbt Structure Validation` for changes under `dbt/` or its own workflow file. It performs dbt parsing, selector/governance/contract validation, and empty-catalog documentation generation using Python 3.11, dbt-core 1.8.7, and the Hive adapter.
+At the Phase 8 baseline, `main` contains merged Phase 7 at `0be6db2`. The [baseline PR workflow](https://github.com/Shreyash2942/FraudLens/blob/0be6db22652c135df81aaad885e251a52d1bf314/.github/workflows/pr-validation.yml) runs `dbt Structure Validation` for changes under `dbt/` or its own workflow file. It performs dbt parsing, selector/governance/contract validation, and empty-catalog documentation generation using Python 3.11, dbt-core 1.8.7, and the Hive adapter. Issue #86 migrates these offline checks into `ci.yml` and its aggregate gate; see the [implementation guide](phase-8-plan/issue-86-dbt-validation.md).
 
 The workflow does not yet provide repository-wide Python/standards checks, post-merge candidate validation, deployment, or release packaging. Read-only GitHub inspection on the decision date found no `main` branch protection or repository rulesets, no configured GitHub environments, and no published GitHub releases. These are baseline observations, not claims that the target policy is already enforced.
 

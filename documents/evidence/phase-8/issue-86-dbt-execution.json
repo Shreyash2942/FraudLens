@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "issue": 86,
+  "parent_issue": 83,
+  "validation_date_local": "2026-11-19",
+  "timezone": "America/New_York",
+  "recorded_at_utc": "2026-11-20T01:29:47.722924+00:00",
+  "branch": "83-phase-8-cicd-implementation",
+  "phase_pr": 122,
+  "phase_pr_remains_draft": true,
+  "implementation_sha": "e28cd86a290bf71a1375e3e9a00bfdbd2e392bbe",
+  "task_commits": {
+    "dependencies": "f8f2efa",
+    "parse": "a355f69",
+    "validation": "e28cd86",
+    "failure_proof": "containing evidence commit"
+  },
+  "runs": [
+    {
+      "case": "valid_project",
+      "run_id": 44653554383,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44653554383",
+      "event": "pull_request",
+      "source_sha": "e28cd86a290bf71a1375e3e9a00bfdbd2e392bbe",
+      "tested_merge_sha": "b13da06bf528fba96fff868a1eb42fb18c9ced29",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "job_outcomes": {
+        "Baseline Repository Checks": "success",
+        "dbt Validation": "success",
+        "CI Summary": "success"
+      },
+      "dbt_steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Hive adapter system dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install pinned dbt dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Parse the complete dbt project without a warehouse",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate test selection, naming, governance, contracts, policy and docs",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve sanitized dbt validation report",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "report_artifact": {
+        "id": 14591638018,
+        "name": "dbt-validation-44653554383-1",
+        "digest": "sha256:71a03b73ff94267ba7a0da6d71091a447c42676488242b0eb7666b7a28b2fe46",
+        "size_in_bytes": 631,
+        "expires_at": "2026-12-20T01:26:44Z"
+      },
+      "downloaded_report": {
+        "schema_version": 1,
+        "scope": "offline_dbt_validation",
+        "warehouse_tests_executed": false,
+        "stages": {
+          "parse": {
+            "status": "success"
+          },
+          "validate": {
+            "status": "success"
+          }
+        },
+        "tested_sha": "b13da06bf528fba96fff868a1eb42fb18c9ced29",
+        "pr_head_sha": "e28cd86a290bf71a1375e3e9a00bfdbd2e392bbe",
+        "run_id": "44653554383",
+        "run_attempt": "1",
+        "dependencies": {
+          "dbt-core": "1.8.7",
+          "dbt-hive": "1.8.0"
+        },
+        "manifest": {
+          "sha256": "1cde32f240a5c2ee68d9e8295ccd62dfa5fd7c720ba9b14b15d169c3973e3c3c",
+          "models": 61,
+          "tests": 183
+        },
+        "updated_at": "2026-11-20T01:26:44.502961+00:00",
+        "checks": {
+          "failure_blocking_gate": {
+            "status": "success",
+            "selected_tests": 143
+          },
+          "failure_diagnostic_gate": {
+            "status": "success",
+            "selected_tests": 183
+          },
+          "naming_rules": {
+            "status": "success"
+          },
+          "governance_metadata": {
+            "status": "success"
+          },
+          "contracts": {
+            "status": "success"
+          },
+          "contract_alignment": {
+            "status": "success"
+          },
+          "failure_policy": {
+            "status": "success"
+          },
+          "docs": {
+            "status": "success"
+          }
+        }
+      }
+    },
+    {
+      "case": "missing_ref_parse_failure",
+      "run_id": 44653628665,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44653628665",
+      "event": "pull_request",
+      "source_sha": "f5cf096ad9d5ffc01a4640cb5911af415a980fa0",
+      "tested_merge_sha": "d3bd82a6eb350f58d79b3ff3cef1e971dcd1dcd6",
+      "run_attempt": 1,
+      "conclusion": "failure",
+      "job_outcomes": {
+        "Baseline Repository Checks": "success",
+        "dbt Validation": "failure",
+        "CI Summary": "failure"
+      },
+      "dbt_steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Hive adapter system dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install pinned dbt dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Parse the complete dbt project without a warehouse",
+          "conclusion": "failure"
+        },
+        {
+          "name": "Validate test selection, naming, governance, contracts, policy and docs",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Preserve sanitized dbt validation report",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Set up Python",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "report_artifact": {
+        "id": 14593040100,
+        "name": "dbt-validation-44653628665-1",
+        "digest": "sha256:6e26c932d3b0157ffeba89026d8c8c4b2f74ce91ba673676bc2fdca6e79d7a59",
+        "size_in_bytes": 464,
+        "expires_at": "2026-12-20T01:27:47Z"
+      },
+      "downloaded_report": {
+        "schema_version": 1,
+        "scope": "offline_dbt_validation",
+        "warehouse_tests_executed": false,
+        "stages": {
+          "parse": {
+            "status": "failure",
+            "error_type": "CalledProcessError"
+          }
+        },
+        "tested_sha": "d3bd82a6eb350f58d79b3ff3cef1e971dcd1dcd6",
+        "pr_head_sha": "f5cf096ad9d5ffc01a4640cb5911af415a980fa0",
+        "run_id": "44653628665",
+        "run_attempt": "1",
+        "dependencies": {
+          "dbt-core": "1.8.7",
+          "dbt-hive": "1.8.0"
+        },
+        "updated_at": "2026-11-20T01:27:47.820801+00:00"
+      }
+    },
+    {
+      "case": "invalid_alias_validator_failure",
+      "run_id": 44653868155,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44653868155",
+      "event": "pull_request",
+      "source_sha": "144dd829775c167262273561fe9798b642023caa",
+      "tested_merge_sha": "99e2686eeeb15e079ce675f5f1cfdafc8c362288",
+      "run_attempt": 1,
+      "conclusion": "failure",
+      "job_outcomes": {
+        "dbt Validation": "failure",
+        "Baseline Repository Checks": "success",
+        "CI Summary": "failure"
+      },
+      "dbt_steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Hive adapter system dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install pinned dbt dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Parse the complete dbt project without a warehouse",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate test selection, naming, governance, contracts, policy and docs",
+          "conclusion": "failure"
+        },
+        {
+          "name": "Preserve sanitized dbt validation report",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Set up Python",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "report_artifact": {
+        "id": 14593200007,
+        "name": "dbt-validation-44653868155-1",
+        "digest": "sha256:dab97532444c35794e032965f7f3c28f693a0f6aebb8af6b5733071a8e9492e9",
+        "size_in_bytes": 617,
+        "expires_at": "2026-12-20T01:29:25Z"
+      },
+      "downloaded_report": {
+        "schema_version": 1,
+        "scope": "offline_dbt_validation",
+        "warehouse_tests_executed": false,
+        "stages": {
+          "parse": {
+            "status": "success"
+          },
+          "validate": {
+            "status": "failure",
+            "error_type": "CalledProcessError"
+          }
+        },
+        "tested_sha": "99e2686eeeb15e079ce675f5f1cfdafc8c362288",
+        "pr_head_sha": "144dd829775c167262273561fe9798b642023caa",
+        "run_id": "44653868155",
+        "run_attempt": "1",
+        "dependencies": {
+          "dbt-core": "1.8.7",
+          "dbt-hive": "1.8.0"
+        },
+        "manifest": {
+          "sha256": "2339b444646683f5e2e9ae5c0425a6c57245767678d644e98699535774f9de04",
+          "models": 61,
+          "tests": 183
+        },
+        "updated_at": "2026-11-20T01:29:25.698807+00:00",
+        "checks": {
+          "failure_blocking_gate": {
+            "status": "success",
+            "selected_tests": 143
+          },
+          "failure_diagnostic_gate": {
+            "status": "success",
+            "selected_tests": 183
+          },
+          "naming_rules": {
+            "status": "failure"
+          }
+        }
+      }
+    }
+  ],
+  "local_regression": {
+    "source_sha": "e28cd86a290bf71a1375e3e9a00bfdbd2e392bbe",
+    "command": "python -m pytest tests airflow/tests -q",
+    "python": "3.14.4",
+    "workspace": "clean git archive; inherited MINIO variables excluded",
+    "tests_passed": 88,
+    "subtests_passed": 168,
+    "ci_regression_tests": 17,
+    "aggregate_result_combinations_tested": 36
+  },
+  "negative_probe": {
+    "pr": 124,
+    "merged": false,
+    "closed": true,
+    "remote_and_local_branch_removed": true,
+    "temporary_worktree_removed": true
+  },
+  "boundaries": {
+    "warehouse_tests_executed": false,
+    "sql_compilation_claimed": false,
+    "branch_protection_configured": false,
+    "main_push_execution_before_merge_claimed": false,
+    "remaining_phase_issues": [
+      87,
+      88,
+      89,
+      90,
+      91
+    ],
+    "parent_issue_remains_open": true
+  }
+}
