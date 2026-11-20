@@ -83,6 +83,9 @@ jobs:
       - name: Parse the complete dbt project without a warehouse
         run: python scripts/ci/validate_dbt.py --stage parse
 
+      - name: Validate test selection, naming, governance, contracts, policy and docs
+        run: python scripts/ci/validate_dbt.py --stage validate
+
       - name: Preserve sanitized dbt validation report
         if: ${{ always() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -95,13 +98,14 @@ jobs:
 
   ci-summary:
     name: CI Summary
-    needs: [repository-checks]
+    needs: [repository-checks, dbt-validation]
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:
-      - name: Require successful baseline checks
+      - name: Require successful repository and dbt checks
         env:
           BASELINE_RESULT: ${{ needs.repository-checks.result }}
+          DBT_RESULT: ${{ needs.dbt-validation.result }}
         run: >-
-          python -c 'import os, sys; result = os.environ.get("BASELINE_RESULT", ""); print("Baseline Repository Checks: " + (result or "missing")); sys.exit(0 if result == "success" else 1)'
+          python -c 'import os, sys; results = {name: os.environ.get(key, "") for name, key in [("Baseline Repository Checks", "BASELINE_RESULT"), ("dbt Validation", "DBT_RESULT")]}; [print(name + ": " + (result or "missing")) for name, result in results.items()]; sys.exit(0 if all(result == "success" for result in results.values()) else 1)'

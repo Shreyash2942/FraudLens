@@ -7,6 +7,7 @@ import importlib.metadata
 import json
 import os
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -34,17 +35,51 @@ def manifest_summary(path: Path = MANIFEST) -> dict:
 
 
 def run_stage(stage: str, report: dict) -> None:
-    if stage != "parse":
+    if stage == "parse":
+        # A failed parse must never reuse a previous successful manifest.
+        MANIFEST.unlink(missing_ok=True)
+        execute(["dbt", "--no-partial-parse", "parse", *DBT_ARGS])
+        report["manifest"] = manifest_summary()
+        return
+    if stage != "validate":
         raise ValueError("Unknown validation stage")
-    # A failed parse must never reuse a previous successful manifest.
-    MANIFEST.unlink(missing_ok=True)
-    execute(["dbt", "--no-partial-parse", "parse", *DBT_ARGS])
-    report["manifest"] = manifest_summary()
+    if report.get("stages", {}).get("parse", {}).get("status") != "success":
+        raise ValueError("A successful parse is required before validation")
+    if report.get("manifest") != manifest_summary():
+        raise ValueError("Manifest changed after parsing")
+    checks = report["checks"] = {}
+    for selector in ("failure_blocking_gate", "failure_diagnostic_gate"):
+        checks[selector] = {"status": "failure"}
+        result = execute(["dbt", "--quiet", "ls", *DBT_ARGS, "--resource-type", "test",
+                          "--selector", selector, "--output", "json"], capture=True)
+        count = selected_test_count(result.stdout)
+        checks[selector] = {"status": "success", "selected_tests": count}
+    for validator in ("naming_rules", "governance_metadata", "contracts",
+                      "contract_alignment", "failure_policy"):
+        checks[validator] = {"status": "failure"}
+        command = [sys.executable, f"dbt/scripts/validate_{validator}.py", "--manifest", str(MANIFEST)]
+        if validator == "failure_policy":
+            command += ["--selectors", "dbt/selectors.yml", "--policy",
+                        "dbt/tests/validation/failure_policy_matrix.json"]
+        execute(command)
+        checks[validator] = {"status": "success"}
+    checks["docs"] = {"status": "failure"}
+    execute(["dbt", "docs", "generate", "--empty-catalog", "--no-compile", *DBT_ARGS])
+    checks["docs"] = {"status": "success"}
+
+
+def selected_test_count(output: str) -> int:
+    """Count dbt JSON test records, never log lines or a selector warning."""
+    records = [json.loads(line) for line in output.splitlines() if line.strip()]
+    if not records or any(not isinstance(item, dict) or item.get("resource_type") != "test"
+                          or not str(item.get("unique_id", "")).startswith("test.") for item in records):
+        raise ValueError("Selector must resolve to actual test records")
+    return len({item["unique_id"] for item in records})
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--stage", choices=["parse"], required=True)
+    parser.add_argument("--stage", choices=["parse", "validate"], required=True)
     parser.add_argument("--report", type=Path, default=Path(".ci-artifacts/dbt-validation.json"))
     args = parser.parse_args()
     report = {"schema_version": 1, "scope": "offline_dbt_validation",
@@ -57,6 +92,8 @@ def main() -> int:
                                for name in ("dbt-core", "dbt-hive")}}
     code = 0
     try:
+        if args.stage == "validate":
+            report = json.loads(args.report.read_text(encoding="utf-8"))
         run_stage(args.stage, report)
         report["stages"][args.stage] = {"status": "success"}
     except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:

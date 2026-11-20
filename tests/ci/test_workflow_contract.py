@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import itertools
 import shlex
 import subprocess
 import sys
@@ -31,15 +32,16 @@ class WorkflowContractTest(unittest.TestCase):
     def test_summary_executes_for_failure_and_requires_a_result(self) -> None:
         job = self.workflow["jobs"]["ci-summary"]
         self.assertEqual(job["name"], "CI Summary")
-        self.assertEqual(job["needs"], ["repository-checks"])
+        self.assertEqual(job["needs"], ["repository-checks", "dbt-validation"])
         self.assertIn("always()", job["if"])
         command = shlex.split(job["steps"][0]["run"])
         self.assertEqual(command[:2], ["python", "-c"])
-        for state in ("success", "failure", "cancelled", "skipped", "", "unknown"):
-            with self.subTest(state=state):
+        self.assertEqual(job["steps"][0]["env"]["DBT_RESULT"], "${{ needs.dbt-validation.result }}")
+        for baseline, dbt in itertools.product(("success", "failure", "cancelled", "skipped", "", "unknown"), repeat=2):
+            with self.subTest(baseline=baseline, dbt=dbt):
                 result = subprocess.run([sys.executable, "-c", command[2]],
-                    env=dict(os.environ, BASELINE_RESULT=state), capture_output=True)
-                self.assertEqual(result.returncode == 0, state == "success")
+                    env=dict(os.environ, BASELINE_RESULT=baseline, DBT_RESULT=dbt), capture_output=True)
+                self.assertEqual(result.returncode == 0, baseline == dbt == "success")
 
     def test_jobs_are_bounded_read_only_and_do_not_use_deployment_environments(self) -> None:
         self.assertEqual(self.workflow["permissions"], {"contents": "read"})
