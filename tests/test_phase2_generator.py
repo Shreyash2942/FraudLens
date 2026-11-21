@@ -157,7 +157,7 @@ class MinioConfigCompatibilityTest(unittest.TestCase):
                 "DATALAB_MINIO_SECRET_KEY": "minioadmin",
                 "DATALAB_MINIO_BUCKET": "datalab",
             }
-            with patch.dict(os.environ, env, clear=True), patch("minio.Minio", _FakeMinio):
+            with patch("minio.Minio", _FakeMinio), patch.dict(os.environ, env, clear=True):
                 report = upload_run_to_minio(run_dir, "synthetic_demo_seed42")
 
             self.assertEqual(report["status"], "uploaded")
@@ -183,7 +183,7 @@ class MinioConfigCompatibilityTest(unittest.TestCase):
                 "DATALAB_MINIO_ACCESS_KEY": "minio_admin",
                 "DATALAB_MINIO_SECRET_KEY": "minioadmin",
             }
-            with patch.dict(os.environ, env, clear=True), patch("minio.Minio", _FakeMinio):
+            with patch("minio.Minio", _FakeMinio), patch.dict(os.environ, env, clear=True):
                 report = upload_run_to_minio(run_dir, "synthetic_demo_seed17")
 
             self.assertEqual(report["status"], "uploaded")
@@ -216,7 +216,7 @@ class MinioConfigCompatibilityTest(unittest.TestCase):
             original_cwd = Path.cwd()
             try:
                 os.chdir(workspace)
-                with patch.dict(os.environ, {}, clear=True), patch("minio.Minio", _FakeMinio):
+                with patch("minio.Minio", _FakeMinio), patch.dict(os.environ, {}, clear=True):
                     exit_code = main(
                         [
                             "--output-dir",
@@ -260,7 +260,7 @@ class MinioConfigCompatibilityTest(unittest.TestCase):
             original_cwd = Path.cwd()
             try:
                 os.chdir(workspace)
-                with patch.dict(os.environ, {}, clear=True), patch("minio.Minio", _FakeMinio):
+                with patch("minio.Minio", _FakeMinio), patch.dict(os.environ, {}, clear=True):
                     exit_code = main(
                         [
                             "--output-dir",

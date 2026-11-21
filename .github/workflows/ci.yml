@@ -124,6 +124,9 @@ jobs:
       - name: Lint tracked Python scripts for correctness
         run: python -m scripts.ci.validate_python --stage lint
 
+      - name: Validate generator and helpers in a clean source snapshot
+        run: python -m scripts.ci.validate_python --stage tests
+
       - name: Preserve sanitized Python validation report
         if: ${{ always() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -136,7 +139,7 @@ jobs:
 
   ci-summary:
     name: CI Summary
-    needs: [repository-checks, dbt-validation]
+    needs: [repository-checks, dbt-validation, python-validation]
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 2
@@ -145,5 +148,6 @@ jobs:
         env:
           BASELINE_RESULT: ${{ needs.repository-checks.result }}
           DBT_RESULT: ${{ needs.dbt-validation.result }}
+          PYTHON_RESULT: ${{ needs.python-validation.result }}
         run: >-
-          python -c 'import os, sys; results = {name: os.environ.get(key, "") for name, key in [("Baseline Repository Checks", "BASELINE_RESULT"), ("dbt Validation", "DBT_RESULT")]}; [print(name + ": " + (result or "missing")) for name, result in results.items()]; sys.exit(0 if all(result == "success" for result in results.values()) else 1)'
+          python -c 'import os, sys; results = {name: os.environ.get(key, "") for name, key in [("Baseline Repository Checks", "BASELINE_RESULT"), ("dbt Validation", "DBT_RESULT"), ("Python Validation", "PYTHON_RESULT")]}; [print(name + ": " + (result or "missing")) for name, result in results.items()]; sys.exit(0 if all(result == "success" for result in results.values()) else 1)'
