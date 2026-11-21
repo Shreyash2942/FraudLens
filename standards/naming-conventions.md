@@ -16,6 +16,7 @@
 ## Field Naming
 
 - primary keys end with `_id`
+- the existing calendar and reference catalog natural keys are `calendar_date` and `code_set_name`; these two named contracts retain those keys
 - foreign keys reuse the referenced business identifier
 - UTC timestamps end with `_at`
 - dates use `_date`

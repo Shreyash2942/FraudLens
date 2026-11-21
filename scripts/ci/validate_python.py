@@ -85,9 +85,10 @@ def main() -> int:
     parser.add_argument("--report", type=Path, default=Path(".ci-artifacts/python-validation.json"))
     args = parser.parse_args()
     report = {"schema_version": 1, "scope": "offline_python_validation", "stages": {},
+              "python_version": sys.version.split()[0],
               "context": run_context(ROOT),
               "dependencies": {name: importlib.metadata.version(name)
-                               for name in ("pytest", "ruff", "Faker", "minio", "PyYAML")}}
+                               for name in ("pytest", "ruff", "Faker", "minio", "PyYAML", "markdown-it-py")}}
     passed = False
     try:
         if args.stage == "tests":

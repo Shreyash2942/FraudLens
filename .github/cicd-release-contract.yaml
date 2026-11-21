@@ -23,7 +23,7 @@ baseline:
   github_environments: []
   published_releases: []
 validation:
-  policy_status: partially_implemented
+  policy_status: implemented_on_phase_branch
   aggregate_check: CI Summary
   gates: [repository_standards, python_validation, dbt_validation]
   required_summary_on_every_pull_request: true
@@ -37,26 +37,30 @@ validation:
   privileged_pull_request_target_executes_untrusted_code: false
   clean_workspace_required: true
   current_implementation:
-    issues: [85, 86]
+    issues: [85, 86, 87]
     status: verified_on_phase_branch
     workflow: .github/workflows/ci.yml
     workflow_name: Code Validation
-    implemented_gates: [repository_baseline, dbt_validation]
+    implemented_gates: [repository_baseline, repository_standards, dbt_validation, python_validation]
     implemented_aggregate_check: CI Summary
     all_main_pr_paths_including_drafts: true
     main_push_revalidation_configured: true
-    ci_regression_tests: 17
+    ci_regression_tests: 30
+    aggregate_result_combinations_tested: 216
     report_artifact_retention_days: 30
     baseline_live_evidence: documents/evidence/phase-8/issue-85-ci-execution.json
     dbt_live_evidence: documents/evidence/phase-8/issue-86-dbt-execution.json
+    python_standards_live_evidence: documents/evidence/phase-8/issue-87-python-standards-execution.json
+    python_environment: hosted_ubuntu_24_04_python_3_11
+    python_test_scope: clean_tracked_source_tests_and_airflow_tests
+    python_lint_scope: explicit_git_tracked_python_correctness_rules
+    repository_standards_scope: versioned_contract_identity_ownership_audit_and_tracked_markdown_destinations
     dbt_positive_run: 44653554383
     dbt_validation_scope: offline_parse_selectors_manifest_validators_docs
     warehouse_data_tests_executed: false
     positive_probe_run: 44435005871
     negative_probe_run: 44435087173
-    pending_gate_issues:
-      python_validation: 87
-      repository_standards: 87
+    pending_gate_issues: {}
     existing_dbt_workflow_remains_separate: false
     retired_workflow: .github/workflows/pr-validation.yml
 candidate:

@@ -33,6 +33,21 @@ The [CI/CD strategy and release model](documents/cicd-strategy-release-model.md)
 - Use the phase merge commit to preserve the issue and task history. Promote a validated `main` commit rather than an environment branch.
 - Treat branch protection, aggregate checks, and environment controls as planned until their implementation issues provide enforcement evidence.
 
+## Automated Python And Repository Checks
+
+Use Python 3.11 to match the hosted CI runner. From the repository root, install `requirements-python-ci.txt`, then run:
+
+```bash
+python -m pip install -r requirements-python-ci.txt
+python -m scripts.ci.validate_python --stage lint
+python -m scripts.ci.validate_python --stage tests
+python -m scripts.ci.validate_standards
+```
+
+The test runner copies current Git-tracked source into a temporary workspace. Stage newly added files with `git add` before validating them; ignored local `.env`, runtime configuration, generated data, and inherited MinIO settings are excluded. Tests use temporary generated data and mocked service clients. They do not require a warehouse, Airflow installation, or external services.
+
+Ruff checks correctness using `ruff.toml`; CI does not rewrite source. Repository checks enforce tracked-file hygiene, governed contract naming/ownership/audit metadata, and local Markdown destinations. See the [automated standards policy](standards/README.md) and [issue #87 guide](documents/phase-8-plan/issue-87-python-standards.md). `CI Summary` requires baseline/standards, dbt, and Python validation to succeed; GitHub enforcement is configured separately under #89.
+
 ## Definition Of Ready For Design Changes
 
 - Business purpose is clear.
