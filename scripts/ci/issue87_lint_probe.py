@@ -1,1 +1,0 @@
-result = issue87_intentionally_undefined
