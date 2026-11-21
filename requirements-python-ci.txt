@@ -1,0 +1,8 @@
+-r requirements-ci.txt
+-r requirements-phase2.txt
+
+# Keep the tested generator generation within its runtime dependency bounds.
+Faker==37.12.0
+minio==7.2.20
+pytest==9.0.3
+ruff==0.17.6

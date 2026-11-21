@@ -1,0 +1,5 @@
+target-version = "py311"
+
+[lint]
+# Correctness rules: syntax, invalid comparisons/control flow, undefined names.
+select = ["E9", "F63", "F7", "F82"]

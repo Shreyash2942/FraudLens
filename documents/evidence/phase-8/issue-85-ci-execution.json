@@ -1,0 +1,114 @@
+{
+  "issue": 85,
+  "validation_scope": "CI foundation on the Phase 8 feature branch; no deployment or protected-branch configuration",
+  "live_cases": [
+    {
+      "role": "positive",
+      "run_id": 44435005871,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44435005871",
+      "event": "pull_request",
+      "head_sha": "faaf28a25e0d672407304c627a1a2134d8323ceb",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "Baseline Repository Checks",
+          "conclusion": "success",
+          "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44435005871/job/135261548523"
+        },
+        {
+          "name": "CI Summary",
+          "conclusion": "success",
+          "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44435005871/job/135261706262"
+        }
+      ],
+      "validation_report": {
+        "valid": true,
+        "counts": {
+          "tracked": 598,
+          "python": 131,
+          "yaml": 53
+        },
+        "errors": [],
+        "context": {
+          "tested_commit": "fff02308d6734dd698cbb4e97dd97af2a1a905cf",
+          "event_name": "pull_request",
+          "workflow_run_id": "44435005871",
+          "workflow_run_attempt": "1",
+          "checked_at_utc": "2026-11-19T01:11:54.449832+00:00",
+          "pull_request_head_sha": "faaf28a25e0d672407304c627a1a2134d8323ceb",
+          "pull_request_base_sha": "0be6db22652c135df81aaad885e251a52d1bf314"
+        }
+      },
+      "artifact": {
+        "id": 14488526014,
+        "name": "baseline-validation-44435005871-1",
+        "digest": "sha256:ee273e4192fb8529265f98b632fa9ef0b086b31fabd2b2494686ed1b92ab8762",
+        "expired": false
+      },
+      "report_sha256": "577bceb637dfe30d6bf1c8b136678b20a3923fb91f5378298df912726ce49147"
+    },
+    {
+      "role": "negative",
+      "run_id": 44435087173,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44435087173",
+      "event": "pull_request",
+      "head_sha": "9602061e2741c5377dfdc184c9836abc729b46bb",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "name": "Baseline Repository Checks",
+          "conclusion": "failure",
+          "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44435087173/job/135261817302"
+        },
+        {
+          "name": "CI Summary",
+          "conclusion": "failure",
+          "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44435087173/job/135261983633"
+        }
+      ],
+      "validation_report": {
+        "valid": false,
+        "counts": {
+          "tracked": 599,
+          "python": 132,
+          "yaml": 53
+        },
+        "errors": [
+          {
+            "code": "python_syntax",
+            "path": "scripts/ci/intentional_failure_probe.py",
+            "line": 1
+          }
+        ],
+        "context": {
+          "tested_commit": "dfe9f8f63ade71080adf1b53bdfbdc2b80a77983",
+          "event_name": "pull_request",
+          "workflow_run_id": "44435087173",
+          "workflow_run_attempt": "1",
+          "checked_at_utc": "2026-11-19T01:12:32.839707+00:00",
+          "pull_request_head_sha": "9602061e2741c5377dfdc184c9836abc729b46bb",
+          "pull_request_base_sha": "0be6db22652c135df81aaad885e251a52d1bf314"
+        }
+      },
+      "artifact": {
+        "id": 14488856510,
+        "name": "baseline-validation-44435087173-1",
+        "digest": "sha256:de43fe61113f31c762bf801ec5575750a53551cf0fa3b2bc071962cbd674481e",
+        "expired": false
+      },
+      "report_sha256": "31e1063db1b3cde3422410d17599baa6027837dc4b1a43271710459712cbbab4"
+    }
+  ],
+  "local_regression": {
+    "scope": "clean source archive",
+    "source_sha": "faaf28a25e0d672407304c627a1a2134d8323ceb",
+    "passed_tests": 82,
+    "passed_subtests": 133
+  },
+  "probe_cleanup": {
+    "pr": "closed_without_merge",
+    "remote_branch": "deleted",
+    "temporary_worktree": "removed",
+    "local_probe_branch": "deleted"
+  }
+}

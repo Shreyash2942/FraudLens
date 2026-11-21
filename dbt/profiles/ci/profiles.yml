@@ -1,0 +1,10 @@
+# Fixed placeholder connection for parse/list/docs only. No warehouse is started in CI.
+fraudlens_ci:
+  target: validation
+  outputs:
+    validation:
+      type: hive
+      host: 127.0.0.1
+      port: 10000
+      schema: default
+      threads: 1
