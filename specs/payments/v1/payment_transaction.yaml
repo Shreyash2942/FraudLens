@@ -7,7 +7,6 @@ standards_alignment:
   iso_20022_inspired: true
   bian_inspired_domain: payments
 ownership:
-  business_owner: Fraud Analytics Product Owner
   technical_steward: Data Platform Lead
   approval_model: owner_and_steward_review
 keys:

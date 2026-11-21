@@ -56,3 +56,5 @@ python -m scripts.ci.validate_standards
 Stage newly added files before validating: `git add` supplies the input inventory; the test runner uses current tracked source instead of ignored local configuration or only the previous commit. No live services are needed.
 
 Execution evidence records the passing project and controlled failures, exact source/merge SHAs, report inspection and probe cleanup. The final documentation/evidence commit receives another normal PR run. Default-branch execution before merge is not claimed. Environment controls #89 precede privileged deployment #88, followed by #90 runtime qualification and #91 handoff; parent #83 remains open.
+
+[Intentional invalid destination](issue87_intentionally_missing.md)
