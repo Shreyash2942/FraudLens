@@ -44,6 +44,13 @@ def configure_definitions(apply: bool) -> dict:
         payload = {"wait_timer": 0, "prevent_self_review": settings["prevent_self_review"],
                    "reviewers": [{"type": "User", "id": owner["id"]}], "can_admins_bypass": False,
                    "deployment_branch_policy": {"protected_branches": True, "custom_branch_policies": False}}
+        try:
+            existing = github(f"repos/{REPOSITORY}/environments/{name}")
+        except subprocess.CalledProcessError as error:
+            if b"404" not in (error.stderr or b""):
+                raise
+        else:
+            payload["deployment_branch_policy"] = existing["deployment_branch_policy"]
         plan["environments"][name] = {"enabled": settings["enabled"], "runtime": settings["runtime"],
                                       "owner_reviewer": desired["owner"], "prevent_self_review": settings["prevent_self_review"]}
         if apply:
@@ -84,14 +91,83 @@ def configure_variables(apply: bool, enabled: bool = False) -> dict:
             "secret_storage": "private_existing_local_docker_volume"}
 
 
+def main_check_ready() -> dict:
+    sha = github(f"repos/{REPOSITORY}/branches/main")["commit"]["sha"]
+    runs = github(f"repos/{REPOSITORY}/actions/runs?branch=main&event=push&status=success&head_sha={sha}&per_page=100")["workflow_runs"]
+    runs = [run for run in runs if run["head_sha"] == sha and run["path"] == ".github/workflows/ci.yml"]
+    if not runs:
+        raise ValueError("Required status activation waits for successful CI on the actual main commit")
+    run = runs[0]
+    jobs = github(f"repos/{REPOSITORY}/actions/runs/{run['id']}/jobs?per_page=100")["jobs"]
+    for name in ("Baseline Repository Checks", "dbt Validation", "Python Validation", "CI Summary", "Deployment Validation / Candidate Bundle"):
+        if not any(job["name"] == name and job["conclusion"] == "success" for job in jobs):
+            raise ValueError("Actual main validation gates are incomplete")
+    checks = github(f"repos/{REPOSITORY}/commits/{sha}/check-runs?per_page=100")["check_runs"]
+    summary = next((row for row in checks if row["name"] == "CI Summary" and row["conclusion"] == "success"
+                    and row["app"]["slug"] == "github-actions"), None)
+    if not summary:
+        raise ValueError("Main CI Summary check identity could not be verified")
+    return {"strict": True, "checks": [{"context": "CI Summary", "app_id": summary["app"]["id"]}]}
+
+
+def configure_protections(apply: bool, seal_main: bool = False) -> dict:
+    desired = contract()
+    owner = github("users/" + desired["owner"])
+    for name, settings in desired["environments"].items():
+        if apply:
+            github(f"repos/{REPOSITORY}/environments/{name}", "PUT", {
+                "wait_timer": 0, "prevent_self_review": settings["prevent_self_review"],
+                "reviewers": [{"type": "User", "id": owner["id"]}], "can_admins_bypass": False,
+                "deployment_branch_policy": {"protected_branches": False, "custom_branch_policies": True}})
+        prefix = f"repos/{REPOSITORY}/environments/{name}/deployment-branch-policies"
+        current = github(f"repos/{REPOSITORY}/environments/{name}")
+        policies = (github(prefix + "?per_page=100")["branch_policies"]
+                    if current.get("deployment_branch_policy", {}).get("custom_branch_policies") else [])
+        if any(row["name"] != settings["allowed_branch"] or row.get("type", "branch") != "branch" for row in policies):
+            raise ValueError("Conflicting environment branch restrictions require owner review")
+        if apply and not policies:
+            github(prefix, "POST", {"name": settings["allowed_branch"], "type": "branch"})
+    try:
+        old = github(f"repos/{REPOSITORY}/branches/main/protection")
+    except subprocess.CalledProcessError as error:
+        if b"404" not in (error.stderr or b""):
+            raise
+        old = {}
+    checks = main_check_ready() if seal_main else old.get("required_status_checks")
+    if checks:
+        checks = {"strict": checks["strict"], "checks": checks["checks"]}
+    payload = {"required_status_checks": checks, "enforce_admins": True,
+               "required_pull_request_reviews": {"dismiss_stale_reviews": True, "require_code_owner_reviews": False,
+                   "required_approving_review_count": 0, "require_last_push_approval": False},
+               "restrictions": None, "required_linear_history": False, "allow_force_pushes": False,
+               "allow_deletions": False, "required_conversation_resolution": True}
+    if apply:
+        github(f"repos/{REPOSITORY}/branches/main/protection", "PUT", payload)
+        github(f"repos/{REPOSITORY}/actions/permissions/workflow", "PUT", {
+            "default_workflow_permissions": "read", "can_approve_pull_request_reviews": False})
+        github(f"repos/{REPOSITORY}/actions/permissions/fork-pr-contributor-approval", "PUT", {
+            "approval_policy": "all_external_contributors"})
+    return {"applied": apply, "main_protection": payload,
+            "required_ci_summary": "enforced" if checks else "pending_first_successful_main_ci",
+            "sole_maintainer_review": "owner_acceptance_at_merge; not independent approval",
+            "environment_branch_rules": {name: settings["allowed_branch"] for name, settings in desired["environments"].items()},
+            "external_contributor_workflow_approval": "all_external_contributors", "default_token": "read"}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="Apply the reviewed environment definitions")
-    parser.add_argument("--section", choices=["definitions", "variables"], default="definitions")
+    parser.add_argument("--section", choices=["definitions", "variables", "protections"], default="definitions")
+    parser.add_argument("--seal-main", action="store_true", help="Require CI Summary only after verifying successful CI on actual main")
     parser.add_argument("--report", type=Path, default=Path(".ci-artifacts/environment-definitions.json"))
     args = parser.parse_args()
     try:
-        result = configure_definitions(args.apply) if args.section == "definitions" else configure_variables(args.apply)
+        if args.section == "definitions":
+            result = configure_definitions(args.apply)
+        elif args.section == "variables":
+            result = configure_variables(args.apply)
+        else:
+            result = configure_protections(args.apply, args.seal_main)
     except (ValueError, OSError, KeyError, subprocess.SubprocessError):
         raise SystemExit("Environment configuration failed; no cloud resources were requested") from None
     args.report.parent.mkdir(parents=True, exist_ok=True)
