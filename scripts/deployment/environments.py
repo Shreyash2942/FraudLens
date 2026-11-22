@@ -54,13 +54,44 @@ def configure_definitions(apply: bool) -> dict:
     return plan
 
 
+def desired_variables(enabled: bool = False) -> dict[str, dict[str, str]]:
+    desired = contract()
+    dev = desired["environments"]["dev"]
+    result = {"repository": {"FRAUDLENS_COST_PROFILE": desired["cost_policy"],
+                              "FRAUDLENS_DEV_DEPLOY_ENABLED": str(enabled).lower()}}
+    for name, settings in desired["environments"].items():
+        values = {"FRAUDLENS_ENVIRONMENT": name, "FRAUDLENS_CLOUD_RESOURCES_ENABLED": "false",
+                  "FRAUDLENS_EXECUTION_MODE": desired["execution_mode"] if settings["enabled"] else "disabled"}
+        if name == "dev":
+            values.update(FRAUDLENS_DOCKER_CONTAINER=dev["container"], FRAUDLENS_DEPLOY_ROOT=dev["managed_root"],
+                          FRAUDLENS_RUNTIME_PYTHON=dev["runtime_python"], FRAUDLENS_SOURCE_ROOT=dev["source_root"])
+        else:
+            values["FRAUDLENS_DEPLOY_ENABLED"] = "false"
+        result[name] = values
+    return result
+
+
+def configure_variables(apply: bool, enabled: bool = False) -> dict:
+    values = desired_variables(enabled)
+    for scope, variables in values.items():
+        prefix = f"repos/{REPOSITORY}/actions" if scope == "repository" else f"repos/{REPOSITORY}/environments/{scope}"
+        existing = {row["name"] for row in github(prefix + "/variables?per_page=100")["variables"]}
+        if apply:
+            for name, value in variables.items():
+                github(prefix + "/variables" + ("/" + name if name in existing else ""),
+                       "PATCH" if name in existing else "POST", {"name": name, "value": value})
+    return {"applied": apply, "variables": values, "github_runtime_secrets_required": [],
+            "secret_storage": "private_existing_local_docker_volume"}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="Apply the reviewed environment definitions")
+    parser.add_argument("--section", choices=["definitions", "variables"], default="definitions")
     parser.add_argument("--report", type=Path, default=Path(".ci-artifacts/environment-definitions.json"))
     args = parser.parse_args()
     try:
-        result = configure_definitions(args.apply)
+        result = configure_definitions(args.apply) if args.section == "definitions" else configure_variables(args.apply)
     except (ValueError, OSError, KeyError, subprocess.SubprocessError):
         raise SystemExit("Environment configuration failed; no cloud resources were requested") from None
     args.report.parent.mkdir(parents=True, exist_ok=True)
