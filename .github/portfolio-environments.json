@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "repository": "Shreyash2942/FraudLens",
+  "owner": "Shreyash2942",
+  "cost_policy": "local_only_no_new_paid_resources",
+  "execution_mode": "local_docker_operator",
+  "public_ci_runner": "ubuntu-24.04",
+  "cloud_resources_enabled": false,
+  "environments": {
+    "dev": {
+      "enabled": true,
+      "runtime": "existing_local_docker",
+      "profile": "local",
+      "container": "fraudlens",
+      "source_root": "/home/datalab/fraudlens",
+      "managed_root": "/home/datalab/runtime/fraudlens/environments/dev",
+      "runtime_python": "/usr/bin/python3",
+      "allowed_branch": "main",
+      "prevent_self_review": false
+    },
+    "test": {
+      "enabled": false,
+      "runtime": "policy_only_no_resources",
+      "allowed_branch": "portfolio-test-disabled",
+      "prevent_self_review": true
+    },
+    "prod": {
+      "enabled": false,
+      "runtime": "policy_only_no_resources",
+      "allowed_branch": "portfolio-prod-disabled",
+      "prevent_self_review": true
+    }
+  },
+  "github_runtime_secrets_required": [],
+  "local_runtime_secrets_required": [
+    "FRAUDLENS_MONGODB_URI",
+    "DATALAB_MINIO_ACCESS_KEY",
+    "DATALAB_MINIO_SECRET_KEY"
+  ]
+}
