@@ -37,16 +37,16 @@ validation:
   privileged_pull_request_target_executes_untrusted_code: false
   clean_workspace_required: true
   current_implementation:
-    issues: [85, 86, 87]
+    issues: [85, 86, 87, 88]
     status: verified_on_phase_branch
     workflow: .github/workflows/ci.yml
     workflow_name: Code Validation
-    implemented_gates: [repository_baseline, repository_standards, dbt_validation, python_validation]
+    implemented_gates: [repository_baseline, repository_standards, dbt_validation, python_validation, candidate_packaging]
     implemented_aggregate_check: CI Summary
     all_main_pr_paths_including_drafts: true
     main_push_revalidation_configured: true
-    ci_regression_tests: 30
-    aggregate_result_combinations_tested: 216
+    ci_regression_tests: 40
+    aggregate_result_combinations_tested: 1296
     report_artifact_retention_days: 30
     baseline_live_evidence: documents/evidence/phase-8/issue-85-ci-execution.json
     dbt_live_evidence: documents/evidence/phase-8/issue-86-dbt-execution.json
@@ -98,7 +98,21 @@ branches:
   enforcement_owner_issue: 89
   exception_fields: [owner, reason, affected_control, approved_scope, timestamp, compensating_validation, follow_up_issue]
 promotion:
-  policy_status: planned
+  policy_status: workflow_implemented_activation_blocked_pending_controls
+  workflow: .github/workflows/deploy.yml
+  implementation_issue: 88
+  implementation_evidence: documents/evidence/phase-8/issue-88-deployment-execution.json
+  ci_reusable_call: candidate_packaging_only
+  pr_candidate_qualification: preview_only
+  dispatch_operations: [verify, deploy]
+  dispatch_inputs: [candidate_sha, ci_run_id, candidate_sha256, environment, owner_approval]
+  required_ci_event: push_to_main
+  artifact_and_payload_digest_verification: true
+  environment_preflight_before_association: true
+  environment_settings_created_by_workflow: false
+  runtime_adapter: scripts/deployment/runtime.py
+  maintenance_window: registered_dags_paused_and_drained
+  runtime_qualification_owner_issue: 90
   required_portfolio_path: [local_development, pull_request_ci, main_candidate, dev, release_record]
   optional_cloud_path: [dev, test, prod]
   trigger: workflow_dispatch
@@ -110,7 +124,11 @@ promotion:
   full_ci_orchestration_profile_is_offline_validation: false
   environments:
     dev:
-      activation: pending_implementation
+      activation: blocked_pending_issue_89_and_main_merge
+      activation_repository_variable: FRAUDLENS_DEV_DEPLOY_ENABLED
+      runner_labels: [self-hosted, linux, fraudlens-dev-deploy]
+      environment_variables: [FRAUDLENS_DEPLOY_ROOT, FRAUDLENS_RUNTIME_PYTHON]
+      current_code_pointer: managed_root/current
       runtime: external_data_lab_spark_hive
       runtime_profile: local
       approval: recorded_owner_approval

@@ -54,6 +54,7 @@ class WorkflowContractTest(unittest.TestCase):
             if "uses" in job:
                 self.assertEqual(job["uses"], "./.github/workflows/deploy.yml")
                 self.assertNotIn("secrets", job)
+                self.assertEqual(job["with"], {"ci_bundle": True})
                 self.assertEqual(job["needs"], ["repository-checks", "dbt-validation", "python-validation"])
                 continue
             self.assertEqual(job["runs-on"], "ubuntu-24.04")

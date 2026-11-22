@@ -157,6 +157,8 @@ jobs:
       contents: read
       actions: read
     uses: ./.github/workflows/deploy.yml
+    with:
+      ci_bundle: true
 
   ci-summary:
     name: CI Summary

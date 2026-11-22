@@ -2,6 +2,11 @@ name: Controlled Deployment
 
 "on":
   workflow_call:
+    inputs:
+      ci_bundle:
+        description: Package validated source only; never enter deployment jobs
+        type: boolean
+        required: true
   workflow_dispatch:
     inputs:
       operation:
@@ -37,7 +42,7 @@ permissions:
 jobs:
   package:
     name: Candidate Bundle
-    if: ${{ github.event_name != 'workflow_dispatch' }}
+    if: ${{ inputs.ci_bundle == true }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -64,7 +69,7 @@ jobs:
   deploy-dev:
     name: Deploy Approved Dev Candidate
     needs: [verify]
-    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.operation == 'deploy' && inputs.environment == 'dev' }}
+    if: ${{ !inputs.ci_bundle && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.operation == 'deploy' && inputs.environment == 'dev' }}
     runs-on: [self-hosted, linux, fraudlens-dev-deploy]
     timeout-minutes: 15
     environment: dev
@@ -109,7 +114,7 @@ jobs:
 
   verify:
     name: Verify Main Candidate
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ !inputs.ci_bundle && github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

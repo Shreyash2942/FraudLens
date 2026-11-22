@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "issue": 88,
+  "parent_issue": 83,
+  "validation_date_local": "2026-11-21",
+  "timezone": "America/New_York",
+  "recorded_at_utc": "2026-11-22T01:14:39.318554+00:00",
+  "branch": "83-phase-8-cicd-implementation",
+  "phase_pr": 122,
+  "phase_pr_remains_draft": true,
+  "implementation_source_sha": "811678e72084a053fd08d9d575a000bae3833dcd",
+  "task_commits": {
+    "workflow": "4786c52",
+    "triggers": "dbf3f2e",
+    "environment_adapter": "811678e",
+    "validation": "containing evidence commit"
+  },
+  "runs": [
+    {
+      "case": "positive",
+      "run_id": 44970010277,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44970010277",
+      "source_head_sha": "811678e72084a053fd08d9d575a000bae3833dcd",
+      "event": "pull_request",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "job_outcomes": {
+        "Python Validation": "success",
+        "Baseline Repository Checks": "success",
+        "dbt Validation": "success",
+        "Deployment Validation / Candidate Bundle": "success",
+        "Deployment Validation / Verify Main Candidate": "skipped",
+        "Deployment Validation / Deploy Approved Dev Candidate": "skipped",
+        "CI Summary": "success"
+      },
+      "packaging_steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout validated source",
+          "conclusion": "success"
+        },
+        {
+          "name": "Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install validation dependency",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build and verify immutable candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve candidate bundle",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Checkout validated source",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "case": "negative",
+      "run_id": 44970295561,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/44970295561",
+      "source_head_sha": "30606d21de71269be5b094734f5207db9cd05039",
+      "event": "pull_request",
+      "run_attempt": 1,
+      "conclusion": "failure",
+      "job_outcomes": {
+        "dbt Validation": "success",
+        "Baseline Repository Checks": "success",
+        "Python Validation": "success",
+        "Deployment Validation / Candidate Bundle": "failure",
+        "Deployment Validation / Verify Main Candidate": "skipped",
+        "Deployment Validation / Deploy Approved Dev Candidate": "skipped",
+        "CI Summary": "failure"
+      },
+      "packaging_steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout validated source",
+          "conclusion": "success"
+        },
+        {
+          "name": "Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install validation dependency",
+          "conclusion": "success"
+        },
+        {
+          "name": "Exercise rejection of a deployment request from PR context",
+          "conclusion": "failure"
+        },
+        {
+          "name": "Preserve rejection proof",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build and verify immutable candidate",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Preserve candidate bundle",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Set up Python",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Checkout validated source",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "positive_candidate_report": {
+    "schema_version": 1,
+    "repository": "Shreyash2942/FraudLens",
+    "source_sha": "fe108840e675a3cdd76c73aeedd89c56aa45afd2",
+    "ci_run_id": "44970010277",
+    "ci_run_attempt": "1",
+    "origin_main_push": false,
+    "candidate_sha256": "ef172e35a5d4da4358e24a1ef86bb513feb9fe10fdd28adc06df1e18df2f8f35",
+    "file_count": 618,
+    "qualification": "preview_only",
+    "deployment_executed": false
+  },
+  "positive_artifact": {
+    "id": 14732523590,
+    "name": "candidate-fe108840e675a3cdd76c73aeedd89c56aa45afd2-44970010277-1",
+    "digest": "sha256:9c484f565cbc1e93e7101d534081d5642ce0dd4a644c4ff52abbe873c93814c2",
+    "size_in_bytes": 2380570,
+    "expires_at": "2026-12-22T01:09:32Z"
+  },
+  "outer_zip_digest_verified": true,
+  "payload_file_digests_verified": 618,
+  "private_generated_payload_files": 0,
+  "tested_code_blob_sha256": {
+    ".github/workflows/ci.yml": "8bb14b4404e27fee9fea72a8f550bdee623a0a36fa4520c8d340678aefa522cb",
+    ".github/workflows/deploy.yml": "76ce8f7366c9e66329b2b8fa3cb5232bf9dbe5cb4c66a4e0896be475b4ae13b0",
+    "scripts/deployment/candidate.py": "88e822c30a0a86cbaf0dfc77da0a8c597d08f7581719edf35b1dc8374aa7f719",
+    "scripts/deployment/control.py": "51bba7cae71cd85fdc05979328204caab8ad5b7a3fa707c2ca836d26c4d5adcf",
+    "scripts/deployment/runtime.py": "30328377dfe4c1280b7acb1a84294e7e7e69c088afb6a60de59da534bba79ec7",
+    "tests/ci/test_deployment.py": "a7ff66146a21070cf51605d7bfc1730b9fb62fe84f064284354901acab23b59c",
+    "tests/ci/test_workflow_contract.py": "814fe9401d7a4f86bcb1b246764532b94b2ef78e7f1c0d1dc7dc51ed8090111e"
+  },
+  "tested_merge_sha": "fe108840e675a3cdd76c73aeedd89c56aa45afd2",
+  "positive_python_report": {
+    "schema_version": 1,
+    "scope": "offline_python_validation",
+    "stages": {
+      "lint": {
+        "status": "success"
+      },
+      "tests": {
+        "status": "success"
+      }
+    },
+    "python_version": "3.11.18",
+    "context": {
+      "tested_commit": "fe108840e675a3cdd76c73aeedd89c56aa45afd2",
+      "event_name": "pull_request",
+      "workflow_run_id": "44970010277",
+      "workflow_run_attempt": "1",
+      "checked_at_utc": "2026-11-22T01:08:36.659073+00:00",
+      "pull_request_head_sha": "811678e72084a053fd08d9d575a000bae3833dcd",
+      "pull_request_base_sha": "0be6db22652c135df81aaad885e251a52d1bf314"
+    },
+    "dependencies": {
+      "pytest": "9.0.3",
+      "ruff": "0.17.6",
+      "Faker": "37.12.0",
+      "minio": "7.2.20",
+      "PyYAML": "6.0.3",
+      "markdown-it-py": "4.0.0"
+    },
+    "python_files": 141,
+    "lint_errors": [],
+    "tests": {
+      "workspace": "tracked_source_snapshot",
+      "junit_counts": {
+        "tests": 1562,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    }
+  },
+  "negative_rejection_report": {
+    "status": "rejected",
+    "error_type": "ValueError",
+    "deployment_executed": false
+  },
+  "github_environments_observed_before": 0,
+  "github_environments_observed_after": 0,
+  "hosted_regression": {
+    "python": "3.11.18",
+    "tests_passed": 111,
+    "subtests_passed": 1451,
+    "ci_tests": 40,
+    "aggregate_result_combinations": 1296,
+    "linux_activation_fixture_tests_executed": true,
+    "live_airflow_verifier_used": false
+  },
+  "local_regression": {
+    "python": "3.14.4",
+    "tests_passed": 109,
+    "subtests_passed": 1451,
+    "skipped_linux_only_tests": 2
+  },
+  "probe": {
+    "pr": 126,
+    "merged": false,
+    "closed": true,
+    "remote_and_local_branch_removed": true,
+    "temporary_worktree_removed": true
+  },
+  "activation": {
+    "live_dev_deployment_executed": false,
+    "post_merge_main_candidate_run_executed": false,
+    "manual_dispatch_execution_claimed": false,
+    "environment_or_runner_provisioned": false,
+    "controls_issue": 89,
+    "runtime_qualification_issue": 90,
+    "missing_prerequisites": [
+      "issue89_controls_and_trusted_runtime",
+      "workflow_on_main",
+      "successful_post_merge_main_candidate"
+    ],
+    "test_and_prod_enabled": false,
+    "data_rollback_performed": false,
+    "release_published": false
+  },
+  "final_routing_followup": {
+    "reason": "Explicit ci_bundle input isolates reusable packaging even when CI itself is manually dispatched",
+    "changed_paths": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/deploy.yml",
+      "tests/ci/test_workflow_contract.py",
+      "tests/ci/test_deployment.py"
+    ],
+    "final_code_blob_sha256": {
+      ".github/workflows/ci.yml": "76fa9a6755b967a6863b275208471e5fb7968b17e9d8b71a823b0fccf8df70c9",
+      ".github/workflows/deploy.yml": "3fbcf630403692f9e26fa089a31f9c65aabea559662129b2e6f8bb385030b016",
+      "scripts/deployment/candidate.py": "88e822c30a0a86cbaf0dfc77da0a8c597d08f7581719edf35b1dc8374aa7f719",
+      "scripts/deployment/control.py": "51bba7cae71cd85fdc05979328204caab8ad5b7a3fa707c2ca836d26c4d5adcf",
+      "scripts/deployment/runtime.py": "30328377dfe4c1280b7acb1a84294e7e7e69c088afb6a60de59da534bba79ec7",
+      "tests/ci/test_deployment.py": "75723395dc7661f944939a02ba971fabb07eee5d194b75b76ef7b98fd06c90e5",
+      "tests/ci/test_workflow_contract.py": "674ca67e6f55ec3fa69f73edf67beb5aaba1deeed677ae9da2b348a817bc0073"
+    },
+    "validation": "Containing task4 commit must pass a fresh Code Validation run and candidate artifact inspection before issue closure",
+    "local_regression_subtests_after_followup": 1453
+  }
+}

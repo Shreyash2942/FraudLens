@@ -71,3 +71,5 @@ These cases used disposable draft [PR #125](https://github.com/Shreyash2942/Frau
 The full candidate source passed **101 tests and 353 subtests**, including 30 CI regression tests and all 216 aggregate result combinations. Pytest's sanitized JUnit counts contain 454 successful test/subtest records and zero failures/errors/skips. The pinned local virtual environment passed the same suite on Python 3.14.4. The evidence file records SHA-256 digests of tested code/configuration blobs and verifies they match the staged final implementation; the later changes add final documentation and evidence.
 
 Implementation references: [Ruff rule selection and exit behavior](https://docs.astral.sh/ruff/linter/), [pytest invocation](https://docs.pytest.org/en/stable/how-to/usage.html), and [Markdown token parsing](https://markdown-it-py.readthedocs.io/en/latest/using.html).
+
+Subsequent [issue #88 deployment integration](issue-88-deployment-workflow.md) adds candidate packaging as the fourth aggregate gate and expands the result-combination test to 1,296 cases. The three-gate counts above remain the historical #87 evidence.

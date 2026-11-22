@@ -81,9 +81,11 @@ class DeploymentTest(unittest.TestCase):
             candidate.build(self.repo, self.output, self.context)
 
     def test_pr_bundle_is_explicitly_preview_only(self) -> None:
-        report = candidate.build(self.repo, self.output, {**self.context, "GITHUB_EVENT_NAME": "pull_request", "GITHUB_REF": "refs/pull/1/merge"})
-        self.assertEqual(report["qualification"], "preview_only")
-        self.assertFalse(report["origin_main_push"])
+        for event, ref in (("pull_request", "refs/pull/1/merge"), ("workflow_dispatch", "refs/heads/main")):
+            with self.subTest(event=event):
+                report = candidate.build(self.repo, self.output, {**self.context, "GITHUB_EVENT_NAME": event, "GITHUB_REF": ref})
+                self.assertEqual(report["qualification"], "preview_only")
+                self.assertFalse(report["origin_main_push"])
 
     def test_tar_traversal_links_and_duplicate_members_are_rejected(self) -> None:
         for name, mode in (("../escape", tarfile.REGTYPE), ("payload/link", tarfile.SYMTYPE), ("manifest.json", tarfile.REGTYPE)):
@@ -191,6 +193,10 @@ class DeploymentTest(unittest.TestCase):
     def test_workflow_preflight_precedes_environment_and_prs_only_package(self) -> None:
         workflow = yaml.safe_load((candidate.ROOT / ".github/workflows/deploy.yml").read_text())
         self.assertEqual(set(workflow["on"]), {"workflow_call", "workflow_dispatch"})
+        self.assertEqual(workflow["on"]["workflow_call"]["inputs"]["ci_bundle"]["type"], "boolean")
+        self.assertEqual(workflow["jobs"]["package"]["if"], "${{ inputs.ci_bundle == true }}")
+        self.assertIn("!inputs.ci_bundle", workflow["jobs"]["verify"]["if"])
+        self.assertIn("!inputs.ci_bundle", workflow["jobs"]["deploy-dev"]["if"])
         self.assertNotIn("environment", workflow["jobs"]["verify"])
         deploy = workflow["jobs"]["deploy-dev"]
         self.assertEqual(deploy["needs"], ["verify"])
