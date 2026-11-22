@@ -61,6 +61,52 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
+  deploy-dev:
+    name: Deploy Approved Dev Candidate
+    needs: [verify]
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.operation == 'deploy' && inputs.environment == 'dev' }}
+    runs-on: [self-hosted, linux, fraudlens-dev-deploy]
+    timeout-minutes: 15
+    environment: dev
+    concurrency:
+      group: fraudlens-deployment-dev
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET_ENVIRONMENT: ${{ inputs.environment }}
+      CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      CI_RUN_ID: ${{ inputs.ci_run_id }}
+      CANDIDATE_SHA256: ${{ inputs.candidate_sha256 }}
+      OWNER_APPROVAL: ${{ inputs.owner_approval }}
+      DEPLOY_ENABLED: ${{ vars.FRAUDLENS_DEV_DEPLOY_ENABLED }}
+      DEPLOY_ROOT: ${{ vars.FRAUDLENS_DEPLOY_ROOT }}
+      AIRFLOW_PYTHON: ${{ vars.FRAUDLENS_RUNTIME_PYTHON }}
+    steps:
+      - name: Checkout trusted workflow source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+      - name: Install validation dependency
+        run: python -m pip install --disable-pip-version-check -r requirements-ci.txt
+      - name: Reverify, stage, check imports and activate dev source
+        run: python -m scripts.deployment.runtime --root "$DEPLOY_ROOT" --airflow-python "$AIRFLOW_PYTHON"
+      - name: Preserve sanitized deployment result
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: deployment-result-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-artifacts/deployment/deployment.json
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
+
   verify:
     name: Verify Main Candidate
     if: ${{ github.event_name == 'workflow_dispatch' }}

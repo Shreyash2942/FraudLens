@@ -5,6 +5,7 @@ import io
 import json
 import os
 import subprocess
+import tarfile
 import zipfile
 from pathlib import Path
 
@@ -107,7 +108,7 @@ def main() -> None:
     output = Path(".ci-artifacts/deployment")
     try:
         report = prepare(dict(os.environ), output)
-    except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError, zipfile.BadZipFile) as error:
+    except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError, zipfile.BadZipFile, tarfile.TarError) as error:
         output.mkdir(parents=True, exist_ok=True)
         (output / "verification.json").write_text(json.dumps({"status": "rejected", "error_type": type(error).__name__,
                                                               "deployment_executed": False}) + "\n", encoding="utf-8")
