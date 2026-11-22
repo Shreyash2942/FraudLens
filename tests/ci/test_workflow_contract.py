@@ -33,23 +33,29 @@ class WorkflowContractTest(unittest.TestCase):
     def test_summary_executes_for_failure_and_requires_a_result(self) -> None:
         job = self.workflow["jobs"]["ci-summary"]
         self.assertEqual(job["name"], "CI Summary")
-        self.assertEqual(job["needs"], ["repository-checks", "dbt-validation", "python-validation"])
+        self.assertEqual(job["needs"], ["repository-checks", "dbt-validation", "python-validation", "deployment-validation"])
         self.assertIn("always()", job["if"])
         command = shlex.split(job["steps"][0]["run"])
         self.assertEqual(command[:2], ["python", "-c"])
         self.assertEqual(job["steps"][0]["env"]["DBT_RESULT"], "${{ needs.dbt-validation.result }}")
         self.assertEqual(job["steps"][0]["env"]["PYTHON_RESULT"], "${{ needs.python-validation.result }}")
         code = compile(command[2], "<workflow-summary>", "exec")
-        for baseline, dbt, python in itertools.product(("success", "failure", "cancelled", "skipped", "", "unknown"), repeat=3):
-            with self.subTest(baseline=baseline, dbt=dbt, python=python), \
-                 patch.dict(os.environ, BASELINE_RESULT=baseline, DBT_RESULT=dbt, PYTHON_RESULT=python), \
+        self.assertEqual(job["steps"][0]["env"]["DEPLOYMENT_RESULT"], "${{ needs.deployment-validation.result }}")
+        for baseline, dbt, python, deployment in itertools.product(("success", "failure", "cancelled", "skipped", "", "unknown"), repeat=4):
+            with self.subTest(baseline=baseline, dbt=dbt, python=python, deployment=deployment), \
+                 patch.dict(os.environ, BASELINE_RESULT=baseline, DBT_RESULT=dbt, PYTHON_RESULT=python, DEPLOYMENT_RESULT=deployment), \
                  redirect_stdout(io.StringIO()), self.assertRaises(SystemExit) as result:
                 exec(code, {})
-            self.assertEqual(result.exception.code == 0, baseline == dbt == python == "success")
+            self.assertEqual(result.exception.code == 0, baseline == dbt == python == deployment == "success")
 
     def test_jobs_are_bounded_read_only_and_do_not_use_deployment_environments(self) -> None:
         self.assertEqual(self.workflow["permissions"], {"contents": "read"})
         for job in self.workflow["jobs"].values():
+            if "uses" in job:
+                self.assertEqual(job["uses"], "./.github/workflows/deploy.yml")
+                self.assertNotIn("secrets", job)
+                self.assertEqual(job["needs"], ["repository-checks", "dbt-validation", "python-validation"])
+                continue
             self.assertEqual(job["runs-on"], "ubuntu-24.04")
             self.assertLessEqual(job["timeout-minutes"], 10)
             self.assertNotIn("environment", job)

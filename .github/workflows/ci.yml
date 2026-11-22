@@ -150,9 +150,17 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
+  deployment-validation:
+    name: Deployment Validation
+    needs: [repository-checks, dbt-validation, python-validation]
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/deploy.yml
+
   ci-summary:
     name: CI Summary
-    needs: [repository-checks, dbt-validation, python-validation]
+    needs: [repository-checks, dbt-validation, python-validation, deployment-validation]
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 2
@@ -162,5 +170,6 @@ jobs:
           BASELINE_RESULT: ${{ needs.repository-checks.result }}
           DBT_RESULT: ${{ needs.dbt-validation.result }}
           PYTHON_RESULT: ${{ needs.python-validation.result }}
+          DEPLOYMENT_RESULT: ${{ needs.deployment-validation.result }}
         run: >-
-          python -c 'import os, sys; results = {name: os.environ.get(key, "") for name, key in [("Baseline Repository Checks", "BASELINE_RESULT"), ("dbt Validation", "DBT_RESULT"), ("Python Validation", "PYTHON_RESULT")]}; [print(name + ": " + (result or "missing")) for name, result in results.items()]; sys.exit(0 if all(result == "success" for result in results.values()) else 1)'
+          python -c 'import os, sys; results = {name: os.environ.get(key, "") for name, key in [("Baseline Repository Checks", "BASELINE_RESULT"), ("dbt Validation", "DBT_RESULT"), ("Python Validation", "PYTHON_RESULT"), ("Deployment Validation", "DEPLOYMENT_RESULT")]}; [print(name + ": " + (result or "missing")) for name, result in results.items()]; sys.exit(0 if all(result == "success" for result in results.values()) else 1)'
