@@ -51,6 +51,17 @@ jobs:
           python-version: "3.11"
       - name: Install validation dependency
         run: python -m pip install --disable-pip-version-check -r requirements-ci.txt
+      - name: Exercise rejection of a deployment request from PR context
+        run: python -m scripts.deployment.control
+      - name: Preserve rejection proof
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: deployment-rejection-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-artifacts/deployment/verification.json
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
       - name: Build and verify immutable candidate
         run: python -m scripts.deployment.candidate
       - name: Preserve candidate bundle
