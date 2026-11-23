@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "issue": 90,
+  "parent_issue": 83,
+  "validation_date_local": "2026-11-23",
+  "timezone": "America/New_York",
+  "recorded_at_utc": "2026-11-23T19:42:17.315495+00:00",
+  "scope": "premerge_validation_only_not_end_to_end_completion",
+  "branch": "83-phase-8-cicd-implementation",
+  "phase_pr": 122,
+  "task_1_commit": "c38cf9d8d3a9ee2749a5d8b5152b33dc4c34cf65",
+  "task_2_commit": "containing evidence commit",
+  "runs": [
+    {
+      "case": "positive",
+      "run_id": 45251226338,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/45251226338",
+      "head_sha": "c38cf9d8d3a9ee2749a5d8b5152b33dc4c34cf65",
+      "event": "pull_request",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "job_outcomes": {
+        "Baseline Repository Checks": "success",
+        "dbt Validation": "success",
+        "Python Validation": "success",
+        "Deployment Validation / Candidate Bundle": "success",
+        "Deployment Validation / Verify Main Candidate": "skipped",
+        "Deployment Validation / Prepare Approved Dev Handoff": "skipped",
+        "CI Summary": "success"
+      },
+      "python_report": {
+        "schema_version": 1,
+        "scope": "offline_python_validation",
+        "stages": {
+          "lint": {
+            "status": "success"
+          },
+          "tests": {
+            "status": "success"
+          }
+        },
+        "python_version": "3.11.18",
+        "context": {
+          "tested_commit": "15d1072f7b3b501a71ec658bb269db3b980de3f3",
+          "event_name": "pull_request",
+          "workflow_run_id": "45251226338",
+          "workflow_run_attempt": "1",
+          "checked_at_utc": "2026-11-23T19:39:59.870151+00:00",
+          "pull_request_head_sha": "c38cf9d8d3a9ee2749a5d8b5152b33dc4c34cf65",
+          "pull_request_base_sha": "0be6db22652c135df81aaad885e251a52d1bf314"
+        },
+        "dependencies": {
+          "pytest": "9.0.3",
+          "ruff": "0.17.6",
+          "Faker": "37.12.0",
+          "minio": "7.2.20",
+          "PyYAML": "6.0.3",
+          "markdown-it-py": "4.0.0"
+        },
+        "python_files": 147,
+        "lint_errors": [],
+        "tests": {
+          "workspace": "tracked_source_snapshot",
+          "junit_counts": {
+            "tests": 1594,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "exit_code": 0
+        }
+      },
+      "candidate": {
+        "zip_sha256": "sha256:b30968809124daeca63c9a70f5e568fb7efa775e64407f75b7bcec9b35418726",
+        "tar_sha256": "50844e0e7eb5d7de77e0cef76bfadc05a8976422c4593b7095af4d540caebc5a",
+        "verified_file_count": 630,
+        "preview_only": true,
+        "private_configuration_paths_present": false
+      },
+      "inspected_steps": {
+        "Python Validation": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Checkout candidate",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Python",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install pinned Python validation dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint tracked Python scripts for correctness",
+            "conclusion": "success"
+          },
+          {
+            "name": "Validate generator and helpers in a clean source snapshot",
+            "conclusion": "success"
+          },
+          {
+            "name": "Preserve sanitized Python validation report",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Python",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Checkout candidate",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "CI Summary": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Require successful validation gates",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ]
+      }
+    },
+    {
+      "case": "negative",
+      "run_id": 45251287212,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/45251287212",
+      "head_sha": "46a22f61c6789dedb2fe27d44bb45e7918aaba97",
+      "event": "pull_request",
+      "run_attempt": 1,
+      "conclusion": "failure",
+      "job_outcomes": {
+        "dbt Validation": "success",
+        "Baseline Repository Checks": "success",
+        "Python Validation": "failure",
+        "CI Summary": "failure",
+        "Deployment Validation": "skipped"
+      },
+      "python_report": {
+        "schema_version": 1,
+        "scope": "offline_python_validation",
+        "stages": {
+          "lint": {
+            "status": "failure"
+          }
+        },
+        "python_version": "3.11.18",
+        "context": {
+          "tested_commit": "a0de454ae72914291bfcfc2b1d51b7f8596ec1a9",
+          "event_name": "pull_request",
+          "workflow_run_id": "45251287212",
+          "workflow_run_attempt": "1",
+          "checked_at_utc": "2026-11-23T19:40:16.230162+00:00",
+          "pull_request_head_sha": "46a22f61c6789dedb2fe27d44bb45e7918aaba97",
+          "pull_request_base_sha": "0be6db22652c135df81aaad885e251a52d1bf314"
+        },
+        "dependencies": {
+          "pytest": "9.0.3",
+          "ruff": "0.17.6",
+          "Faker": "37.12.0",
+          "minio": "7.2.20",
+          "PyYAML": "6.0.3",
+          "markdown-it-py": "4.0.0"
+        },
+        "python_files": 148,
+        "lint_errors": [
+          {
+            "path": "scripts/ci/issue90_invalid_probe.py",
+            "rule": "F821",
+            "line": 2,
+            "column": 7
+          }
+        ]
+      },
+      "candidate": null,
+      "inspected_steps": {
+        "Python Validation": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Checkout candidate",
+            "conclusion": "success"
+          },
+          {
+            "name": "Set up Python",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install pinned Python validation dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Lint tracked Python scripts for correctness",
+            "conclusion": "failure"
+          },
+          {
+            "name": "Validate generator and helpers in a clean source snapshot",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Preserve sanitized Python validation report",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Set up Python",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Post Checkout candidate",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ],
+        "CI Summary": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Require successful validation gates",
+            "conclusion": "failure"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ]
+      }
+    }
+  ],
+  "read_only_local_readiness": {
+    "scope": "read_only_premerge_readiness_not_deployment",
+    "source_activated": false,
+    "pipeline_executed": false,
+    "airflow_imports_and_paused_drained_gate": true,
+    "paused_dags": 4,
+    "dag_runs": 0,
+    "local_tcp_readiness_only": {
+      "hive_thrift": true,
+      "hive_metastore": true,
+      "marquez": true,
+      "prometheus": true,
+      "grafana": true
+    },
+    "pr_ci_rejected_by_actual_local_operator": true
+  },
+  "probe_cleanup": {
+    "pr": 128,
+    "closed_without_merge": true,
+    "temporary_worktree_removed": true,
+    "remote_branch_removed": true
+  },
+  "main_sha": "0be6db22652c135df81aaad885e251a52d1bf314",
+  "pending": {
+    "owner_approved_phase_merge": true,
+    "actual_main_push_ci": true,
+    "required_status_seal": true,
+    "approved_main_handoff": true,
+    "local_operator_activation": true,
+    "runtime_failure_recovery": true,
+    "tasks_3_and_4_complete": false,
+    "issue_90_complete": false
+  },
+  "boundaries": {
+    "cloud_resources_created": 0,
+    "containers_created": 0,
+    "main_merge_performed": false,
+    "runtime_source_activated": false,
+    "pipeline_executed": false,
+    "credentials_exported": false,
+    "test_prod_enabled": false,
+    "parent_issue_closed": false
+  }
+}

@@ -30,3 +30,20 @@ After approved merge and successful main CI:
 5. Inspect actual Airflow imports/paused-and-drained metadata and local service checks. Perform controlled failure/recovery qualification within the managed dev sandbox; record precisely whether the full data pipeline was exercised. Leave test/prod disabled.
 
 No main merge, real main handoff, local source activation, pipeline execution or end-to-end completion is claimed by this initial plan. Keep #90, parent #83 and final handoff #91 open until their respective evidence is available.
+
+## Pre-merge execution evidence
+
+Sanitized machine evidence: [issue-90-premerge-validation.json](../evidence/phase-8/issue-90-premerge-validation.json).
+
+| Case | Actual outcome |
+| --- | --- |
+| Valid PR change | [Run 45251226338](https://github.com/Shreyash2942/FraudLens/actions/runs/45251226338), task-1 commit `c38cf9d`: repository, dbt, Python, candidate packaging and CI Summary passed. Hosted Linux passed 123 tests/1,471 subtests; 147 Python files linted, no skips. Protected dispatch jobs remained skipped. |
+| Invalid PR change | [Run 45251287212](https://github.com/Shreyash2942/FraudLens/actions/runs/45251287212): an actual undefined name produced Ruff `F821`; Python and CI Summary failed. Repository/dbt passed, deployment validation was skipped and no candidate/handoff artifact was produced. |
+| Preview integrity | Downloaded GitHub ZIP, tar and every source-file digest verified. The valid bundle remains preview-only and excludes the negative probe, private runtime configuration and generated batches. |
+| Promotion refusal | The actual local operator rejected the PR CI run as a deployment handoff. It did not activate source or produce a successful operator report. This validates blocking, not successful promotion. |
+| Local readiness | Actual Airflow import and paused/drained gate passed against the existing checkout; four DAGs paused, zero runs, no current source pointer. Local Hive/metastore/Marquez/Prometheus/Grafana TCP ports responded; TCP readiness does not prove pipeline or service semantics. |
+| Probe cleanup | [PR #128](https://github.com/Shreyash2942/FraudLens/pull/128) closed without merge. Its exact remote branch, local branch and checked temporary worktree were removed. No intentional failure is on the phase branch. |
+
+Task 1 is commit `c38cf9d`; task 2 is the containing evidence commit. No deployment implementation changed: this issue's pre-merge diff is documentation and sanitized evidence only. The final evidence commit receives fresh normal PR validation before merge approval is requested.
+
+Tasks 3 and 4 remain pending owner approval of the reviewed Phase 8 merge candidate. PR #122 is still draft, main still points to `0be6db22652c135df81aaad885e251a52d1bf314`, and its main-push/deployment workflow cannot run before merge. Neither prior fixture tests nor the readiness probe substitute for that proof. The next action is an explicit owner decision on the merge, followed by actual main CI and protected local promotion; do not close #90 based only on these PR checks.
