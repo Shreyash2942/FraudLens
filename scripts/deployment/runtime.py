@@ -41,6 +41,8 @@ def smoke(release: Path, interpreter: Path) -> None:
                        AIRFLOW__CORE__DAGS_FOLDER=str(release / "airflow/dags"),
                        AIRFLOW__CORE__LOAD_EXAMPLES="false", AIRFLOW__LOGGING__LOGGING_LEVEL="ERROR")
     environment.pop("PYTHONHOME", None)
+    environment.pop("GH_TOKEN", None)
+    environment.pop("GITHUB_TOKEN", None)
     result = subprocess.run([str(interpreter), "-c", SMOKE], env=environment,
                             cwd=release, capture_output=True, check=False, timeout=120)
     if result.returncode:

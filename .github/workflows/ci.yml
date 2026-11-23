@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   repository-checks:
+    if: ${{ github.event.repository.private == false }}
     name: Baseline Repository Checks
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -43,6 +44,19 @@ jobs:
       - name: Validate governed contracts and tracked documentation links
         run: python -m scripts.ci.validate_standards
 
+      - name: Validate local-only portfolio cost and workflow boundaries
+        run: python -m scripts.deployment.environment_audit
+
+      - name: Preserve portfolio policy report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: portfolio-policy-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-artifacts/portfolio-policy.json
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
+
       - name: Preserve baseline validation report
         if: ${{ always() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -64,6 +78,7 @@ jobs:
           if-no-files-found: error
 
   dbt-validation:
+    if: ${{ github.event.repository.private == false }}
     name: dbt Validation
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -110,6 +125,7 @@ jobs:
           if-no-files-found: error
 
   python-validation:
+    if: ${{ github.event.repository.private == false }}
     name: Python Validation
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -151,6 +167,7 @@ jobs:
           if-no-files-found: error
 
   deployment-validation:
+    if: ${{ github.event.repository.private == false }}
     name: Deployment Validation
     needs: [repository-checks, dbt-validation, python-validation]
     permissions:
@@ -163,7 +180,7 @@ jobs:
   ci-summary:
     name: CI Summary
     needs: [repository-checks, dbt-validation, python-validation, deployment-validation]
-    if: ${{ always() }}
+    if: ${{ always() && github.event.repository.private == false }}
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:
