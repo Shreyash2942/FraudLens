@@ -33,6 +33,8 @@ def validate_dispatch(context: dict[str, str]) -> None:
         raise ValueError("Deployment requires an owner dispatch from main")
     if context.get("TARGET_ENVIRONMENT") != "dev" or context.get("DEPLOY_ENABLED") != "true":
         raise ValueError("Dev deployment controls are not activated; cloud deployment is disabled")
+    if context.get("COST_PROFILE") != "local_only_no_new_paid_resources":
+        raise ValueError("The local-only portfolio cost policy must be explicit")
     sha = context.get("CANDIDATE_SHA", "")
     if (not SHA.fullmatch(sha) or context.get("OWNER_APPROVAL") != sha
             or not DIGEST.fullmatch(context.get("CANDIDATE_SHA256", ""))
@@ -42,6 +44,8 @@ def validate_dispatch(context: dict[str, str]) -> None:
 
 def check_remote(context: dict[str, str]) -> tuple[dict, dict]:
     validate_dispatch(context)
+    if api("").get("visibility") != "public":
+        raise ValueError("This portfolio workflow requires a public repository and standard free runners")
     sha, run_id = context["CANDIDATE_SHA"], context["CI_RUN_ID"]
     run = api(f"actions/runs/{run_id}")
     if any(run.get(key) != value for key, value in {
@@ -78,17 +82,21 @@ def check_remote(context: dict[str, str]) -> tuple[dict, dict]:
     return run, artifacts[0]
 
 
-def prepare(context: dict[str, str], output: Path) -> dict:
-    run, artifact = check_remote(context)
+def download_artifact(artifact: dict, expected_names: set[str]) -> dict[str, bytes]:
     archive = subprocess.check_output(["gh", "api", "--hostname", "github.com",
                                        f"repos/{REPOSITORY}/actions/artifacts/{artifact['id']}/zip"])
     if len(archive) > MAX_BYTES or artifact.get("digest") != "sha256:" + sha256(archive):
         raise ValueError("GitHub artifact digest mismatch")
     with zipfile.ZipFile(io.BytesIO(archive)) as zipped:
-        if (len(zipped.infolist()) != 3 or set(zipped.namelist()) != {"candidate.tar", "candidate.sha256", "candidate-report.json"}
+        if (len(zipped.infolist()) != len(expected_names) or set(zipped.namelist()) != expected_names
                 or sum(item.file_size for item in zipped.infolist()) > MAX_BYTES):
             raise ValueError("Unexpected artifact contents")
-        raw = zipped.read("candidate.tar")
+        return {name: zipped.read(name) for name in expected_names}
+
+
+def prepare(context: dict[str, str], output: Path) -> dict:
+    run, artifact = check_remote(context)
+    raw = download_artifact(artifact, {"candidate.tar", "candidate.sha256", "candidate-report.json"})["candidate.tar"]
     output.mkdir(parents=True, exist_ok=True)
     bundle = output / "candidate.tar"
     bundle.write_bytes(raw)

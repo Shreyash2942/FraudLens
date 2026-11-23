@@ -79,6 +79,8 @@ def desired_variables(enabled: bool = False) -> dict[str, dict[str, str]]:
 
 
 def configure_variables(apply: bool, enabled: bool = False) -> dict:
+    if github(f"repos/{REPOSITORY}")["visibility"] != "public":
+        raise ValueError("Private-repository activation is outside the no-spend portfolio policy")
     values = desired_variables(enabled)
     for scope, variables in values.items():
         prefix = f"repos/{REPOSITORY}/actions" if scope == "repository" else f"repos/{REPOSITORY}/environments/{scope}"
@@ -159,13 +161,14 @@ def main() -> None:
     parser.add_argument("--apply", action="store_true", help="Apply the reviewed environment definitions")
     parser.add_argument("--section", choices=["definitions", "variables", "protections"], default="definitions")
     parser.add_argument("--seal-main", action="store_true", help="Require CI Summary only after verifying successful CI on actual main")
+    parser.add_argument("--enable-dev-handoff", action="store_true", help="Enable approval handoffs; never start Docker or a pipeline")
     parser.add_argument("--report", type=Path, default=Path(".ci-artifacts/environment-definitions.json"))
     args = parser.parse_args()
     try:
         if args.section == "definitions":
             result = configure_definitions(args.apply)
         elif args.section == "variables":
-            result = configure_variables(args.apply)
+            result = configure_variables(args.apply, args.enable_dev_handoff)
         else:
             result = configure_protections(args.apply, args.seal_main)
     except (ValueError, OSError, KeyError, subprocess.SubprocessError):

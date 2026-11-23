@@ -8,6 +8,8 @@ Branch: `83-phase-8-cicd-implementation`
 
 Validation date: November 21, 2026 (America/New_York; GitHub runs use November 22 UTC)
 
+Current operation is defined by [#89 environment controls](issue-89-environment-controls.md). Its no-spend portfolio model replaces the original self-hosted runtime job with an approved hosted handoff and explicit local Docker operator. The execution and evidence below describe #88 as delivered; follow #89 for current configuration and commands.
+
 ## Delivery priorities and task commits
 
 | Task | Delivery |
@@ -48,9 +50,9 @@ gh workflow run deploy.yml --ref main \
 
 Inspect verification, then dispatch `operation=deploy` with the same candidate/digest and complete the environment approval. This dispatch path is intentionally unavailable on the default branch before the Phase 8 workflow merges. Merging or tagging never triggers automatic runtime deployment.
 
-## Dev runner and environment handoff to #89
+## Historical dev runner design, superseded by #89
 
-The fixed runner labels are `[self-hosted, linux, fraudlens-dev-deploy]`. Provision a dedicated trusted deployment runner with access to the external Data-Lab runtime filesystem/process namespace; PRs must never execute on it. It needs Git, GitHub CLI, supported Actions Node/runtime libraries, Python 3.11 for the workflow, and a separately provisioned Airflow 2.x interpreter/runtime with the project dependencies and private service configuration.
+The original #88 implementation used `[self-hosted, linux, fraudlens-dev-deploy]`. **Do not provision that runner.** The [#89 environment controls](issue-89-environment-controls.md) supersede this design: protected standard-hosted execution produces an approved handoff, and an explicit owner-operated local Docker command consumes it. No public workflow executes on the developer container. The following table records the original #88 prerequisites; use the #89 guide for current paths, private configuration and operator commands.
 
 GitHub configuration expected from #89:
 

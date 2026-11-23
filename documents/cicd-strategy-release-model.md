@@ -6,6 +6,8 @@ Decision date: November 17, 2026
 
 This is the agreed design for validation, merge, promotion, and release control. The machine-readable operational contract is [`.github/cicd-release-contract.yaml`](../.github/cicd-release-contract.yaml). Issue #84 defines the operating model; issues #85–#91 implement and prove its controls.
 
+Portfolio constraint updated November 22, 2026 under [#89](phase-8-plan/issue-89-environment-controls.md): provision no paid cloud resources. Only the existing local Docker dev runtime is active infrastructure; GitHub test/prod are disabled policy definitions. Standard public Ubuntu CI prepares an approved handoff, and the owner executes it locally. The initial self-hosted-runner implementation from #88 is superseded by this local-operator path. Snowflake remains the conceptual analytics target; no Snowflake or other cloud account is provisioned for this portfolio.
+
 ## Priorities and task commits
 
 | Order | Priority | Issue #84 task | Commit scope |
@@ -92,7 +94,7 @@ An exceptional administrative action requires a named owner, reason, affected co
 
 ## 3. Promotion path across environments
 
-The required portfolio path is **local development -> pull-request CI -> revalidated `main` candidate -> approved Data-Lab `dev` verification -> release record**. `test` and `prod` describe a future Snowflake promotion path; they remain disabled until their prerequisites are demonstrated. Local Spark/Hive evidence does not qualify a Snowflake production deployment.
+The required portfolio path is **local development -> pull-request CI -> revalidated `main` candidate -> approved handoff -> local Docker Data-Lab `dev` verification -> release record**. Under #89's no-spend constraint, `test` and `prod` are protected, disabled policy definitions with no compute or cloud credentials. Snowflake remains a conceptual future target outside this portfolio implementation. Local Spark/Hive evidence does not qualify a Snowflake production deployment.
 
 | Stage / GitHub environment | Execution target | Entry gate | Exit evidence and activation |
 | --- | --- | --- | --- |
@@ -100,21 +102,21 @@ The required portfolio path is **local development -> pull-request CI -> revalid
 | PR CI / none | Ephemeral hosted runner; repository tests, contract checks, and offline dbt parse/docs. | `pull_request` targeting `main`; read-only token; no runtime credentials. | Applicable gates and summary succeed for the tested head/merge SHAs. Implement #85–#87. |
 | Candidate validation / none | Hosted runner on the resulting `main` SHA. | Successful merge; revalidate that exact commit. | Candidate bundle, digests, reports, and evidence index. Implement #85, #88. |
 | `dev` | Trusted, isolated Data-Lab runtime; Spark/Hive plus Airflow, artifact backend, metrics, and lineage services as configured. | Explicit dispatch by owner, verified candidate digest, configured environment rules, approved settings, and healthy runtime. | Success run, controlled failure/recovery, quality gates, artifact/log correlation, and metric/lineage checks. Enable through #88–#90. |
-| `test` | Optional non-production Snowflake resources; `snowflake` runtime profile after scaffold completion. | Same candidate previously verified in `dev`; dedicated database/schema/role; enabled workflow path; independent approval. | Warehouse load/build/tests and service evidence against the same candidate. Disabled by default. |
-| `prod` | Future Snowflake production target with separate identities and resources. | Successful `test` qualification; independent approval; migration/restore plan; environment restrictions and access verified. | Production verification and release/deployment record. Disabled by default; not required to claim local Phase 8 workflow completion. |
+| `test` | Policy definition only; no runtime resources. | Disabled workflow path and branch allowlist, no self-review, no runtime credentials. | No deployment or warehouse qualification claimed. Future activation requires a separately reviewed design. |
+| `prod` | Policy definition only; no runtime resources. | Disabled workflow path and branch allowlist, no self-review, no runtime credentials. | No production deployment claimed; no paid infrastructure required for local Phase 8 completion. |
 
 ### Runtime profiles are not GitHub environments
 
 The [orchestration profiles](../airflow/config/orchestration_profiles.yml) are existing runtime configurations, not approval boundaries. The `ci` profile sets ingestion to dry-run but retains `dbt_build`, `dbt_test`, and a MongoDB artifact backend. Running that full DAG is not an offline hosted CI check. PR CI validates those configuration contracts and runs isolated tests; runtime DAG execution belongs in trusted `dev` verification with explicitly configured services. The `snowflake` profile is marked scaffold-only and must not be interpreted as a working deployment target.
 
-GitHub environment names `dev`, `test`, and `prod` are planned allowlisted identifiers. Before a deployment job starts, an unprivileged preflight verifies the selected environment exists, its approved protections are configured, the candidate belongs to `main`, artifact digests match, required validation succeeded, and requested target/profile configuration agrees. Fail closed if any prerequisite is missing; do not rely on implicit environment creation by the workflow.
+GitHub environment names `dev`, `test`, and `prod` are configured allowlisted identifiers under #89; only `dev` has a handoff path. Before a handoff job starts, an unprivileged preflight verifies the selected environment exists, its approved protections are configured, the candidate belongs to `main`, artifact digests match, required validation succeeded, and requested target/profile configuration agrees. Fail closed if any prerequisite is missing; do not rely on implicit environment creation by the workflow.
 
 ### Approval, runner, and secret boundaries
 
 - Keep validation, artifact packaging, and privileged deployment in separate jobs. Give each job only its necessary token permissions; PR CI has no environment association or deployment credentials.
 - Use `workflow_dispatch` as the initial deployment trigger. Select an allowlisted environment and a full verified candidate SHA; reject arbitrary shell commands, feature refs, and unvalidated configuration overrides. Merging a PR or tagging a commit must not automatically deploy the runtime.
-- Hosted runners cannot reach the developer machine through their own `localhost`. Dev execution needs an explicitly configured, isolated trusted runner or operator execution adapter with access to the external Data-Lab runtime. Do not expose the existing persistent developer container to untrusted PR code. Runner installation and service provisioning are separate from this design.
-- Store credentials as environment-scoped secrets or approved short-lived identity configuration. Keep endpoints, database/schema names, profile selection, and non-sensitive flags as environment variables. Do not commit secret values, upload private `.env` files, or put credentials in candidate bundles, command logs, or lineage facets.
+- Hosted runners produce a protected approval handoff; the owner explicitly consumes it using the local Docker operator. No self-hosted runner is registered and no public workflow reaches the persistent developer container.
+- Store this portfolio's credentials only in the existing local Docker volume, in the private `0600` runtime JSON. No GitHub runtime secrets are required or uploaded. Keep non-sensitive paths and policy flags as environment variables. Do not commit secret values, upload private `.env` files, or put credentials in candidate bundles, command logs, or lineage facets.
 - `dev` may use recorded owner approval for this single-maintainer portfolio; identify it as self-approval. `test` and `prod` require an independent authorized reviewer and no self-approval. They stay blocked if no such reviewer or protected target is available. No automated fallback bypasses this requirement.
 - Apply environment branch/tag restrictions and serialize promotion per environment. Preserve the triggering actor, approver, source SHA, candidate digest, target/profile identity, and run/batch correlation keys in the deployment record.
 

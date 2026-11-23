@@ -52,10 +52,11 @@ class DeploymentTest(unittest.TestCase):
     def dispatch(self) -> dict:
         return {**self.context, "GITHUB_EVENT_NAME": "workflow_dispatch", "GITHUB_ACTOR": "Shreyash2942",
                 "DEPLOY_ENABLED": "true", "TARGET_ENVIRONMENT": "dev", "CANDIDATE_SHA": self.sha,
+                "COST_PROFILE": "local_only_no_new_paid_resources",
                 "OWNER_APPROVAL": self.sha, "CANDIDATE_SHA256": self.digest, "CI_RUN_ID": "123"}
 
     def remote(self) -> dict:
-        return {"actions/runs/123": {"id": 123, "run_attempt": 1, "head_sha": self.sha, "head_branch": "main",
+        return {"": {"visibility": "public"}, "actions/runs/123": {"id": 123, "run_attempt": 1, "head_sha": self.sha, "head_branch": "main",
                     "event": "push", "status": "completed", "conclusion": "success", "path": ".github/workflows/ci.yml",
                     "head_repository": {"full_name": candidate.REPOSITORY}},
                 "actions/runs/123/jobs": {"jobs": [{"name": name, "conclusion": "success"} for name in
@@ -103,14 +104,14 @@ class DeploymentTest(unittest.TestCase):
     def test_dispatch_rejects_feature_pr_cloud_missing_activation_and_missing_acceptance(self) -> None:
         changes = [{"GITHUB_REF": "refs/heads/feature"}, {"GITHUB_EVENT_NAME": "pull_request"},
                    {"TARGET_ENVIRONMENT": "prod"}, {"DEPLOY_ENABLED": ""}, {"OWNER_APPROVAL": ""},
-                   {"GITHUB_ACTOR": "another-user"}, {"CI_RUN_ID": "123; command"}]
+                   {"GITHUB_ACTOR": "another-user"}, {"CI_RUN_ID": "123; command"}, {"COST_PROFILE": "paid_cloud"}]
         for change in changes:
             with self.subTest(change=change), patch.object(control, "api") as api, self.assertRaises(ValueError):
                 control.check_remote({**self.dispatch(), **change})
             api.assert_not_called()
 
     def test_remote_provenance_gates_and_environment_rules_reject_invalid_evidence(self) -> None:
-        changes = [("actions/runs/123", "event", "pull_request"), ("actions/runs/123", "conclusion", "failure"),
+        changes = [("", "visibility", "private"), ("actions/runs/123", "event", "pull_request"), ("actions/runs/123", "conclusion", "failure"),
                    ("actions/runs/123/jobs", "jobs", []), (f"compare/{self.sha}...main", "status", "diverged"),
                    ("environments/dev", "can_admins_bypass", True), ("environments/dev", "protection_rules", []),
                    ("environments/dev/deployment-branch-policies", "branch_policies", [{"name": "*"}]),
@@ -194,7 +195,7 @@ class DeploymentTest(unittest.TestCase):
         workflow = yaml.safe_load((candidate.ROOT / ".github/workflows/deploy.yml").read_text())
         self.assertEqual(set(workflow["on"]), {"workflow_call", "workflow_dispatch"})
         self.assertEqual(workflow["on"]["workflow_call"]["inputs"]["ci_bundle"]["type"], "boolean")
-        self.assertEqual(workflow["jobs"]["package"]["if"], "${{ inputs.ci_bundle == true }}")
+        self.assertIn("inputs.ci_bundle == true", workflow["jobs"]["package"]["if"])
         self.assertIn("!inputs.ci_bundle", workflow["jobs"]["verify"]["if"])
         self.assertIn("!inputs.ci_bundle", workflow["jobs"]["deploy-dev"]["if"])
         self.assertNotIn("environment", workflow["jobs"]["verify"])
@@ -205,6 +206,7 @@ class DeploymentTest(unittest.TestCase):
         self.assertIn("workflow_dispatch", deploy["if"])
         self.assertFalse(deploy["concurrency"]["cancel-in-progress"])
         for job in workflow["jobs"].values():
+            self.assertIn("github.event.repository.private == false", job["if"])
             for step in job["steps"]:
                 self.assertNotIn("continue-on-error", step)
                 if "uses" in step:
