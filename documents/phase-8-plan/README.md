@@ -14,7 +14,7 @@ The [CI/CD strategy and release model](../cicd-strategy-release-model.md) and [o
 | [#87](https://github.com/Shreyash2942/FraudLens/issues/87) | Integrate Python Checks & Repository Standards | Python 3.11 environment, tracked correctness lint, clean-source generator/helper tests and governed metadata/docs checks; [execution guide](issue-87-python-standards.md). |
 | [#89](https://github.com/Shreyash2942/FraudLens/issues/89) | Configure Environment Controls & Secrets Handling | Protected logical environments, private local dev configuration, main PR controls and safe local-Docker handoff; [controls/evidence guide](issue-89-environment-controls.md). |
 | [#88](https://github.com/Shreyash2942/FraudLens/issues/88) | Implement Deployment Workflow | Candidate bundles, controlled dispatch/preflight and managed dev adapter delivered; [activation and evidence guide](issue-88-deployment-workflow.md). Live activation waits for #89 and main merge. |
-| #90 | Validate End-to-End CI/CD Execution | Prove successful promotion, blocking failure, and recovery using real runtime evidence. |
+| #90 | Validate End-to-End CI/CD Execution | [Qualification plan and evidence](issue-90-end-to-end-validation.md): PR pass/fail proof first, then owner-approved actual-main promotion and local runtime qualification. |
 | #91 | Document CI/CD Workflows & Release Process | Publish the final runbook and clearly bounded Phase 8 handoff. |
 
 Issue closure records delivery on the feature branch. The Phase 8 parent and milestone stay open until the remaining workstreams are complete and the phase is reviewed and merged. Branch protection, environment controls, deployment credentials, and automatic workflows are not activated by this planning document.
