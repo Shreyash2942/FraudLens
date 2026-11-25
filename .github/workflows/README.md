@@ -1,8 +1,8 @@
 # Workflow layout and CI/CD strategy
 
-The Phase 8 branch uses `ci.yml` for repository standards, offline dbt and Python validation, and `CI Summary`. Issue #86 migrates the previous path-filtered dbt checks; #87 adds generator/helper regression, correctness lint and repository standards. The [CI/CD strategy and release model](../../documents/cicd-strategy-release-model.md) defines the target operating model; [cicd-release-contract.yaml](../cicd-release-contract.yaml) distinguishes implemented checks from remaining policy work.
+Use the [CI/CD workflows and release process](../../documents/cicd-workflows-release-process.md) for current commands, controls, release guidance and troubleshooting. `ci.yml` implements repository standards, offline dbt, Python and required `CI Summary`; `deploy.yml` packages candidates and prepares protected local Docker handoffs. The [strategy](../../documents/cicd-strategy-release-model.md) records design rationale and [release contract](../cicd-release-contract.yaml) records policy.
 
-Issues #84–#88 define the strategy, validation and deployment implementation. #89 configures no-spend environment controls and local Docker handoffs. The workflows become the `main` baseline after the Phase 8 PR merges; actual runtime qualification and final handoff remain #90/#91. Required `CI Summary` enforcement is sealed only after successful CI on actual merged `main`.
+These workflows are merged into main through PR #122. Required `CI Summary` enforcement was enabled after successful actual-main run 45545800298. Issue #89 configured no-spend logical environments and private local secrets. Runtime activation/pipeline qualification is not established by issue closure or this documentation.
 
 ## Current and planned workflow responsibilities
 
@@ -21,12 +21,6 @@ Issues #84–#88 define the strategy, validation and deployment implementation. 
   - see [issue #85 execution and reproduction guide](../../documents/phase-8-plan/issue-85-code-validation.md)
   - see [issue #86 validation and failure evidence](../../documents/phase-8-plan/issue-86-dbt-validation.md)
   - see [issue #87 Python and repository standards evidence](../../documents/phase-8-plan/issue-87-python-standards.md)
-- `governance-checks.yml`
-  - verify required ownership and control metadata
-  - detect missing audit fields in governed contracts
-  - enforce naming standards for new datasets
-- `main-release.yml`
-  - reserved for later release publication; candidate packaging and controlled dev deployment are in `deploy.yml`
 - `deploy.yml` — implemented in #88
   - reusable CI path builds and verifies source bundles with per-file and archive digests; it has no environment association
   - manual `verify`/`deploy` requires owner dispatch from `main`, successful push-to-main CI for the exact candidate, matching artifact/digests, explicit acceptance and existing environment protections
@@ -34,7 +28,7 @@ Issues #84–#88 define the strategy, validation and deployment implementation. 
   - #89 replaces the initial self-hosted-runner path with an approved hosted handoff and an explicit owner-operated local Docker adapter; no public workflow runs on the developer's container
   - private service settings remain in an owner-only file on the existing Docker volume; GitHub requires no runtime secrets
   - local activation retains the managed source/import/maintenance/pointer checks; it neither starts a pipeline nor rolls back data
-  - activation waits for merged main CI, owner environment approval and the explicit local operator command; #90 supplies real runtime qualification
+  - main CI is verified; activation still requires owner environment approval and the explicit local operator command; real runtime/pipeline qualification is not yet certified
   - see [issue #88 workflow and activation guide](../../documents/phase-8-plan/issue-88-deployment-workflow.md)
 
 ## Workflow Design Rules
@@ -46,4 +40,4 @@ Issues #84–#88 define the strategy, validation and deployment implementation. 
 - Candidate validation must repeat on the resulting `main` SHA before runtime promotion.
 - Deployment and secret controls are implemented under #88 and #89 after the validation gates are available.
 - Every runner job has a public-repository guard and uses standard Ubuntu 24.04. The portfolio provisions no cloud accounts, paid runners or test/prod compute.
-- `CI Summary` aggregates baseline/standards, offline dbt, Python and candidate packaging. See [#89 controls and local operation](../../documents/phase-8-plan/issue-89-environment-controls.md) for applied settings and the post-merge status-check seal.
+- `CI Summary` aggregates baseline/standards, offline dbt, Python and candidate packaging. Main enforces that exact check with strict/up-to-date integration. Only `ci.yml` and `deploy.yml` exist; governance is integrated into CI and automated release publication is not implemented.

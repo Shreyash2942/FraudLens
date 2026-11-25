@@ -1,5 +1,7 @@
 # Issue #89: portfolio environment controls and local secrets
 
+Historical implementation record. PR #122 has since merged and strict main `CI Summary` enforcement is applied. Use the [current CI/CD operator guide](../cicd-workflows-release-process.md) for current status and commands; pre-merge pending statements below describe the original delivery date.
+
 Issue: [#89](https://github.com/Shreyash2942/FraudLens/issues/89)
 
 Parent: [#83](https://github.com/Shreyash2942/FraudLens/issues/83)

@@ -16,8 +16,9 @@ Use these as the primary phase review and handoff files:
 | `5` | `data-quality-governance.md` | consolidated quality, governance, readiness, and controls handoff |
 | `6` | `orchestration-airflow.md` | consolidated Airflow orchestration branch handoff |
 | `7` | `phase-7-observability-lineage.md` | observability, lineage, validation evidence, and operations handoff |
+| `8` | [`cicd-workflows-release-process.md`](cicd-workflows-release-process.md) | CI triggers/gates, approved local-Docker deployment, environment/secret controls, recovery and release process; runtime qualification limits explicit |
 
-Future phases `8` through `10` do not yet have their final consolidated handoff documents in `documents/`.
+Phases `9` and `10` do not yet have their consolidated handoff documents in `documents/`.
 
 ## Canonical Documents
 
@@ -38,6 +39,7 @@ Future phases `8` through `10` do not yet have their final consolidated handoff 
 - `orchestration-airflow.md` consolidated Phase 6 branch handoff for `orchestration-airflow`, including architecture, operations, MongoDB artifact persistence, validation status, and commit ledger
 - `phase-7-observability-lineage.md` Phase 7 handoff for metrics, dashboards, logs, OpenLineage, Marquez, and validation evidence
 - [`cicd-strategy-release-model.md`](cicd-strategy-release-model.md) issue #84 design for CI goals, merge rules, environment promotion, and Phase 8 delivery priorities
+- [`cicd-workflows-release-process.md`](cicd-workflows-release-process.md) current Phase 8 operator guide, troubleshooting, release evidence and known qualification boundaries
 
 ## Supporting Airflow Reference Set
 
