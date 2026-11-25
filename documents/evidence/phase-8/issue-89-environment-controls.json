@@ -1,0 +1,520 @@
+{
+  "schema_version": 1,
+  "issue": 89,
+  "parent_issue": 83,
+  "validation_date_local": "2026-11-22",
+  "timezone": "America/New_York",
+  "recorded_at_utc": "2026-11-23T00:20:26.061495+00:00",
+  "branch": "83-phase-8-cicd-implementation",
+  "phase_pr": 122,
+  "phase_pr_remains_draft": true,
+  "task_commits": {
+    "environment_structure": "4cbaf6fc",
+    "secrets_variables": "22142d0a",
+    "protected_controls": "afe3e79d",
+    "safe_consumption": "containing evidence commit"
+  },
+  "cost_policy": "local_only_no_new_paid_resources",
+  "github_public": true,
+  "self_hosted_runner_count": 0,
+  "repository_variables": {
+    "FRAUDLENS_COST_PROFILE": "local_only_no_new_paid_resources",
+    "FRAUDLENS_DEV_DEPLOY_ENABLED": "true"
+  },
+  "github_runtime_secret_count": 0,
+  "environments": {
+    "dev": {
+      "can_admins_bypass": false,
+      "reviewer": "Shreyash2942",
+      "prevent_self_review": false,
+      "allowed_branch": "main",
+      "variables": {
+        "FRAUDLENS_CLOUD_RESOURCES_ENABLED": "false",
+        "FRAUDLENS_DEPLOY_ROOT": "/home/datalab/runtime/fraudlens/environments/dev",
+        "FRAUDLENS_DOCKER_CONTAINER": "fraudlens",
+        "FRAUDLENS_ENVIRONMENT": "dev",
+        "FRAUDLENS_EXECUTION_MODE": "local_docker_operator",
+        "FRAUDLENS_RUNTIME_PYTHON": "/usr/bin/python3",
+        "FRAUDLENS_SOURCE_ROOT": "/home/datalab/fraudlens"
+      },
+      "runtime_secret_count": 0,
+      "runtime_resources": "existing_local_docker"
+    },
+    "test": {
+      "can_admins_bypass": false,
+      "reviewer": "Shreyash2942",
+      "prevent_self_review": true,
+      "allowed_branch": "portfolio-test-disabled",
+      "variables": {
+        "FRAUDLENS_CLOUD_RESOURCES_ENABLED": "false",
+        "FRAUDLENS_DEPLOY_ENABLED": "false",
+        "FRAUDLENS_ENVIRONMENT": "test",
+        "FRAUDLENS_EXECUTION_MODE": "disabled"
+      },
+      "runtime_secret_count": 0,
+      "runtime_resources": "none_policy_only"
+    },
+    "prod": {
+      "can_admins_bypass": false,
+      "reviewer": "Shreyash2942",
+      "prevent_self_review": true,
+      "allowed_branch": "portfolio-prod-disabled",
+      "variables": {
+        "FRAUDLENS_CLOUD_RESOURCES_ENABLED": "false",
+        "FRAUDLENS_DEPLOY_ENABLED": "false",
+        "FRAUDLENS_ENVIRONMENT": "prod",
+        "FRAUDLENS_EXECUTION_MODE": "disabled"
+      },
+      "runtime_secret_count": 0,
+      "runtime_resources": "none_policy_only"
+    }
+  },
+  "main_protection": {
+    "pull_request_required": true,
+    "enforce_admins": true,
+    "required_approving_reviews": 0,
+    "independent_approval_claimed": false,
+    "resolve_conversations_required": true,
+    "allow_force_pushes": false,
+    "allow_deletions": false,
+    "required_status_checks": null,
+    "status_check_seal_pending_successful_merged_main_ci": true
+  },
+  "default_workflow_permissions": {
+    "default_workflow_permissions": "read",
+    "can_approve_pull_request_reviews": false
+  },
+  "external_pr_approval_policy": {
+    "approval_policy": "all_external_contributors"
+  },
+  "main_sha_at_capture": "0be6db22652c135df81aaad885e251a52d1bf314",
+  "local_private_runtime": {
+    "private_file_mode": "0o600",
+    "private_directory_mode": "0o700",
+    "private_file_symlink": false,
+    "active_source_exists": false,
+    "marker_matches": true,
+    "local_endpoints_only": true,
+    "registered_dags": 4,
+    "paused_dags": 4,
+    "dag_runs": 0,
+    "mongodb_authenticated_ping": true,
+    "minio_authenticated_bucket_access": true,
+    "provisioning_report": {
+      "configured": true,
+      "runtime_root": "/home/datalab/runtime/fraudlens/environments/dev",
+      "secret_file": "/home/datalab/runtime/fraudlens/environments/dev/secrets/runtime.json",
+      "secret_mode": "0o600",
+      "secret_names_present": [
+        "DATALAB_MINIO_ACCESS_KEY",
+        "DATALAB_MINIO_SECRET_KEY",
+        "FRAUDLENS_MONGODB_URI"
+      ],
+      "isolated_airflow_metadata": true,
+      "registered_paused_dags": 4,
+      "scheduler_started": false,
+      "source_activated": false,
+      "cloud_resources_created": 0
+    }
+  },
+  "local_activation_lock_proof": {
+    "existing_container_flock_available": true,
+    "concurrent_command_blocked": true,
+    "command_succeeds_after_holder_exits": true,
+    "temporary_lock_removed": true,
+    "source_activated": false
+  },
+  "runs": [
+    {
+      "case": "positive",
+      "run_id": 45086588170,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/45086588170",
+      "source_head_sha": "e65f51f7431d49d45c337b025ad2d5e698b2457d",
+      "run_attempt": 1,
+      "event": "pull_request",
+      "conclusion": "success",
+      "job_outcomes": {
+        "Baseline Repository Checks": "success",
+        "Python Validation": "success",
+        "dbt Validation": "success",
+        "Deployment Validation / Candidate Bundle": "success",
+        "Deployment Validation / Verify Main Candidate": "skipped",
+        "Deployment Validation / Prepare Approved Dev Handoff": "skipped",
+        "CI Summary": "success"
+      },
+      "baseline_steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install baseline validation dependency",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test CI validation and failure propagation",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate tracked repository files",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate governed contracts and tracked documentation links",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate local-only portfolio cost and workflow boundaries",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve portfolio policy report",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve baseline validation report",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve sanitized repository standards report",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "reports": {
+        "python-validation": {
+          "schema_version": 1,
+          "scope": "offline_python_validation",
+          "stages": {
+            "lint": {
+              "status": "success"
+            },
+            "tests": {
+              "status": "success"
+            }
+          },
+          "python_version": "3.11.18",
+          "context": {
+            "tested_commit": "1b198f5fc9bf44a3204860be23ca13dc7b55f44e",
+            "event_name": "pull_request",
+            "workflow_run_id": "45086588170",
+            "workflow_run_attempt": "1",
+            "checked_at_utc": "2026-11-23T00:04:20.631668+00:00",
+            "pull_request_head_sha": "e65f51f7431d49d45c337b025ad2d5e698b2457d",
+            "pull_request_base_sha": "0be6db22652c135df81aaad885e251a52d1bf314"
+          },
+          "dependencies": {
+            "pytest": "9.0.3",
+            "ruff": "0.17.6",
+            "Faker": "37.12.0",
+            "minio": "7.2.20",
+            "PyYAML": "6.0.3",
+            "markdown-it-py": "4.0.0"
+          },
+          "python_files": 147,
+          "lint_errors": [],
+          "tests": {
+            "workspace": "tracked_source_snapshot",
+            "junit_counts": {
+              "tests": 1594,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            "exit_code": 0
+          }
+        },
+        "portfolio-policy": {
+          "valid": true,
+          "cost_policy": "local_only_no_new_paid_resources",
+          "execution_mode": "local_docker_operator",
+          "workflows": 2,
+          "github_runtime_secrets_required": 0,
+          "errors": []
+        },
+        "repository-standards": {
+          "valid": true,
+          "counts": {
+            "contracts": 21,
+            "markdown_files": 155,
+            "local_links": 54
+          },
+          "errors": [],
+          "context": {
+            "tested_commit": "1b198f5fc9bf44a3204860be23ca13dc7b55f44e",
+            "event_name": "pull_request",
+            "workflow_run_id": "45086588170",
+            "workflow_run_attempt": "1",
+            "checked_at_utc": "2026-11-23T00:04:25.012313+00:00",
+            "pull_request_head_sha": "e65f51f7431d49d45c337b025ad2d5e698b2457d",
+            "pull_request_base_sha": "0be6db22652c135df81aaad885e251a52d1bf314"
+          }
+        }
+      },
+      "candidate": {
+        "artifact_id": 14779521739,
+        "zip_sha256": "sha256:90f8cc3e327bc82ea4abc0b5137e439e458a98c700dc6484f96e384ef12f322a",
+        "tar_sha256": "02fbb7bdd2a56ca017faa5026baa35e6f775074b10afcf0bac4fcba4edf85c91",
+        "verified_source_files": 627,
+        "preview_only": true,
+        "private_configuration_paths_present": false
+      },
+      "report_artifacts": [
+        {
+          "id": 14779711330,
+          "name": "repository-standards-45086588170-1",
+          "digest": "sha256:84a196d26803620b541115e5df146f9254f66efe4fc85468cdf0efc1805685fd",
+          "size_in_bytes": 474,
+          "expires_at": "2026-12-23T00:04:27Z"
+        },
+        {
+          "id": 14779641014,
+          "name": "python-validation-45086588170-1",
+          "digest": "sha256:277b33f9dc217449a7915dc2a5fa5641098e70cb52aeb6798da05d22c86572a5",
+          "size_in_bytes": 670,
+          "expires_at": "2026-12-23T00:04:25Z"
+        },
+        {
+          "id": 14779552685,
+          "name": "dbt-validation-45086588170-1",
+          "digest": "sha256:75b0b5b8b92c9c0d8ad2a71ef252f1118378b8b47cbbb948094dfb72ecae128d",
+          "size_in_bytes": 632,
+          "expires_at": "2026-12-23T00:05:31Z"
+        },
+        {
+          "id": 14779521739,
+          "name": "candidate-1b198f5fc9bf44a3204860be23ca13dc7b55f44e-45086588170-1",
+          "digest": "sha256:90f8cc3e327bc82ea4abc0b5137e439e458a98c700dc6484f96e384ef12f322a",
+          "size_in_bytes": 2400756,
+          "expires_at": "2026-12-23T00:05:44Z"
+        },
+        {
+          "id": 14779477839,
+          "name": "portfolio-policy-45086588170-1",
+          "digest": "sha256:aa679f3ff5f6a15637441bcf821a2d968b3c3706620e521fb882cde43557e3d1",
+          "size_in_bytes": 295,
+          "expires_at": "2026-12-23T00:04:25Z"
+        },
+        {
+          "id": 14779104436,
+          "name": "baseline-validation-45086588170-1",
+          "digest": "sha256:c84ff7a2c7e2f021d520ae080f9d71142477b2fae069615d4a78591f7f89ee2f",
+          "size_in_bytes": 459,
+          "expires_at": "2026-12-23T00:04:26Z"
+        }
+      ]
+    },
+    {
+      "case": "negative",
+      "run_id": 45087263173,
+      "url": "https://github.com/Shreyash2942/FraudLens/actions/runs/45087263173",
+      "source_head_sha": "33df6dd3420232f2dafe171c89873db7d9a2a3ec",
+      "run_attempt": 1,
+      "event": "pull_request",
+      "conclusion": "failure",
+      "job_outcomes": {
+        "Python Validation": "success",
+        "Baseline Repository Checks": "failure",
+        "dbt Validation": "success",
+        "CI Summary": "failure",
+        "Deployment Validation": "skipped"
+      },
+      "baseline_steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Set up Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install baseline validation dependency",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test CI validation and failure propagation",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate tracked repository files",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate governed contracts and tracked documentation links",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate local-only portfolio cost and workflow boundaries",
+          "conclusion": "success"
+        },
+        {
+          "name": "Reject an unsafe cloud-enabled handoff configuration (disposable proof)",
+          "conclusion": "failure"
+        },
+        {
+          "name": "Preserve unsafe handoff rejection proof",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve portfolio policy report",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve baseline validation report",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve sanitized repository standards report",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Set up Python",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Checkout candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "reports": {
+        "unsafe-handoff-rejection": {
+          "unsafe_configuration_rejected": true,
+          "docker_executed": false,
+          "deployment_executed": false,
+          "probe": "cloud_enabled_handoff"
+        }
+      },
+      "candidate": null,
+      "report_artifacts": [
+        {
+          "id": 14780210448,
+          "name": "baseline-validation-45087263173-1",
+          "digest": "sha256:d2bb75013b15820883d1875373e1523ec4bd341a70616ce9b11cad5985bbf5a6",
+          "size_in_bytes": 461,
+          "expires_at": "2026-12-23T00:11:46Z"
+        },
+        {
+          "id": 14780100692,
+          "name": "portfolio-policy-45087263173-1",
+          "digest": "sha256:c0b39612b05bce20165aec72d572b1218c598b5a15989c378ca66c1488082d67",
+          "size_in_bytes": 295,
+          "expires_at": "2026-12-23T00:11:46Z"
+        },
+        {
+          "id": 14780051181,
+          "name": "dbt-validation-45087263173-1",
+          "digest": "sha256:b400e0cbf5461ad3f0bdea48f050ad072f374938f1960da86833d44645662028",
+          "size_in_bytes": 631,
+          "expires_at": "2026-12-23T00:12:44Z"
+        },
+        {
+          "id": 14780026097,
+          "name": "unsafe-handoff-rejection-45087263173-1",
+          "digest": "sha256:be5c494ab1691bd55fab563dfdc800aeb3181a697b8e6f9d221b70a6b1ea2858",
+          "size_in_bytes": 265,
+          "expires_at": "2026-12-23T00:11:45Z"
+        },
+        {
+          "id": 14779856766,
+          "name": "repository-standards-45087263173-1",
+          "digest": "sha256:769cd87fded9af4acb2387a2a2c20beb9287e1721eebc7cce35f8bcb96aa828c",
+          "size_in_bytes": 476,
+          "expires_at": "2026-12-23T00:11:47Z"
+        },
+        {
+          "id": 14778928910,
+          "name": "python-validation-45087263173-1",
+          "digest": "sha256:0e1b7260e16aa72ab8256251a93e7a71ac94b3638e1b025b5a6232f4239217b5",
+          "size_in_bytes": 672,
+          "expires_at": "2026-12-23T00:11:51Z"
+        }
+      ]
+    }
+  ],
+  "tested_code_blob_sha256": {
+    ".github/workflows/ci.yml": "9c8f326ecb5f71e56bc74716a13889abd1a500ac28b1454f9db6ab7ac986f2ae",
+    ".github/workflows/deploy.yml": "b08ebc67d5fcfabd55154c080eb0662847a1f71bafdb1b0bc7311cbc9fadc079",
+    ".github/portfolio-environments.json": "33a08cc25c267f3dc183ecc93564108287f117388ff643b65d05654a3764d628",
+    "scripts/deployment/environments.py": "1cbd6315d8b5391e7dba2ef39e5ff20446c588ca9c2ab9b1a758b7b2fae62aac",
+    "scripts/deployment/local_configuration.py": "6f586b1bb442118065303fa182b641ee637f2186cfb12f5fb6d8fe21c2f786e8",
+    "scripts/deployment/environment_audit.py": "58e76436b5efb8fad844cbdd3587f6d8de55f5a4a20b5ab7f9bdfef52b615b16",
+    "scripts/deployment/handoff.py": "8257e8e8397967f61c84722a5caed80aba8f4f8edd5c6b9ee09318d637b81d34",
+    "scripts/deployment/operator.py": "3f3a35dfdf754f91553e91fc0552c082e9e3fcc46b6059116ecd50a253a7c7d8",
+    "scripts/deployment/control.py": "f95b219bca0d5f220c770b5d56debd5063561d478ce6f2a9a4e176071df03b7c",
+    "scripts/deployment/runtime.py": "eb7767786ca67f234d665e0b0d934c342fc1dd7583325181273b1813dfab4175",
+    "tests/ci/test_deployment.py": "f2639f6ab6285fc9d3cb353d679c70967a42457d50dd7c4d414f701741888729",
+    "tests/ci/test_portfolio_environments.py": "d9c2750eaa203c9af3a06ae37b27c4f443221253ec7be23ee529d695d5d3fcd8"
+  },
+  "tested_code_identical_to_staged_task4": false,
+  "final_followup": {
+    "reason": "Pass explicit dev target through local operator to the shared dispatch guard; exercise real guard in the approved handoff test; serialize local activation with existing container flock",
+    "expected_final_blob_sha256": {
+      "scripts/deployment/operator.py": "4916317e5f644bc10fb79798e9864961d47957f06aefe13f570991ddcf63ee3d",
+      "tests/ci/test_portfolio_environments.py": "26d7617304ec8540b9cb0f83eec62e36966c7f250684e71c467ef6396e474724"
+    },
+    "validation": "local regression plus final containing-commit hosted CI and artifact inspection before issue closure"
+  },
+  "local_regression": {
+    "python": "3.14.4",
+    "tests_passed": 121,
+    "subtests_passed": 1471,
+    "linux_only_skips": 2,
+    "ci_tests": 52,
+    "aggregate_combinations": 1296,
+    "linted_python_files": 147
+  },
+  "hosted_regression": {
+    "python": "3.11.18",
+    "tests_passed": 123,
+    "subtests_passed": 1471,
+    "skips": 0
+  },
+  "probe_cleanup": {
+    "pr": 127,
+    "closed_without_merge": true,
+    "remote_branch_removed": true,
+    "temporary_worktree_removed": true
+  },
+  "boundaries": {
+    "paid_cloud_resources_created": 0,
+    "containers_created": 0,
+    "test_prod_compute_provisioned": false,
+    "github_runtime_credentials_uploaded": false,
+    "local_source_activated": false,
+    "scheduler_started": false,
+    "pipeline_run_executed": false,
+    "real_main_dispatch_or_approved_handoff_claimed": false,
+    "release_created": false,
+    "main_merged": false,
+    "parent_issue_remains_open": true,
+    "next_issue_90_remains_open": true
+  }
+}

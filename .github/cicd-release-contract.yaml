@@ -1,0 +1,205 @@
+contract_version: "1.0"
+project: FraudLens
+phase: 8
+issue: 84
+owner: Shreyash2942
+status: design_defined
+portfolio_cost_policy: local_only_no_new_paid_resources
+portfolio_environment_contract: .github/portfolio-environments.json
+paid_cloud_resources_enabled: false
+decision_date: "2026-11-17"
+strategy_document: documents/cicd-strategy-release-model.md
+scope:
+  - validation
+  - merge_control
+  - candidate_identity
+  - environment_promotion
+  - release_evidence
+implementation_issues: [85, 86, 87, 88, 89, 90, 91]
+baseline:
+  source_commit: 0be6db22652c135df81aaad885e251a52d1bf314
+  workflow: .github/workflows/pr-validation.yml
+  existing_check: dbt Structure Validation
+  existing_triggers: [pull_request_path_filtered, workflow_dispatch]
+  protected_main: false
+  repository_rulesets: []
+  github_environments: []
+  published_releases: []
+validation:
+  policy_status: implemented_on_phase_branch
+  aggregate_check: CI Summary
+  gates: [repository_standards, python_validation, dbt_validation]
+  required_summary_on_every_pull_request: true
+  unjustified_skip_or_missing_result: fail
+  cancelled_required_check: fail
+  pull_request_runner: ephemeral_github_hosted
+  default_token_permissions:
+    contents: read
+  pull_request_deployment_secrets: false
+  untrusted_pull_request_on_persistent_self_hosted_runner: false
+  privileged_pull_request_target_executes_untrusted_code: false
+  clean_workspace_required: true
+  current_implementation:
+    issues: [85, 86, 87, 88, 89]
+    status: verified_on_phase_branch
+    workflow: .github/workflows/ci.yml
+    workflow_name: Code Validation
+    implemented_gates: [repository_baseline, repository_standards, dbt_validation, python_validation, candidate_packaging]
+    implemented_aggregate_check: CI Summary
+    all_main_pr_paths_including_drafts: true
+    main_push_revalidation_configured: true
+    ci_regression_tests: 52
+    aggregate_result_combinations_tested: 1296
+    report_artifact_retention_days: 30
+    baseline_live_evidence: documents/evidence/phase-8/issue-85-ci-execution.json
+    dbt_live_evidence: documents/evidence/phase-8/issue-86-dbt-execution.json
+    python_standards_live_evidence: documents/evidence/phase-8/issue-87-python-standards-execution.json
+    python_environment: hosted_ubuntu_24_04_python_3_11
+    python_test_scope: clean_tracked_source_tests_and_airflow_tests
+    python_lint_scope: explicit_git_tracked_python_correctness_rules
+    repository_standards_scope: versioned_contract_identity_ownership_audit_and_tracked_markdown_destinations
+    dbt_positive_run: 44653554383
+    dbt_validation_scope: offline_parse_selectors_manifest_validators_docs
+    warehouse_data_tests_executed: false
+    positive_probe_run: 44435005871
+    negative_probe_run: 44435087173
+    pending_gate_issues: {}
+    existing_dbt_workflow_remains_separate: false
+    retired_workflow: .github/workflows/pr-validation.yml
+candidate:
+  source_branch: main
+  post_merge_revalidation_required: true
+  identity_fields: [commit_sha, workflow_run_id, workflow_run_attempt, artifact_digest]
+  changed_commit_or_configuration_requires_revalidation: true
+  evidence_retention_days: 30
+  evidence_fields:
+    - pull_request
+    - tested_head_and_merge_shas
+    - dependency_versions
+    - manifest_digest
+    - gate_outcomes
+    - configuration_fingerprint_without_secrets
+    - operator_owner
+  include_secrets_or_generated_banking_data: false
+branches:
+  policy_status: protected_pr_controls_configured_summary_pending_actual_main_ci
+  configured_by_issue: 89
+  admins_enforced: true
+  approving_review_count_for_sole_maintainer: 0
+  required_check_activation_command: python -m scripts.deployment.environments --section protections --seal-main --apply
+  integration: main
+  feature_pattern: NN-short-slug
+  phase_8_branch: 83-phase-8-cicd-implementation
+  permanent_environment_branches: false
+  pull_request_required: true
+  phase_merge_method: merge_commit
+  required_check: CI Summary
+  require_current_revision: true
+  require_up_to_date_integration: true
+  resolve_conversations_before_merge: true
+  independent_approval_when_qualified_reviewer_available: true
+  sole_maintainer_acceptance_note_required: true
+  sole_maintainer_acceptance_is_independent_review: false
+  allow_main_force_push: false
+  enable_required_checks_only_after_verified_on_main: true
+  enforcement_owner_issue: 89
+  exception_fields: [owner, reason, affected_control, approved_scope, timestamp, compensating_validation, follow_up_issue]
+promotion:
+  policy_status: controls_configured_local_handoff_waits_main_and_runtime_qualification
+  workflow: .github/workflows/deploy.yml
+  implementation_issue: 88
+  implementation_evidence: documents/evidence/phase-8/issue-88-deployment-execution.json
+  ci_reusable_call: candidate_packaging_only
+  pr_candidate_qualification: preview_only
+  dispatch_operations: [verify, deploy]
+  dispatch_inputs: [candidate_sha, ci_run_id, candidate_sha256, environment, owner_approval]
+  required_ci_event: push_to_main
+  artifact_and_payload_digest_verification: true
+  environment_preflight_before_association: true
+  environment_settings_created_by_workflow: false
+  runtime_adapter: scripts/deployment/operator.py
+  runtime_activation_implementation: scripts/deployment/runtime.py
+  execution_mode: local_docker_operator
+  github_success_means: approved_handoff_not_runtime_deployment
+  github_runtime_secrets_required: []
+  local_secret_storage: existing_docker_volume_owner_only_json
+  controls_evidence: documents/evidence/phase-8/issue-89-environment-controls.json
+  maintenance_window: registered_dags_paused_and_drained
+  runtime_qualification_owner_issue: 90
+  required_portfolio_path: [local_development, pull_request_ci, main_candidate, dev, release_record]
+  optional_cloud_path: []
+  trigger: workflow_dispatch
+  automatic_after_merge: false
+  candidate_source_branch: main
+  verify_candidate_digest_before_deployment: true
+  preflight_existing_environment_protections: true
+  implicit_environment_creation_is_approval: false
+  full_ci_orchestration_profile_is_offline_validation: false
+  environments:
+    dev:
+      activation: configured_awaiting_main_ci_owner_approval_and_explicit_local_operator
+      activation_repository_variable: FRAUDLENS_DEV_DEPLOY_ENABLED
+      github_runner: ubuntu-24.04
+      local_container: fraudlens
+      managed_root: /home/datalab/runtime/fraudlens/environments/dev
+      environment_variables: [FRAUDLENS_EXECUTION_MODE, FRAUDLENS_DOCKER_CONTAINER, FRAUDLENS_DEPLOY_ROOT, FRAUDLENS_RUNTIME_PYTHON, FRAUDLENS_SOURCE_ROOT]
+      current_code_pointer: managed_root/current
+      runtime: external_data_lab_spark_hive
+      runtime_profile: local
+      approval: recorded_owner_approval
+      runner: standard_public_github_handoff_then_owner_local_docker
+      airflow_metadata: separate_local_sqlite_database
+      required_evidence: [success_run, controlled_failure_recovery, quality_gates, correlated_logs_artifacts_metrics_lineage]
+    test:
+      activation: disabled_by_default
+      runtime: policy_only_no_resources
+      runtime_profile: disabled
+      profile_readiness: no_cloud_provisioning_in_portfolio
+      prerequisites: [dev_qualified_same_candidate, implemented_cloud_path, separate_database_schema_role, environment_protections]
+      approval: independent_authorized_reviewer
+      self_approval_allowed: false
+    prod:
+      activation: disabled_by_default
+      runtime: policy_only_no_resources
+      runtime_profile: disabled
+      profile_readiness: no_cloud_provisioning_in_portfolio
+      prerequisites: [test_qualified_same_candidate, separate_production_identity, migration_restore_plan, environment_protections]
+      approval: independent_authorized_reviewer
+      self_approval_allowed: false
+  credentials:
+    scope: local_docker_dev_runtime_only
+    local_secret_file_mode: "0600"
+    github_runtime_secret_values: none_required_or_uploaded
+    commit_secret_values: false
+    put_secret_values_in_artifacts: false
+  implementation_owner_issues: [88, 89, 90]
+delivery_alignment:
+  parent_issue: 83
+  issue_84_task_count: 4
+  one_commit_per_task: true
+  issue_84_completion_closes_parent: false
+  priority_order: [84, 85, 86, 87, 89, 88, 90, 91]
+  dependencies:
+    85: [84]
+    86: [85]
+    87: [85]
+    89: [84]
+    88: [85, 86, 87, 89]
+    90: [85, 86, 87, 88, 89]
+    91: [90]
+  deployment_dry_run_design_may_parallel_environment_controls: true
+  required_runtime_qualification: dev
+  cloud_runtime_qualification: disabled_no_cloud_provisioning_in_portfolio
+  next_phase: 9
+  final_hardening_phase: 10
+release:
+  policy_status: planned
+  version_pattern: v0.MINOR.PATCH
+  automatic_on_phase_completion: false
+  validated_environment_must_be_named: true
+  immutable_tag_required: true
+  candidate_digest_verification_required: true
+  release_evidence_index_required: true
+  deployment_concurrency: serialize_per_environment
+  cancel_deployment_in_progress: false
+  rollback_data_by_reverting_code: false

@@ -1,0 +1,194 @@
+name: Code Validation
+
+"on":
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  repository-checks:
+    if: ${{ github.event.repository.private == false }}
+    name: Baseline Repository Checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Install baseline validation dependency
+        run: python -m pip install --disable-pip-version-check -r requirements-ci.txt
+
+      - name: Test CI validation and failure propagation
+        run: python -m unittest discover -s tests/ci -p 'test_*.py' -v
+
+      - name: Validate tracked repository files
+        run: python scripts/ci/validate_repository.py --report .ci-artifacts/repository-checks.json
+
+      - name: Validate governed contracts and tracked documentation links
+        run: python -m scripts.ci.validate_standards
+
+      - name: Validate local-only portfolio cost and workflow boundaries
+        run: python -m scripts.deployment.environment_audit
+
+      - name: Preserve portfolio policy report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: portfolio-policy-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-artifacts/portfolio-policy.json
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Preserve baseline validation report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: baseline-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-artifacts/repository-checks.json
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Preserve sanitized repository standards report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: repository-standards-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-artifacts/repository-standards.json
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
+
+  dbt-validation:
+    if: ${{ github.event.repository.private == false }}
+    name: dbt Validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Install Hive adapter system dependencies
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y krb5-user libkrb5-dev
+
+      - name: Install pinned dbt dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements-dbt-ci.txt
+          python -m pip check
+          dbt --version
+          python -c "import dbt.adapters.hive; print('Hive adapter import succeeded')"
+
+      - name: Parse the complete dbt project without a warehouse
+        run: python scripts/ci/validate_dbt.py --stage parse
+
+      - name: Validate test selection, naming, governance, contracts, policy and docs
+        run: python scripts/ci/validate_dbt.py --stage validate
+
+      - name: Preserve sanitized dbt validation report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dbt-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-artifacts/dbt-validation.json
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
+
+  python-validation:
+    if: ${{ github.event.repository.private == false }}
+    name: Python Validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Install pinned Python validation dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements-python-ci.txt
+          python -m pip check
+          python --version
+          python -m pytest --version
+          python -m ruff --version
+
+      - name: Lint tracked Python scripts for correctness
+        run: python -m scripts.ci.validate_python --stage lint
+
+      - name: Validate generator and helpers in a clean source snapshot
+        run: python -m scripts.ci.validate_python --stage tests
+
+      - name: Preserve sanitized Python validation report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: python-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-artifacts/python-validation.json
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
+
+  deployment-validation:
+    if: ${{ github.event.repository.private == false }}
+    name: Deployment Validation
+    needs: [repository-checks, dbt-validation, python-validation]
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ci_bundle: true
+
+  ci-summary:
+    name: CI Summary
+    needs: [repository-checks, dbt-validation, python-validation, deployment-validation]
+    if: ${{ always() && github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Require successful validation gates
+        env:
+          BASELINE_RESULT: ${{ needs.repository-checks.result }}
+          DBT_RESULT: ${{ needs.dbt-validation.result }}
+          PYTHON_RESULT: ${{ needs.python-validation.result }}
+          DEPLOYMENT_RESULT: ${{ needs.deployment-validation.result }}
+        run: >-
+          python -c 'import os, sys; results = {name: os.environ.get(key, "") for name, key in [("Baseline Repository Checks", "BASELINE_RESULT"), ("dbt Validation", "DBT_RESULT"), ("Python Validation", "PYTHON_RESULT"), ("Deployment Validation", "DEPLOYMENT_RESULT")]}; [print(name + ": " + (result or "missing")) for name, result in results.items()]; sys.exit(0 if all(result == "success" for result in results.values()) else 1)'

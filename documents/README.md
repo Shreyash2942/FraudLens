@@ -37,6 +37,7 @@ Future phases `8` through `10` do not yet have their final consolidated handoff 
 - `data-quality-governance.md` consolidated Phase 5 document (issues `#57`-`#64`, controls, validation, readiness, and handoff)
 - `orchestration-airflow.md` consolidated Phase 6 branch handoff for `orchestration-airflow`, including architecture, operations, MongoDB artifact persistence, validation status, and commit ledger
 - `phase-7-observability-lineage.md` Phase 7 handoff for metrics, dashboards, logs, OpenLineage, Marquez, and validation evidence
+- [`cicd-strategy-release-model.md`](cicd-strategy-release-model.md) issue #84 design for CI goals, merge rules, environment promotion, and Phase 8 delivery priorities
 
 ## Supporting Airflow Reference Set
 
@@ -55,5 +56,6 @@ These remain available as detailed supporting references behind `orchestration-a
 
 - `phase-6-plan/` detailed per-sub-issue planning workspace for Phase 6 implementation
 - `phase-7-plan/` detailed per-sub-issue planning workspace for Phase 7 observability and lineage implementation
+- [`phase-8-plan/`](phase-8-plan/README.md) Phase 8 CI/CD strategy, workstream dependencies, and implementation handoff
 
 Legacy `.docx` files are retained as reference sources only. Active planning and design content should be maintained in Markdown and YAML.
