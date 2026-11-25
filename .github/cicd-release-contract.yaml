@@ -41,7 +41,10 @@ validation:
   clean_workspace_required: true
   current_implementation:
     issues: [85, 86, 87, 88, 89]
-    status: verified_on_phase_branch
+    status: merged_main_ci_verified_runtime_qualification_pending
+    main_merge_sha: 908011163499d5d1e75f2076dc5a57651dfd3c92
+    main_push_validation_run: 45545800298
+    operations_guide: documents/cicd-workflows-release-process.md
     workflow: .github/workflows/ci.yml
     workflow_name: Code Validation
     implemented_gates: [repository_baseline, repository_standards, dbt_validation, python_validation, candidate_packaging]
@@ -82,7 +85,9 @@ candidate:
     - operator_owner
   include_secrets_or_generated_banking_data: false
 branches:
-  policy_status: protected_pr_controls_configured_summary_pending_actual_main_ci
+  policy_status: protected_pr_controls_and_strict_ci_summary_enforced
+  required_check_app_id: 15368
+  required_check_sealed_date: "2026-11-24"
   configured_by_issue: 89
   admins_enforced: true
   approving_review_count_for_sole_maintainer: 0
@@ -105,7 +110,7 @@ branches:
   enforcement_owner_issue: 89
   exception_fields: [owner, reason, affected_control, approved_scope, timestamp, compensating_validation, follow_up_issue]
 promotion:
-  policy_status: controls_configured_local_handoff_waits_main_and_runtime_qualification
+  policy_status: controls_configured_awaiting_approved_handoff_and_runtime_qualification
   workflow: .github/workflows/deploy.yml
   implementation_issue: 88
   implementation_evidence: documents/evidence/phase-8/issue-88-deployment-execution.json
@@ -137,7 +142,7 @@ promotion:
   full_ci_orchestration_profile_is_offline_validation: false
   environments:
     dev:
-      activation: configured_awaiting_main_ci_owner_approval_and_explicit_local_operator
+      activation: configured_awaiting_owner_approval_and_explicit_local_operator
       activation_repository_variable: FRAUDLENS_DEV_DEPLOY_ENABLED
       github_runner: ubuntu-24.04
       local_container: fraudlens

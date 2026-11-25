@@ -119,3 +119,40 @@ Release publication is a manual governed process; there is no automatic release 
 Before proposing a tag, preserve an evidence index with PR/commit SHA, main CI run/attempt, tar and ZIP digests, gate/dependency reports, environment/configuration fingerprint, owner acceptance/approval, deployment handoff identity and actual local activation/pipeline/service/quality outcomes. Record limitations and recovery compatibility. Include neither secret values nor generated banking datasets. Preserve required evidence within the 30-day artifact window in the approved evidence store.
 
 After the owner accepts that evidence and release scope, create an annotated immutable version tag at the exact qualified SHA, push it, and prepare a GitHub **draft** release using that existing tag (`gh release create <tag> --verify-tag --draft --notes-file <evidence-notes-file>`). Review the named dev environment, evidence links and limitations before separately publishing. Never move/reuse a published tag or label local Spark/Hive evidence as a Snowflake production qualification. These are future operator instructions, not actions executed by this documentation task.
+
+## Environments and private configuration
+
+The [portfolio environment contract](../.github/portfolio-environments.json) fixes `local_only_no_new_paid_resources` and `local_docker_operator`. Reuse the existing Data-Lab `fraudlens` container and persistent runtime volume; provision no paid cloud accounts, Snowflake compute, new containers, larger runners or public self-hosted runner. Test/prod names demonstrate governed controls, not three physical stacks.
+
+| Environment | Runtime | GitHub protection |
+| --- | --- | --- |
+| `dev` | Existing local Docker, local Spark/Hive, isolated Airflow SQLite/SequentialExecutor metadata. | Only branch main; owner reviewer required, admin bypass disabled. Sole-owner self-review is permitted and explicitly identified as owner acceptance. |
+| `test` | Disabled policy definition; no runtime paths, compute or credentials. | Only `portfolio-test-disabled` allowlist; no self-review, no admin bypass; workflow rejects target. |
+| `prod` | Disabled policy definition; no runtime paths, compute or credentials. | Only `portfolio-prod-disabled` allowlist; no self-review, no admin bypass; workflow rejects target. |
+
+The disabled allowlist strings do not create branches. Main also has required PR/conversation/CI controls. Default workflow tokens are read-only and cannot approve PR reviews; every external-contributor fork workflow requires owner approval. Public standard-runner guards are part of this portfolio's cost model; the scripts do not change billing settings or provision a cloud provider.
+
+| Scope | Non-sensitive variables |
+| --- | --- |
+| Repository | `FRAUDLENS_COST_PROFILE=local_only_no_new_paid_resources`; `FRAUDLENS_DEV_DEPLOY_ENABLED=true` enables approved handoffs, not automatic Docker execution. |
+| Dev policy | `FRAUDLENS_ENVIRONMENT=dev`, `FRAUDLENS_CLOUD_RESOURCES_ENABLED=false`, `FRAUDLENS_EXECUTION_MODE=local_docker_operator`. |
+| Dev paths | `FRAUDLENS_DOCKER_CONTAINER=fraudlens`; `FRAUDLENS_DEPLOY_ROOT=/home/datalab/runtime/fraudlens/environments/dev`; `FRAUDLENS_RUNTIME_PYTHON=/usr/bin/python3`; `FRAUDLENS_SOURCE_ROOT=/home/datalab/fraudlens`. |
+| Test/prod | Their environment identity; cloud false, execution mode disabled, `FRAUDLENS_DEPLOY_ENABLED=false`; no physical runtime configuration. |
+
+GitHub requires **zero runtime secrets**. Its automatic read-only token accesses GitHub metadata/artifacts; it never supplies MongoDB/MinIO credentials to the runtime. Keep `FRAUDLENS_MONGODB_URI`, `DATALAB_MINIO_ACCESS_KEY` and `DATALAB_MINIO_SECRET_KEY` only in `<root>/secrets/runtime.json`, with a mode-`0700` managed root and mode-`0600` JSON owned by local `datalab`. The explicit allowlist includes local service endpoints and isolated Airflow settings; endpoint hosts must remain in the local sandbox. Use a separate Airflow database at `<root>/airflow/airflow.db`, not the legacy Data-Lab metadata store.
+
+The regular marker `<root>/.fraudlens-runtime.json` must identify schema version 1, repository `Shreyash2942/FraudLens`, environment dev and profile local. Current DAGs use `<root>/current/airflow/dags`. Initial setup registered four paused DAG rows but activated no source or scheduler. Existing credentials are reused for this local portfolio; production account isolation or credential rotation is not claimed.
+
+The following commands review GitHub setting plans without applying them:
+
+```text
+python -m scripts.deployment.environments --section definitions
+python -m scripts.deployment.environments --section variables --enable-dev-handoff
+python -m scripts.deployment.environments --section protections
+```
+
+Only append `--apply` after owner review of the intended section. Keep `--enable-dev-handoff` when intentionally enabling handoffs: variables applied without that option set the activation flag false. For a fresh local setup, inspect [the provisioning utility](../scripts/deployment/local_configuration.py) before running `python -m scripts.deployment.local_configuration`; it reads existing private local settings and initializes only the designated dev metadata/configuration store. Do not run setup as a routine deployment step or overwrite existing private settings to clear a failed gate.
+
+Strict main status enforcement is **already applied**, verified after main run 45545800298. If restoring settings later, `python -m scripts.deployment.environments --section protections --seal-main --apply` first requires successful CI on actual current main and validates the Actions check identity. Feature-only evidence cannot seal main. Public variable changes after approval require a new configuration fingerprint/handoff. Rotate private credentials locally, preserve permissions and recheck authenticated service access; never publish values or hashes of secret values.
+
+Ignore local `.env`, generator runtime configuration, `.ci-artifacts/` and generated batches. Preserve only sanitized report fields and credential **names** in public evidence. Avoid copying full environment dumps, connection exceptions, private configuration or service logs into GitHub issues/artifacts.

@@ -1,5 +1,7 @@
 # Issue #90: end-to-end CI/CD qualification
 
+Historical pre-merge qualification record. The owner subsequently merged PR #122, closed #83/#90, and main-push CI passed with strict required `CI Summary` enforcement enabled. Runtime activation/pipeline/failure-recovery proof is still not established. See the [current CI/CD handoff](../cicd-workflows-release-process.md); pending merge/issue-state statements below describe this record's original date.
+
 Issue: [#90](https://github.com/Shreyash2942/FraudLens/issues/90). Parent: [#83](https://github.com/Shreyash2942/FraudLens/issues/83).
 
 Validation started November 23, 2026 (America/New_York).
