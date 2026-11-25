@@ -20,7 +20,7 @@ The external runtime source:
 
 - Snowflake remains the intended analytical and portfolio target platform.
 - Spark and Hive in Data-Lab are used as local, cost-saving stand-ins for development, prototyping, and selected test flows.
-- Only the necessary subset of work needs to run against real Snowflake for credibility and final validation.
+- No Snowflake account or paid compute is required for this portfolio; qualification claims name the local Spark/Hive environment actually validated.
 - The local sandbox is a practical developer environment, not a claim of production deployment topology.
 
 ## Design Principles
@@ -54,9 +54,14 @@ Start with these documents:
 6. `specs/README.md`
 7. `standards/README.md`
 8. `documents/phase-7-observability-lineage.md`
+9. [CI/CD workflows and release process](documents/cicd-workflows-release-process.md)
 
 ## Current Status
 
 Phase 0 is implemented as a repo baseline. Phase 1 is implemented as an external-runtime integration layer with documentation, service contracts, and local configuration examples. Phase 2 adds a deterministic synthetic dataset generator with mixed and blueprint-curated batch modes, seeded Faker-backed realism, 21 governed CSV datasets, batch-style landing/control/quality outputs, validation reporting, organization-aware dashboard controls, and optional MinIO upload for local data-foundation work.
 
-Phases 3–6 add warehouse loading, dbt transformations, quality/governance, and Airflow orchestration. Phase 7 delivers monitoring, dashboards, structured logs, and OpenLineage/Marquez integration. See [the Phase 7 handoff](documents/phase-7-observability-lineage.md) for validation evidence and local-runtime boundaries. Phase 8 covers CI/CD.
+Phases 3–6 add warehouse loading, dbt transformations, quality/governance, and Airflow orchestration. Phase 7 delivers monitoring, dashboards, structured logs, and OpenLineage/Marquez integration. See [the Phase 7 handoff](documents/phase-7-observability-lineage.md) for validation evidence and local-runtime boundaries.
+
+Phase 8 CI/CD implementation is merged into `main`: required repository/dbt/Python/packaging gates, strict `CI Summary` merge protection and a protected owner-to-local-Docker deployment handoff. The [CI/CD operator guide](documents/cicd-workflows-release-process.md) explains triggers, local checks, approvals, secrets, recovery and release evidence. GitHub handoff success is separate from local runtime activation; full deployment/pipeline qualification has not been demonstrated. Dev reuses the existing Docker sandbox; test/prod remain disabled policy definitions with no paid infrastructure.
+
+Phase 9, **Analytics & Dashboard**, starts from branch `92-phase-9-analytics-dashboard` after the validated Phase 8 merge. Issue #91 supplies the documentation follow-up on a separate branch so Phase 9 work remains independent.

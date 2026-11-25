@@ -156,3 +156,18 @@ Only append `--apply` after owner review of the intended section. Keep `--enable
 Strict main status enforcement is **already applied**, verified after main run 45545800298. If restoring settings later, `python -m scripts.deployment.environments --section protections --seal-main --apply` first requires successful CI on actual current main and validates the Actions check identity. Feature-only evidence cannot seal main. Public variable changes after approval require a new configuration fingerprint/handoff. Rotate private credentials locally, preserve permissions and recheck authenticated service access; never publish values or hashes of secret values.
 
 Ignore local `.env`, generator runtime configuration, `.ci-artifacts/` and generated batches. Preserve only sanitized report fields and credential **names** in public evidence. Avoid copying full environment dumps, connection exceptions, private configuration or service logs into GitHub issues/artifacts.
+
+## Delivery checklist and evidence map
+
+| Area | Evidence and acceptance |
+| --- | --- |
+| Baseline/dbt/Python validation | [#85 guide](phase-8-plan/issue-85-code-validation.md), [#86 guide](phase-8-plan/issue-86-dbt-validation.md), [#87 guide](phase-8-plan/issue-87-python-standards.md); dated run IDs, sanitized machine reports and deliberate failure propagation. |
+| Immutable candidates | [#88 evidence](evidence/phase-8/issue-88-deployment-execution.json); preview integrity and promotion refusal. The original runner section is historical. |
+| Environment controls | [#89 evidence](evidence/phase-8/issue-89-environment-controls.json); actual settings/private-permission/readiness audits and unsafe-cloud configuration rejection. Its pending status-seal field describes the earlier date. |
+| PR pass/fail and local preflight | [#90 pre-merge evidence](evidence/phase-8/issue-90-premerge-validation.json); actual PR success/F821 failure, preview verification, actual operator refusal and read-only readiness. TCP checks are not pipeline semantics. |
+| Merged main and strict gate | [Run 45545800298](https://github.com/Shreyash2942/FraudLens/actions/runs/45545800298), main `9080111`; baseline/dbt/Python/package/summary passed. Required strict `CI Summary`, app ID 15368, read back through GitHub API. |
+| Remaining runtime/release evidence | Real owner-approved main handoff, local activation, fresh service/quality/pipeline success and controlled failure/recovery are not certified. No release/tag publication or production/Snowflake qualification is claimed. |
+
+Issue #91 follows four task commits: CI purpose/triggers `dcdfd17`; deployment/release flow `af4f8f6`; environment/secrets handling `e4b4206`; README/index/current delivery updates in the containing fourth commit. Changes are documentation and policy status only; runtime/workflow implementation and secret values are excluded.
+
+For a documentation contribution, stage new files, run repository/Markdown/contract validation, review commands against actual workflow inputs/CLI options, and require the PR's full `CI Summary`. This does not require executing deployment instructions, applying environment settings or publishing a release. Keep issue links/evidence dates current and distinguish verified behavior from future operational steps.

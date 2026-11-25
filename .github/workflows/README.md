@@ -28,7 +28,7 @@ These workflows are merged into main through PR #122. Required `CI Summary` enfo
   - #89 replaces the initial self-hosted-runner path with an approved hosted handoff and an explicit owner-operated local Docker adapter; no public workflow runs on the developer's container
   - private service settings remain in an owner-only file on the existing Docker volume; GitHub requires no runtime secrets
   - local activation retains the managed source/import/maintenance/pointer checks; it neither starts a pipeline nor rolls back data
-  - activation waits for merged main CI, owner environment approval and the explicit local operator command; #90 supplies real runtime qualification
+  - main CI is verified; activation still requires owner environment approval and the explicit local operator command; real runtime/pipeline qualification is not yet certified
   - see [issue #88 workflow and activation guide](../../documents/phase-8-plan/issue-88-deployment-workflow.md)
 
 ## Workflow Design Rules
