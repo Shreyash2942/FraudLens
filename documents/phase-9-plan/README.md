@@ -4,6 +4,8 @@ Parent: [#92](https://github.com/Shreyash2942/FraudLens/issues/92). Branch: `92-
 
 Start with [analytics use cases and dashboard scope](../../analytics/use-cases-dashboard-scope.md), the issue #93 design. The owner requires a no-spend portfolio: reuse local Docker Spark/Hive Gold and synthetic data. Snowflake is an architectural target, not a provisioned or qualified BI source. Do not mark the original Snowflake wording complete based on a local demo.
 
+The [Gold mapping](../../analytics/gold-model-mapping.md) records actual dbt aliases/grains and known definition/filter/currency gaps. In particular, current KPI schema descriptions and rate guardrails require reconciliation with SQL before affected panels can be published.
+
 | Order | Issue | Delivery |
 | --- | --- | --- |
 | P0 | #93 | Audience, reporting questions, scope/controls and source-model mapping; four task commits. |

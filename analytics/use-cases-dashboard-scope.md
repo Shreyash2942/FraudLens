@@ -57,3 +57,5 @@ Exclude production decisions, case/alert write-back, PII/customer-identity brows
 - #100: document connection/configuration, source mapping, refresh/provenance, dashboard navigation, screenshots/demo and all remaining limitations. Secrets stay local; reports/exports must contain only approved synthetic content.
 
 Issue #93 is a design deliverable. Its completion does not complete #94–#100, prove materialized Gold availability, implement a BI connection or validate dashboard numbers. Phase 8 CI passing and closed issue states do not establish those runtime outcomes. PR #129 remains the separate pending Phase 8 documentation follow-up.
+
+The [Gold source and metric mapping](gold-model-mapping.md) traces every question to existing nodes, aliases, fields, safe dimension routes and publication gates. Four task commits cover audiences (`67c2fb8`), priority questions (`cdee1ed`), scope/delivery (`611a343`) and that mapping (the containing fourth commit). Validation is source/document consistency and PR CI; live BI, currency reconciliation and runtime evidence belong to the downstream issues.
